@@ -28,6 +28,8 @@ import (
 )
 
 var (
+	// Version is an application version.
+	// TODO Set it during the build.
 	Version = "2.0.0-dev"
 )
 
