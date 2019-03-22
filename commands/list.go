@@ -17,20 +17,33 @@
 package commands
 
 import (
-	"github.com/percona/pmm/api/inventory/json/client"
+	"github.com/percona/pmm/api/inventory/json/client/agents"
+	"github.com/percona/pmm/api/inventory/json/client/nodes"
+	"github.com/percona/pmm/api/inventory/json/client/services"
 )
 
-// FIXME Expand this interface to cover our use cases:
-// * Normal results output
-// * Live progress output
-// * JSON output (do we need it?)
-
-// Command is a common interface for all commands.
-type Command interface {
-	Run()
+type ListResult struct {
+	Nodes    []nodes.ListNodesOKBody
+	Services []services.ListServicesOKBody
+	Agents   []agents.ListAgentsOKBody
 }
 
-// CommonParams contains common parameters for all commands.
-type CommonParams struct {
-	Client *client.PMMServerInventory
+func (r *ListResult) result() {}
+
+func (r *ListResult) String() string {
+	return ""
 }
+
+type ListCmd struct {
+	CommonParams
+}
+
+func (cmd *ListCmd) Run() Result {
+	return &ListResult{}
+}
+
+// check interfaces
+var (
+	_ Result = (*ListResult)(nil)
+	_ Cmd    = (*ListCmd)(nil)
+)
