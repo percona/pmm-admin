@@ -19,6 +19,7 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -26,42 +27,65 @@ import (
 	"os/signal"
 
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/percona/pmm/api/inventory/json/client"
+	inventory "github.com/percona/pmm/api/inventory/json/client"
+	management "github.com/percona/pmm/api/managementpb/json/client"
+	"github.com/percona/pmm/api/managementpb/json/client/node"
+	server "github.com/percona/pmm/api/serverpb/json/client"
 	"github.com/percona/pmm/version"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
 	"gopkg.in/alecthomas/kingpin.v2"
 
+	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
 )
 
+var (
+	nodeTypes = map[string]string{
+		"generic": node.RegisterBodyNodeTypeGENERICNODE,
+	}
+	nodeTypeKeys = []string{"generic"}
+)
+
 func main() {
-	app := kingpin.New("pmm-agent", fmt.Sprintf("Version %s.", version.Version))
+	hostname, _ := os.Hostname()
+
+	app := kingpin.New("pmm-admin", fmt.Sprintf("Version %s.", version.Version))
 	app.HelpFlag.Short('h')
 	app.Version(version.FullInfo())
-	pmmServerAddressF := app.Flag("server-url", "PMM Server URL.").Required().String()
+	serverURLF := app.Flag("server-url", "PMM Server URL.").String()
+	serverInsecureTLSF := app.Flag("server-insecure-tls", "").Bool()
 	debugF := app.Flag("debug", "Enable debug logging.").Bool()
 	traceF := app.Flag("trace", "Enable trace logging (implies debug).").Bool()
-	kingpin.MustParse(app.Parse(os.Args[1:]))
+	jsonF := app.Flag("json", "Enable JSON output.").Bool()
 
+	inventoryC := app.Command("inventory", "Inventory subcommands.")
+	invAddC := inventoryC.Command("add", "Add subcommands.")
+	_ = invAddC.Command("node", "Add Node.")
+	_ = invAddC.Command("service", "Add Service.")
+	_ = invAddC.Command("agent", "Add Agent.")
+	invRemoveC := inventoryC.Command("remove", "Remove subcommands.")
+	_ = invRemoveC.Command("node", "Remove Node.")
+	_ = invRemoveC.Command("service", "Remove Service.")
+	_ = invRemoveC.Command("agent", "Remove Agent.")
+
+	_ = app.Command("status", "Show PMM Server and local pmm-agent status.")
+
+	registerC := app.Command("register", "Register current Node at PMM Server.")
+	registerNodeTypeF := registerC.Flag("node-type", "Node type.").Default(nodeTypeKeys[0]).Enum(nodeTypeKeys...)
+	registerNodeNameF := registerC.Flag("node-name", "Node name.").Default(hostname).String()
+
+	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
+
+	logrus.SetFormatter(&logrus.TextFormatter{
+		DisableTimestamp: true,
+	})
 	if *debugF {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 	if *traceF {
 		logrus.SetLevel(logrus.TraceLevel)
 		logrus.SetReportCaller(true)
-	}
-
-	u, err := url.Parse(*pmmServerAddressF)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	logrus.Debugf("PMM Server URL: %#v.", u)
-	if u.Path == "" {
-		u.Path = "/"
-	}
-	if u.Host == "" || u.Scheme == "" {
-		logrus.Fatal("Invalid PMM Server URL.")
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -76,18 +100,94 @@ func main() {
 		cancel()
 	}()
 
-	// use JSON APIs over HTTP/1.1
-	transport := httptransport.New(u.Host, u.Path, []string{u.Scheme})
-	transport.SetLogger(logrus.WithField("component", "client"))
-	transport.Context = ctx
-	transport.Debug = *debugF || *traceF
-	// disable HTTP/2
-	transport.Transport.(*http.Transport).TLSNextProto = map[string]func(string, *tls.Conn) http.RoundTripper{}
-	client.Default = client.New(transport, nil)
+	agentlocal.SetTransport(ctx, *debugF || *traceF)
 
-	cmd := commands.AddMySQLCmd{
-		Username: "username",
-		Password: "password",
+	var serverURL *url.URL
+	var serverInsecureTLS bool
+	if *serverURLF == "" {
+		status, err := agentlocal.GetStatus()
+		if err != nil {
+			logrus.Fatal(err)
+		}
+		serverURL = status.ServerURL
+		serverInsecureTLS = status.ServerInsecureTLS
+	} else {
+		var err error
+		serverURL, err = url.Parse(*serverURLF)
+		if err != nil {
+			logrus.Fatal(err)
+		}
+		if serverURL.Path == "" {
+			serverURL.Path = "/"
+		}
+		if serverURL.Host == "" || serverURL.Scheme == "" {
+			logrus.Fatal("Invalid PMM Server URL.")
+		}
+		serverInsecureTLS = *serverInsecureTLSF
 	}
-	cmd.Run()
+
+	// use JSON APIs over HTTP/1.1
+	transport := httptransport.New(serverURL.Host, serverURL.Path, []string{serverURL.Scheme})
+	transport.SetLogger(logrus.WithField("component", "server-transport"))
+	transport.SetDebug(*debugF || *traceF)
+	transport.Context = ctx
+	httpTransport := transport.Transport.(*http.Transport)
+	httpTransport.TLSNextProto = map[string]func(string, *tls.Conn) http.RoundTripper{} // disable HTTP/2
+	if serverInsecureTLS {
+		httpTransport.TLSClientConfig.InsecureSkipVerify = true
+	}
+
+	inventory.Default.SetTransport(transport)
+	management.Default.SetTransport(transport)
+	server.Default.SetTransport(transport)
+
+	var command commands.Command
+	switch cmd {
+	case registerC.FullCommand():
+		command = &commands.Register{
+			NodeType: nodeTypes[*registerNodeTypeF],
+			NodeName: *registerNodeNameF,
+		}
+	default:
+		logrus.Fatalf("Unexpected command %q.", cmd)
+	}
+
+	res, err := command.Run()
+	logrus.Debugf("%#v", res)
+	logrus.Debugf("%#v", err)
+
+	if err == nil {
+		if *jsonF {
+			b, err := json.Marshal(res)
+			if err != nil {
+				logrus.Fatal(err)
+			}
+			fmt.Printf("%s\n", b)
+		} else {
+			fmt.Println(res.String())
+		}
+
+		return
+	}
+
+	switch err := err.(type) {
+	case commands.ErrorResponse:
+		e := commands.GetError(err)
+
+		if *jsonF {
+			b, err := json.Marshal(e)
+			if err != nil {
+				logrus.Fatal(err)
+			}
+			fmt.Printf("%s\n", b)
+		} else {
+			fmt.Println(e.Error)
+		}
+
+		os.Exit(1)
+
+	default:
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

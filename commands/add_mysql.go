@@ -19,17 +19,17 @@ package commands
 import (
 	"github.com/percona/pmm/api/inventory/json/client"
 	"github.com/percona/pmm/api/inventory/json/client/agents"
+	"github.com/sirupsen/logrus"
 )
 
-// AddMySQLCmd implements `pmm-admin add mysql` command.
-type AddMySQLCmd struct {
-	CommonParams
+// AddMySQL implements `pmm-admin add mysql` command.
+type AddMySQL struct {
 	Username string
 	Password string
 }
 
 // Run implements Command interface.
-func (cmd *AddMySQLCmd) Run() Result {
+func (cmd *AddMySQL) Run() (Result, error) {
 	// TODO get NodeID from local pmm-agent
 
 	// TODO get or create MySQL service for this Node via pmm-managed
@@ -41,17 +41,17 @@ func (cmd *AddMySQLCmd) Run() Result {
 			Username: cmd.Username,
 			Password: cmd.Password,
 		},
+		Context: Ctx,
 	}
 	resp, err := client.Default.Agents.AddMySqldExporter(params)
 	if err != nil {
-		cmd.Logger.Error(err)
-		return nil
+		return nil, err
 	}
-	cmd.Logger.Infof("mysqld_exporter started on %d.", resp.Payload.MysqldExporter.ListenPort)
-	return nil
+	logrus.Infof("mysqld_exporter started on %d.", resp.Payload.MysqldExporter.ListenPort)
+	return nil, nil
 }
 
 // check interfaces
 var (
-	_ Cmd = (*AddMySQLCmd)(nil)
+	_ Command = (*AddMySQL)(nil)
 )

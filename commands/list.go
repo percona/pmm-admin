@@ -17,33 +17,49 @@
 package commands
 
 import (
+	"github.com/percona/pmm/api/inventory/json/client"
 	"github.com/percona/pmm/api/inventory/json/client/agents"
 	"github.com/percona/pmm/api/inventory/json/client/nodes"
 	"github.com/percona/pmm/api/inventory/json/client/services"
 )
 
 type ListResult struct {
-	Nodes    []nodes.ListNodesOKBody
-	Services []services.ListServicesOKBody
-	Agents   []agents.ListAgentsOKBody
+	Nodes    *nodes.ListNodesOKBody
+	Services *services.ListServicesOKBody
+	Agents   *agents.ListAgentsOKBody
 }
 
-func (r *ListResult) result() {}
+func (res *ListResult) result() {}
 
-func (r *ListResult) String() string {
+func (res *ListResult) String() string {
 	return ""
 }
 
-type ListCmd struct {
-	CommonParams
+type List struct {
 }
 
-func (cmd *ListCmd) Run() Result {
-	return &ListResult{}
+func (cmd *List) Run() (Result, error) {
+	nodes, err := client.Default.Nodes.ListNodes(nil)
+	if err != nil {
+		return nil, err
+	}
+	services, err := client.Default.Services.ListServices(nil)
+	if err != nil {
+		return nil, err
+	}
+	agents, err := client.Default.Agents.ListAgents(nil)
+	if err != nil {
+		return nil, err
+	}
+	return &ListResult{
+		Nodes:    nodes.Payload,
+		Services: services.Payload,
+		Agents:   agents.Payload,
+	}, nil
 }
 
 // check interfaces
 var (
-	_ Result = (*ListResult)(nil)
-	_ Cmd    = (*ListCmd)(nil)
+	_ Result  = (*ListResult)(nil)
+	_ Command = (*List)(nil)
 )

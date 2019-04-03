@@ -17,29 +17,45 @@
 package commands
 
 import (
+	"context"
 	"fmt"
-
-	"github.com/percona/pmm/api/inventory/json/client"
-	"github.com/sirupsen/logrus"
+	"reflect"
 )
+
+var Ctx = context.Background()
 
 // FIXME Expand this interface to cover our use cases:
 // * Normal results output
-// * Live progress output
-// * JSON output (do we need it?)
+// * Live logging / progress output
+// * JSON output
+// * Exit codes
 
 type Result interface {
 	result()
 	fmt.Stringer
 }
 
-// Cmd is a common interface for all commands.
-type Cmd interface {
-	Run() Result
+// Command is a common interface for all commands.
+type Command interface {
+	Run() (Result, error)
 }
 
-// CommonParams contains common parameters for all commands.
-type CommonParams struct {
-	Client *client.PMMServerInventory
-	Logger *logrus.Entry
+type ErrorResponse interface {
+	error
+	Code() int
+}
+
+type Error struct {
+	Code  int
+	Error string
+}
+
+func GetError(err ErrorResponse) Error {
+	v := reflect.ValueOf(err)
+	p := v.Elem().FieldByName("Payload")
+	e := p.Elem().FieldByName("Error")
+	return Error{
+		Code:  err.Code(),
+		Error: e.String(),
+	}
 }
