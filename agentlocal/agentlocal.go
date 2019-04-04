@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+// Package agentlocal provides facilities for accessing local pmm-agent API.
 package agentlocal
 
 import (
@@ -27,6 +28,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// SetTransport configures transport for accessing local pmm-agent API.
 func SetTransport(ctx context.Context, debug bool) {
 	// use JSON APIs over HTTP/1.1
 	transport := httptransport.New("127.0.0.1:7777", "/", []string{"http"})
@@ -39,6 +41,7 @@ func SetTransport(ctx context.Context, debug bool) {
 	agentlocal.Default.SetTransport(transport)
 }
 
+// Status represents pmm-agent status.
 type Status struct {
 	AgentID string
 	NodeID  string
@@ -47,6 +50,7 @@ type Status struct {
 	ServerInsecureTLS bool
 }
 
+// GetStatus returns local pmm-agent status.
 func GetStatus() (*Status, error) {
 	res, err := agentlocal.Default.AgentLocal.Status(nil)
 	if err != nil {

@@ -27,10 +27,9 @@ import (
 	"os/signal"
 
 	httptransport "github.com/go-openapi/runtime/client"
-	inventory "github.com/percona/pmm/api/inventory/json/client"
-	management "github.com/percona/pmm/api/managementpb/json/client"
-	"github.com/percona/pmm/api/managementpb/json/client/node"
-	server "github.com/percona/pmm/api/serverpb/json/client"
+	inventorypb "github.com/percona/pmm/api/inventory/json/client"
+	managementpb "github.com/percona/pmm/api/managementpb/json/client"
+	serverpb "github.com/percona/pmm/api/serverpb/json/client"
 	"github.com/percona/pmm/version"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
@@ -38,44 +37,22 @@ import (
 
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
-)
-
-var (
-	nodeTypes = map[string]string{
-		"generic": node.RegisterBodyNodeTypeGENERICNODE,
-	}
-	nodeTypeKeys = []string{"generic"}
+	"github.com/percona/pmm-admin/commands/management"
 )
 
 func main() {
-	hostname, _ := os.Hostname()
+	kingpin.CommandLine.Name = "pmm-admin"
+	kingpin.CommandLine.Help = fmt.Sprintf("Version %s.", version.Version)
+	kingpin.CommandLine.HelpFlag.Short('h')
+	kingpin.CommandLine.Version(version.FullInfo())
 
-	app := kingpin.New("pmm-admin", fmt.Sprintf("Version %s.", version.Version))
-	app.HelpFlag.Short('h')
-	app.Version(version.FullInfo())
-	serverURLF := app.Flag("server-url", "PMM Server URL.").String()
-	serverInsecureTLSF := app.Flag("server-insecure-tls", "").Bool()
-	debugF := app.Flag("debug", "Enable debug logging.").Bool()
-	traceF := app.Flag("trace", "Enable trace logging (implies debug).").Bool()
-	jsonF := app.Flag("json", "Enable JSON output.").Bool()
+	serverURLF := kingpin.Flag("server-url", "PMM Server URL.").String()
+	serverInsecureTLSF := kingpin.Flag("server-insecure-tls", "").Bool()
+	debugF := kingpin.Flag("debug", "Enable debug logging.").Bool()
+	traceF := kingpin.Flag("trace", "Enable trace logging (implies debug).").Bool()
+	jsonF := kingpin.Flag("json", "Enable JSON output.").Bool()
 
-	inventoryC := app.Command("inventory", "Inventory subcommands.")
-	invAddC := inventoryC.Command("add", "Add subcommands.")
-	_ = invAddC.Command("node", "Add Node.")
-	_ = invAddC.Command("service", "Add Service.")
-	_ = invAddC.Command("agent", "Add Agent.")
-	invRemoveC := inventoryC.Command("remove", "Remove subcommands.")
-	_ = invRemoveC.Command("node", "Remove Node.")
-	_ = invRemoveC.Command("service", "Remove Service.")
-	_ = invRemoveC.Command("agent", "Remove Agent.")
-
-	_ = app.Command("status", "Show PMM Server and local pmm-agent status.")
-
-	registerC := app.Command("register", "Register current Node at PMM Server.")
-	registerNodeTypeF := registerC.Flag("node-type", "Node type.").Default(nodeTypeKeys[0]).Enum(nodeTypeKeys...)
-	registerNodeNameF := registerC.Flag("node-name", "Node name.").Default(hostname).String()
-
-	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
+	cmd := kingpin.Parse()
 
 	logrus.SetFormatter(&logrus.TextFormatter{
 		DisableTimestamp: true,
@@ -137,24 +114,28 @@ func main() {
 		httpTransport.TLSClientConfig.InsecureSkipVerify = true
 	}
 
-	inventory.Default.SetTransport(transport)
-	management.Default.SetTransport(transport)
-	server.Default.SetTransport(transport)
+	inventorypb.Default.SetTransport(transport)
+	managementpb.Default.SetTransport(transport)
+	serverpb.Default.SetTransport(transport)
 
 	var command commands.Command
 	switch cmd {
-	case registerC.FullCommand():
-		command = &commands.Register{
-			NodeType: nodeTypes[*registerNodeTypeF],
-			NodeName: *registerNodeNameF,
-		}
+	case management.RegisterC.FullCommand():
+		command = management.Register
+
+	case management.AddC.FullCommand():
+		command = management.Add
+
+	case commands.ListC.FullCommand():
+		command = commands.List
+
 	default:
-		logrus.Fatalf("Unexpected command %q.", cmd)
+		logrus.Panicf("Unhandled command %q.", cmd)
 	}
 
 	res, err := command.Run()
-	logrus.Debugf("%#v", res)
-	logrus.Debugf("%#v", err)
+	logrus.Debugf("Response: %#v", res)
+	logrus.Debugf("Error: %#v", err)
 
 	if err == nil {
 		if *jsonF {

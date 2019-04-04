@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:5cf6e9d01a446e38eb9280981d77db685301e7b040e294de9255f7a0c2559990"
+  name = "github.com/AlekSi/pointer"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "08a25bac605b3fcb6cc27f3917b2c2c87451963d"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:0a111edd8693fd977f42a0c4f199a0efb13c20aec9da99ad8830c7bb6a87e8d6"
   name = "github.com/PuerkitoBio/purell"
   packages = ["."]
@@ -302,12 +310,11 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/AlekSi/pointer",
     "github.com/go-openapi/runtime/client",
     "github.com/percona/pmm/api/agentlocalpb/json/client",
     "github.com/percona/pmm/api/inventory/json/client",
     "github.com/percona/pmm/api/inventory/json/client/agents",
-    "github.com/percona/pmm/api/inventory/json/client/nodes",
-    "github.com/percona/pmm/api/inventory/json/client/services",
     "github.com/percona/pmm/api/managementpb/json/client",
     "github.com/percona/pmm/api/managementpb/json/client/node",
     "github.com/percona/pmm/api/serverpb/json/client",

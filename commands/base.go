@@ -14,28 +14,39 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+// Package commands provides base commands and helpers.
 package commands
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"reflect"
+	"text/template"
+
+	"github.com/sirupsen/logrus"
 )
 
+// Ctx is a shared context for all requests.
 var Ctx = context.Background()
 
-// FIXME Expand this interface to cover our use cases:
-// * Normal results output
-// * Live logging / progress output
-// * JSON output
-// * Exit codes
-
+// Result is a common interface for all command results.
+//
+// In addition to methods of this interface, result is expected to work with json.Marshal.
 type Result interface {
-	result()
+	Result()
 	fmt.Stringer
 }
 
 // Command is a common interface for all commands.
+//
+// Command should:
+//  * use logrus.Debug/Trace functions for debug logging;
+//  * return result on success;
+//  * return error on failure.
+//
+// Command should not:
+//  * exit with logrus.Fatal, os.Exit, etc.
 type Command interface {
 	Run() (Result, error)
 }
@@ -58,4 +69,13 @@ func GetError(err ErrorResponse) Error {
 		Code:  err.Code(),
 		Error: e.String(),
 	}
+}
+
+// RenderTemplate renders given template with given data and returns result as string.
+func RenderTemplate(t *template.Template, data interface{}) string {
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, data); err != nil {
+		logrus.Fatal(err)
+	}
+	return buf.String()
 }

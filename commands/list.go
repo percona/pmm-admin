@@ -17,49 +17,51 @@
 package commands
 
 import (
+	"strings"
+	"text/template"
+
 	"github.com/percona/pmm/api/inventory/json/client"
 	"github.com/percona/pmm/api/inventory/json/client/agents"
-	"github.com/percona/pmm/api/inventory/json/client/nodes"
-	"github.com/percona/pmm/api/inventory/json/client/services"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-type ListResult struct {
-	Nodes    *nodes.ListNodesOKBody
-	Services *services.ListServicesOKBody
-	Agents   *agents.ListAgentsOKBody
+var listResultT = template.Must(template.New("").Parse(strings.TrimSpace(`
+TODO
+{{ . }}
+`)))
+
+type listResult struct {
+	Agents *agents.ListAgentsOKBody
 }
 
-func (res *ListResult) result() {}
+func (res *listResult) Result() {}
 
-func (res *ListResult) String() string {
-	return ""
+func (res *listResult) String() string {
+	return RenderTemplate(listResultT, res)
 }
 
-type List struct {
+type listCommand struct {
+	PMMAgentID string
 }
 
-func (cmd *List) Run() (Result, error) {
-	nodes, err := client.Default.Nodes.ListNodes(nil)
+func (cmd *listCommand) Run() (Result, error) {
+	agents, err := client.Default.Agents.ListAgents(&agents.ListAgentsParams{
+		Body: agents.ListAgentsBody{
+			PMMAgentID: cmd.PMMAgentID,
+		},
+		Context: Ctx,
+	})
 	if err != nil {
 		return nil, err
 	}
-	services, err := client.Default.Services.ListServices(nil)
-	if err != nil {
-		return nil, err
-	}
-	agents, err := client.Default.Agents.ListAgents(nil)
-	if err != nil {
-		return nil, err
-	}
-	return &ListResult{
-		Nodes:    nodes.Payload,
-		Services: services.Payload,
-		Agents:   agents.Payload,
+
+	return &listResult{
+		Agents: agents.Payload,
 	}, nil
 }
 
-// check interfaces
+// register commands
 var (
-	_ Result  = (*ListResult)(nil)
-	_ Command = (*List)(nil)
+	List  = new(listCommand)
+	ListC = kingpin.Command("list", "Show Agents statuses.")
 )
