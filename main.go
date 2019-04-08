@@ -21,6 +21,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/percona/pmm-admin/commands/inventory"
 	"net/http"
 	"net/url"
 	"os"
@@ -134,6 +135,12 @@ func main() {
 
 	case management.AddMySQLC.FullCommand():
 		command = management.AddMySQL
+
+	case inventory.AddNodeGenericC.FullCommand():
+		command = inventory.AddNodeGeneric
+
+	case inventory.AddNodeContainerC.FullCommand():
+		command = inventory.AddNodeContainer
 
 	case commands.ListC.FullCommand():
 		command = commands.List
