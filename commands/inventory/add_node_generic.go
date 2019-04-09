@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 package inventory
 
 import (
@@ -77,7 +78,7 @@ func (cmd *addNodeGenericCommand) Run() (commands.Result, error) {
 // register command
 var (
 	AddNodeGeneric  = new(addNodeGenericCommand)
-	AddNodeGenericC = InventoryAddC.Command("generic", "Add generic node to inventory.")
+	AddNodeGenericC = AddNodeC.Command("generic", "Add generic node to inventory.")
 )
 
 func init() {
