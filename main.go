@@ -21,7 +21,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/percona/pmm-admin/commands/inventory"
 	"net/http"
 	"net/url"
 	"os"
@@ -39,6 +38,7 @@ import (
 
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
+	"github.com/percona/pmm-admin/commands/inventory"
 	"github.com/percona/pmm-admin/commands/management"
 )
 

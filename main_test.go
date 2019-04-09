@@ -29,11 +29,12 @@ import (
 func TestPackages(t *testing.T) {
 	cmd := exec.Command("pmm-admin", "-h") //nolint:gosec
 	b, err := cmd.CombinedOutput()
-	require.NoError(t, err)
+	require.IsType(t, (*exec.ExitError)(nil), err, "Output:\n%s", b)
+	require.Equal(t, 1, err.(*exec.ExitError).ExitCode(), "Output:\n%s", b) // TODO https://jira.percona.com/browse/PMM-3814
 
 	out := string(b)
-	assert.False(t, strings.Contains(out, "-httptest.serve"), `pmm-admin should not import package "net/http/httptest"`)
-	assert.False(t, strings.Contains(out, "-test.run"), `pmm-admin should not import package "testing"`)
+	assert.False(t, strings.Contains(out, "httptest.serve"), `pmm-admin should not import package "net/http/httptest"`)
+	assert.False(t, strings.Contains(out, "test.run"), `pmm-admin should not import package "testing"`)
 }
 
 func TestImports(t *testing.T) {
