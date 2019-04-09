@@ -39,6 +39,7 @@ import (
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
 	"github.com/percona/pmm-admin/commands/management"
+	"github.com/percona/pmm-admin/logger"
 )
 
 func main() {
@@ -55,8 +56,10 @@ func main() {
 
 	cmd := kingpin.Parse()
 
-	logrus.SetFormatter(&logrus.TextFormatter{
-		DisableTimestamp: true,
+	logrus.SetFormatter(&logger.TextFormatter{
+		TextFormatter: &logrus.TextFormatter{
+			DisableTimestamp: true,
+		},
 	})
 	if *debugF {
 		logrus.SetLevel(logrus.DebugLevel)
