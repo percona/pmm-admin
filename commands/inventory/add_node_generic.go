@@ -13,8 +13,6 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-// Package inventory provides inventory commands.
 package inventory
 
 import (
@@ -36,7 +34,7 @@ Address      : {{ .Node.Address }}
 `)
 
 type addNodeGenericResult struct {
-	Node *nodes.AddGenericNodeOKBodyGeneric
+	Node *nodes.AddGenericNodeOKBodyGeneric `json:"generic"`
 }
 
 func (res *addNodeGenericResult) Result() {}
@@ -79,7 +77,7 @@ func (cmd *addNodeGenericCommand) Run() (commands.Result, error) {
 // register command
 var (
 	AddNodeGeneric  = new(addNodeGenericCommand)
-	AddNodeGenericC = InventoryAddC.Command("node", "Add to inventory commands.")
+	AddNodeGenericC = InventoryAddC.Command("generic", "Add generic node to inventory.")
 )
 
 func init() {

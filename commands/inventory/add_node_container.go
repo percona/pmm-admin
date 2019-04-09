@@ -13,8 +13,6 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-// Package inventory provides inventory commands.
 package inventory
 
 import (
@@ -35,7 +33,7 @@ DockerContainerName: {{ .Node.DockerContainerName }}
 `)
 
 type addContainerNodeResult struct {
-	Node *nodes.AddContainerNodeOKBodyContainer
+	Node *nodes.AddContainerNodeOKBodyContainer `json:"container"`
 }
 
 func (res *addContainerNodeResult) Result() {}
@@ -77,7 +75,7 @@ func (cmd *addNodeContainerCommand) Run() (commands.Result, error) {
 // register command
 var (
 	AddNodeContainer  = new(addNodeContainerCommand)
-	AddNodeContainerC = InventoryAddC.Command("node", "Add to inventory commands.")
+	AddNodeContainerC = InventoryAddC.Command("container", "Add container node to inventory.")
 )
 
 func init() {
