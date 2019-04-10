@@ -23,7 +23,7 @@ import (
 	"github.com/percona/pmm-admin/commands"
 )
 
-var addGenericNodeResultT = commands.ParseTemplate(`
+var addNodeGenericResultT = commands.ParseTemplate(`
 Generic Node added.
 Node ID  : {{ .Node.NodeID }}
 Node name: {{ .Node.NodeName }}
@@ -41,7 +41,7 @@ type addNodeGenericResult struct {
 func (res *addNodeGenericResult) Result() {}
 
 func (res *addNodeGenericResult) String() string {
-	return commands.RenderTemplate(addGenericNodeResultT, res)
+	return commands.RenderTemplate(addNodeGenericResultT, res)
 }
 
 type addNodeGenericCommand struct {
@@ -51,10 +51,14 @@ type addNodeGenericCommand struct {
 	Distro        string
 	DistroVersion string
 	Address       string
-	CustomLabels  map[string]string
+	CustomLabels  string
 }
 
 func (cmd *addNodeGenericCommand) Run() (commands.Result, error) {
+	customLabels, err := parseCustomLabels(cmd.CustomLabels)
+	if err != nil {
+		return nil, err
+	}
 	params := &nodes.AddGenericNodeParams{
 		Body: nodes.AddGenericNodeBody{
 			NodeName:      cmd.NodeName,
@@ -62,6 +66,7 @@ func (cmd *addNodeGenericCommand) Run() (commands.Result, error) {
 			Distro:        cmd.Distro,
 			DistroVersion: cmd.DistroVersion,
 			Address:       cmd.Address,
+			CustomLabels:  customLabels,
 		},
 		Context: commands.Ctx,
 	}
@@ -78,7 +83,7 @@ func (cmd *addNodeGenericCommand) Run() (commands.Result, error) {
 // register command
 var (
 	AddNodeGeneric  = new(addNodeGenericCommand)
-	AddNodeGenericC = AddNodeC.Command("generic", "Add generic node to inventory.")
+	AddNodeGenericC = addNodeC.Command("generic", "Add generic node to inventory.")
 )
 
 func init() {
@@ -88,4 +93,5 @@ func init() {
 	AddNodeGenericC.Flag("distro", "Linux distribution (if any).").StringVar(&AddNodeGeneric.Distro)
 	AddNodeGenericC.Flag("distro-version", "Linux distribution version (if any).").StringVar(&AddNodeGeneric.DistroVersion)
 	AddNodeGenericC.Flag("address", "Address.").StringVar(&AddNodeGeneric.Address)
+	AddNodeGenericC.Flag("custom-labels", "Custom user-assigned labels.").StringVar(&AddNodeGeneric.CustomLabels)
 }

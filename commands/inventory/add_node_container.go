@@ -23,7 +23,7 @@ import (
 	"github.com/percona/pmm-admin/commands"
 )
 
-var addContainerNodeResultT = commands.ParseTemplate(`
+var addNodeContainerResultT = commands.ParseTemplate(`
 Container Node added.
 Node ID  : {{ .Node.NodeID }}
 Node name: {{ .Node.NodeName }}
@@ -33,14 +33,14 @@ DockerContainerID  : {{ .Node.DockerContainerID }}
 DockerContainerName: {{ .Node.DockerContainerName }}
 `)
 
-type addContainerNodeResult struct {
+type addNodeContainerResult struct {
 	Node *nodes.AddContainerNodeOKBodyContainer `json:"container"`
 }
 
-func (res *addContainerNodeResult) Result() {}
+func (res *addNodeContainerResult) Result() {}
 
-func (res *addContainerNodeResult) String() string {
-	return commands.RenderTemplate(addContainerNodeResultT, res)
+func (res *addNodeContainerResult) String() string {
+	return commands.RenderTemplate(addNodeContainerResultT, res)
 }
 
 type addNodeContainerCommand struct {
@@ -50,16 +50,18 @@ type addNodeContainerCommand struct {
 	DockerContainerID   string
 	DockerContainerName string
 	Address             string
-	CustomLabels        map[string]string
+	CustomLabels        string
 }
 
 func (cmd *addNodeContainerCommand) Run() (commands.Result, error) {
+	customLabels, err := parseCustomLabels(cmd.CustomLabels)
 	params := &nodes.AddContainerNodeParams{
 		Body: nodes.AddContainerNodeBody{
 			NodeName:            cmd.NodeName,
 			MachineID:           cmd.MachineID,
 			DockerContainerID:   cmd.DockerContainerID,
 			DockerContainerName: cmd.DockerContainerName,
+			CustomLabels:        customLabels,
 		},
 		Context: commands.Ctx,
 	}
@@ -68,7 +70,7 @@ func (cmd *addNodeContainerCommand) Run() (commands.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &addContainerNodeResult{
+	return &addNodeContainerResult{
 		Node: resp.Payload.Container,
 	}, nil
 }
@@ -76,7 +78,7 @@ func (cmd *addNodeContainerCommand) Run() (commands.Result, error) {
 // register command
 var (
 	AddNodeContainer  = new(addNodeContainerCommand)
-	AddNodeContainerC = AddNodeC.Command("container", "Add container node to inventory.")
+	AddNodeContainerC = addNodeC.Command("container", "Add container node to inventory.")
 )
 
 func init() {

@@ -21,8 +21,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-// register command
+// register commands
 var (
-	InventoryC    = kingpin.Command("inventory", "Inventory commands.")
-	InventoryAddC = InventoryC.Command("add", "Add to inventory commands.")
+	inventoryC    = kingpin.Command("inventory", "Inventory commands.")
+	inventoryAddC = inventoryC.Command("add", "Add to inventory commands.")
 )
