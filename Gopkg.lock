@@ -192,7 +192,7 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-3786-inventorypb"
+  branch = "PMM-2.0"
   digest = "1:5e101cccd4c375f503d0b967f8b709602f7914133f99f73acf36ac9e1f7e1245"
   name = "github.com/percona/pmm"
   packages = [
@@ -211,7 +211,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "a542274615a1b9c6a2a85f421291a5bd9d77c1d7"
+  revision = "0b99bc21e13aa99b21e9b572b827d86c2dfb4f7b"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
@@ -316,7 +316,6 @@
     "github.com/percona/pmm/api/agentlocalpb/json/client",
     "github.com/percona/pmm/api/inventorypb/json/client",
     "github.com/percona/pmm/api/inventorypb/json/client/agents",
-    "github.com/percona/pmm/api/inventorypb/json/client/nodes",
     "github.com/percona/pmm/api/inventorypb/json/client/services",
     "github.com/percona/pmm/api/managementpb/json/client",
     "github.com/percona/pmm/api/managementpb/json/client/my_sql",
