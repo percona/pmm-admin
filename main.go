@@ -28,7 +28,7 @@ import (
 	"strings"
 
 	httptransport "github.com/go-openapi/runtime/client"
-	inventorypb "github.com/percona/pmm/api/inventory/json/client"
+	inventorypb "github.com/percona/pmm/api/inventorypb/json/client"
 	managementpb "github.com/percona/pmm/api/managementpb/json/client"
 	serverpb "github.com/percona/pmm/api/serverpb/json/client"
 	"github.com/percona/pmm/version"
@@ -38,6 +38,7 @@ import (
 
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
+	"github.com/percona/pmm-admin/commands/inventory"
 	"github.com/percona/pmm-admin/commands/management"
 	"github.com/percona/pmm-admin/logger"
 )
@@ -143,6 +144,12 @@ func main() {
 
 	case management.AddMySQLC.FullCommand():
 		command = management.AddMySQL
+
+	case inventory.AddNodeGenericC.FullCommand():
+		command = inventory.AddNodeGeneric
+
+	case inventory.AddNodeContainerC.FullCommand():
+		command = inventory.AddNodeContainer
 
 	case commands.ListC.FullCommand():
 		command = commands.List
