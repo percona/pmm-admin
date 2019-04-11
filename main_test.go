@@ -29,7 +29,7 @@ import (
 func TestPackages(t *testing.T) {
 	cmd := exec.Command("pmm-admin", "-h") //nolint:gosec
 	b, err := cmd.CombinedOutput()
-	require.NoError(t, err) // TODO https://jira.percona.com/browse/PMM-3814
+	require.NoError(t, err)
 
 	out := string(b)
 	assert.False(t, strings.Contains(out, "httptest.serve"), `pmm-admin should not import package "net/http/httptest"`)
