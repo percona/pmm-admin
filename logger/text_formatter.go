@@ -25,6 +25,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	red    = 31
+	yellow = 33
+	blue   = 36
+	gray   = 37
+)
+
 // TextFormatter formats logs into text.
 type TextFormatter struct {
 	*logrus.TextFormatter
@@ -32,34 +39,29 @@ type TextFormatter struct {
 
 // Format renders a single log entry.
 func (f *TextFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-	if entry.Level == logrus.FatalLevel {
-
-		var b *bytes.Buffer
-		if entry.Buffer != nil {
-			b = entry.Buffer
-		} else {
-			b = &bytes.Buffer{}
-		}
-		entry.Message = strings.TrimSuffix(entry.Message, "\n")
-
-		caller := ""
-
-		if entry.HasCaller() {
-			funcVal := fmt.Sprintf("%s()", entry.Caller.Function)
-			fileVal := fmt.Sprintf("%s:%d", entry.Caller.File, entry.Caller.Line)
-
-			if f.CallerPrettyfier != nil {
-				funcVal, fileVal = f.CallerPrettyfier(entry.Caller)
-			}
-			caller = fileVal + " " + funcVal
-
-			fmt.Fprintf(b, "%s %-44s ", caller, entry.Message)
-		} else {
-			fmt.Fprintf(b, "%-44s ", entry.Message)
-		}
-
-		b.WriteByte('\n')
-		return b.Bytes(), nil
+	var levelColor int
+	switch entry.Level {
+	case logrus.DebugLevel, logrus.TraceLevel:
+		levelColor = gray
+	case logrus.WarnLevel:
+		levelColor = yellow
+	case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
+		levelColor = red
+	default:
+		levelColor = blue
 	}
-	return f.TextFormatter.Format(entry)
+
+	levelText := strings.ToUpper(entry.Level.String())
+	if !f.DisableLevelTruncation {
+		levelText = levelText[0:4]
+	}
+	bytesArray, err := f.TextFormatter.Format(entry)
+	if err != nil {
+		return bytesArray, err
+	}
+	bytesArray = bytes.TrimPrefix(bytesArray, []byte(fmt.Sprintf("\x1b[%dm%s\x1b[0m", levelColor, levelText)))
+
+	bytesArray = bytes.TrimPrefix(bytesArray, []byte(" "))
+
+	return bytesArray, nil
 }
