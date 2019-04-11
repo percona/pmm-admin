@@ -32,6 +32,7 @@ MachineID    : {{ .Node.MachineID }}
 Distro       : {{ .Node.Distro }}
 DistroVersion: {{ .Node.DistroVersion }}
 Address      : {{ .Node.Address }}
+CustomLabels : {{ .Node.CustomLabels }}
 `)
 
 type addNodeGenericResult struct {
