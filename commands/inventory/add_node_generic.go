@@ -17,8 +17,8 @@
 package inventory
 
 import (
-	"github.com/percona/pmm/api/inventory/json/client"
-	"github.com/percona/pmm/api/inventory/json/client/nodes"
+	"github.com/percona/pmm/api/inventorypb/json/client"
+	"github.com/percona/pmm/api/inventorypb/json/client/nodes"
 
 	"github.com/percona/pmm-admin/commands"
 )
@@ -45,7 +45,6 @@ func (res *addNodeGenericResult) String() string {
 }
 
 type addNodeGenericCommand struct {
-	NodeType      string
 	NodeName      string
 	MachineID     string
 	Distro        string

@@ -17,8 +17,8 @@
 package inventory
 
 import (
-	"github.com/percona/pmm/api/inventory/json/client"
-	"github.com/percona/pmm/api/inventory/json/client/nodes"
+	"github.com/percona/pmm/api/inventorypb/json/client"
+	"github.com/percona/pmm/api/inventorypb/json/client/nodes"
 
 	"github.com/percona/pmm-admin/commands"
 )
@@ -44,7 +44,6 @@ func (res *addNodeContainerResult) String() string {
 }
 
 type addNodeContainerCommand struct {
-	NodeType            string
 	NodeName            string
 	MachineID           string
 	DockerContainerID   string
@@ -55,12 +54,16 @@ type addNodeContainerCommand struct {
 
 func (cmd *addNodeContainerCommand) Run() (commands.Result, error) {
 	customLabels, err := parseCustomLabels(cmd.CustomLabels)
+	if err != nil {
+		return nil, err
+	}
 	params := &nodes.AddContainerNodeParams{
 		Body: nodes.AddContainerNodeBody{
 			NodeName:            cmd.NodeName,
 			MachineID:           cmd.MachineID,
 			DockerContainerID:   cmd.DockerContainerID,
 			DockerContainerName: cmd.DockerContainerName,
+			Address:             cmd.Address,
 			CustomLabels:        customLabels,
 		},
 		Context: commands.Ctx,
@@ -85,7 +88,9 @@ func init() {
 	AddNodeContainerC.Arg("name", "Node name").StringVar(&AddNodeContainer.NodeName)
 
 	AddNodeContainerC.Flag("machine-id", "Linux machine-id.").StringVar(&AddNodeContainer.MachineID)
-	AddNodeContainerC.Flag("container-id", "Docker container identifier. If specified, must be a unique Docker container identifier.").StringVar(&AddNodeContainer.DockerContainerID)
+	AddNodeContainerC.Flag("container-id", "Docker container identifier. If specified, must be a unique Docker container identifier.").
+		StringVar(&AddNodeContainer.DockerContainerID)
 	AddNodeContainerC.Flag("container-name", "Container name.").StringVar(&AddNodeContainer.DockerContainerName)
 	AddNodeContainerC.Flag("address", "Address.").StringVar(&AddNodeContainer.Address)
+	AddNodeContainerC.Flag("custom-labels", "Custom user-assigned labels.").StringVar(&AddNodeGeneric.CustomLabels)
 }
