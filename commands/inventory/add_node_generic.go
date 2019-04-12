@@ -28,11 +28,11 @@ Generic Node added.
 Node ID  : {{ .Node.NodeID }}
 Node name: {{ .Node.NodeName }}
 
-MachineID    : {{ .Node.MachineID }}
-Distro       : {{ .Node.Distro }}
-DistroVersion: {{ .Node.DistroVersion }}
-Address      : {{ .Node.Address }}
-CustomLabels : {{ .Node.CustomLabels }}
+MachineID     : {{ .Node.MachineID }}
+Distro        : {{ .Node.Distro }}
+DistroVersion : {{ .Node.DistroVersion }}
+Address       : {{ .Node.Address }}
+Custom labels : {{ .Node.CustomLabels }}
 `)
 
 type addNodeGenericResult struct {

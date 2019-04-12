@@ -25,12 +25,12 @@ import (
 
 var addServiceMySQLResultT = commands.ParseTemplate(`
 MySQL Service added.
-Service ID  : {{ .Service.ServiceID }}
-Service name: {{ .Service.ServiceName }}
-Node ID     : {{ .Service.NodeID }}
-Address     : {{ .Service.Address }}
-Port        : {{ .Service.Port }}
-CustomLabels: {{ .Service.CustomLabels }}
+Service ID   : {{ .Service.ServiceID }}
+Service name : {{ .Service.ServiceName }}
+Node ID      : {{ .Service.NodeID }}
+Address      : {{ .Service.Address }}
+Port         : {{ .Service.Port }}
+Custom labels: {{ .Service.CustomLabels }}
 `)
 
 type addServiceMySQLResult struct {
