@@ -60,5 +60,5 @@ var (
 )
 
 func init() {
-	RemoveNodeC.Arg("node_id", "Node ID").StringVar(&RemoveNode.NodeID)
+	RemoveNodeC.Arg("node-id", "Node ID").StringVar(&RemoveNode.NodeID)
 }
