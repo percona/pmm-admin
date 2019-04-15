@@ -60,5 +60,5 @@ var (
 )
 
 func init() {
-	RemoveServiceC.Arg("service_id", "Service ID").StringVar(&RemoveService.ServiceID)
+	RemoveServiceC.Arg("service-id", "Service ID").StringVar(&RemoveService.ServiceID)
 }
