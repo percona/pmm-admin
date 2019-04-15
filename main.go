@@ -57,11 +57,7 @@ func main() {
 
 	cmd := kingpin.Parse()
 
-	logrus.SetFormatter(&logger.TextFormatter{
-		TextFormatter: &logrus.TextFormatter{
-			DisableTimestamp: true,
-		},
-	})
+	logrus.SetFormatter(&logger.TextFormatter{})
 	if *jsonF {
 		logrus.SetFormatter(&logrus.JSONFormatter{}) // with level and timestamps
 	}
