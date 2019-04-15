@@ -28,9 +28,10 @@ Container Node added.
 Node ID  : {{ .Node.NodeID }}
 Node name: {{ .Node.NodeName }}
 
-MachineID          : {{ .Node.MachineID }}
-DockerContainerID  : {{ .Node.DockerContainerID }}
-DockerContainerName: {{ .Node.DockerContainerName }}
+Machine ID           : {{ .Node.MachineID }}
+Docker container ID  : {{ .Node.DockerContainerID }}
+Docker container name: {{ .Node.DockerContainerName }}
+Custom labels        : {{ .Node.CustomLabels }}
 `)
 
 type addNodeContainerResult struct {
