@@ -76,5 +76,5 @@ var (
 
 func init() {
 	AddAgentPMMAgentC.Arg("runs-on-node-id", "Node identifier where this instance runs.").StringVar(&AddAgentPMMAgent.RunsOnNodeID)
-	AddAgentPostgresExporterC.Flag("custom-labels", "Custom user-assigned labels.").StringVar(&AddAgentPMMAgent.CustomLabels)
+	AddAgentPMMAgentC.Flag("custom-labels", "Custom user-assigned labels.").StringVar(&AddAgentPMMAgent.CustomLabels)
 }
