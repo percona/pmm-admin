@@ -32,7 +32,7 @@ Username     : {{ .Agent.Username }}
 Password     : {{ .Agent.Password }}
 
 Status       : {{ .Agent.Status }}
-Disabled     : {{ .Agent.Status }}
+Disabled     : {{ .Agent.Disabled }}
 Custom labels: {{ .Agent.CustomLabels }}
 `)
 

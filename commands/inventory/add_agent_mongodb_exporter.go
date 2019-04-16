@@ -33,7 +33,7 @@ Password     : {{ .Agent.Password }}
 Listen port  : {{ .Agent.ListenPort }}
 
 Status       : {{ .Agent.Status }}
-Disabled     : {{ .Agent.Status }}
+Disabled     : {{ .Agent.Disabled }}
 Custom labels: {{ .Agent.CustomLabels }}
 `)
 
