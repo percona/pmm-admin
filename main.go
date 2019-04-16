@@ -154,6 +154,9 @@ func main() {
 	case inventory.RemoveServiceC.FullCommand():
 		command = inventory.RemoveService
 
+	case inventory.RemoveAgentC.FullCommand():
+		command = inventory.RemoveAgent
+
 	case commands.ListC.FullCommand():
 		command = commands.List
 
