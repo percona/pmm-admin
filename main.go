@@ -136,6 +136,9 @@ func main() {
 	case management.AddMySQLC.FullCommand():
 		command = management.AddMySQL
 
+	case management.RemoveC.FullCommand():
+		command = management.Remove
+
 	case inventory.AddNodeGenericC.FullCommand():
 		command = inventory.AddNodeGeneric
 
