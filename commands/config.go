@@ -22,18 +22,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-type configResult struct{}
-
-func (res *configResult) Result() {}
-
-func (res *configResult) String() string {
-	return ""
-}
-
 type configCommand struct{}
 
 func (cmd *configCommand) Run() (Result, error) {
-	return new(configResult), fmt.Errorf("Please use `pmm-agent setup`.") //nolint:stylecheck,golint
+	return nil, fmt.Errorf("Please use `pmm-agent setup`.") //nolint:stylecheck,golint
 }
 
 // register command
