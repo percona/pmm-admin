@@ -186,6 +186,9 @@ func main() {
 	case commands.StatusC.FullCommand():
 		command = commands.Status
 
+	case commands.ConfigC.FullCommand():
+		command = commands.Config
+
 	default:
 		logrus.Panicf("Unhandled command %q. Please report this bug.", cmd)
 	}
@@ -227,7 +230,7 @@ func main() {
 
 	default:
 		if *jsonF {
-			b, jErr := json.Marshal(err)
+			b, jErr := json.Marshal(err.Error())
 			if jErr != nil {
 				logrus.Infof("Error: %#v.", err)
 				logrus.Panicf("Failed to marshal error to JSON.\n%s.\nPlease report this bug.", jErr)
