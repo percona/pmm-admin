@@ -30,7 +30,6 @@ Node name: {{ .Node.NodeName }}
 
 Machine ID    : {{ .Node.MachineID }}
 Distro        : {{ .Node.Distro }}
-Distro version: {{ .Node.DistroVersion }}
 Address       : {{ .Node.Address }}
 Custom labels : {{ .Node.CustomLabels }}
 `)
