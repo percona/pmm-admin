@@ -28,17 +28,10 @@ Container Node added.
 Node ID  : {{ .Node.NodeID }}
 Node name: {{ .Node.NodeName }}
 
-<<<<<<< HEAD
-Machine ID           : {{ .Node.MachineID }}
-Container ID  : {{ .Node.ContainerID }}
-Container name: {{ .Node.ContainerName }}
-Custom labels        : {{ .Node.CustomLabels }}
-=======
 Machine ID    : {{ .Node.MachineID }}
 Container ID  : {{ .Node.ContainerID }}
 Container name: {{ .Node.ContainerName }}
 Custom labels : {{ .Node.CustomLabels }}
->>>>>>> master
 `)
 
 type addNodeContainerResult struct {
