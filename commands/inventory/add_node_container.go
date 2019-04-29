@@ -28,10 +28,17 @@ Container Node added.
 Node ID  : {{ .Node.NodeID }}
 Node name: {{ .Node.NodeName }}
 
+<<<<<<< HEAD
 Machine ID           : {{ .Node.MachineID }}
 Container ID  : {{ .Node.ContainerID }}
 Container name: {{ .Node.ContainerName }}
 Custom labels        : {{ .Node.CustomLabels }}
+=======
+Machine ID    : {{ .Node.MachineID }}
+Container ID  : {{ .Node.ContainerID }}
+Container name: {{ .Node.ContainerName }}
+Custom labels : {{ .Node.CustomLabels }}
+>>>>>>> master
 `)
 
 type addNodeContainerResult struct {
@@ -89,7 +96,7 @@ func init() {
 	AddNodeContainerC.Arg("name", "Node name").StringVar(&AddNodeContainer.NodeName)
 
 	AddNodeContainerC.Flag("machine-id", "Linux machine-id.").StringVar(&AddNodeContainer.MachineID)
-	AddNodeContainerC.Flag("container-id", "Docker container identifier. If specified, must be a unique Docker container identifier.").
+	AddNodeContainerC.Flag("container-id", "Container identifier. If specified, must be a unique Docker container identifier.").
 		StringVar(&AddNodeContainer.ContainerID)
 	AddNodeContainerC.Flag("container-name", "Container name.").StringVar(&AddNodeContainer.ContainerName)
 	AddNodeContainerC.Flag("address", "Address.").StringVar(&AddNodeContainer.Address)
