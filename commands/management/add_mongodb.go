@@ -42,7 +42,7 @@ type addMongoDBResult struct {
 func (res *addMongoDBResult) Result() {}
 
 func (res *addMongoDBResult) String() string {
-	return commands.RenderTemplate(addMySQLResultT, res)
+	return commands.RenderTemplate(addMongoDbResultT, res)
 }
 
 type addMongoDBCommand struct {
