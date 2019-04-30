@@ -192,7 +192,7 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-3921-mongodb-management-api"
+  branch = "PMM-2.0"
   digest = "1:9618cab4ae06095ab4189322e2245da85a281ff2b2f20451ec0349a7f9429ed5"
   name = "github.com/percona/pmm"
   packages = [
@@ -213,7 +213,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "c89f6d2464b1095f3c61d7b24119ad068f1666c2"
+  revision = "cf45dc2174f6fa5c74411115822ee0170bbf395e"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
