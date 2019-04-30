@@ -60,7 +60,7 @@ type AddMongoDBOK struct {
 }
 
 func (o *AddMongoDBOK) Error() string {
-	return fmt.Sprintf("[POST /v1/management/MongoDB/AddMongoDB][%d] addMongoDbOk  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /v1/management/MongoDB/Add][%d] addMongoDbOk  %+v", 200, o.Payload)
 }
 
 func (o *AddMongoDBOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -98,7 +98,7 @@ func (o *AddMongoDBDefault) Code() int {
 }
 
 func (o *AddMongoDBDefault) Error() string {
-	return fmt.Sprintf("[POST /v1/management/MongoDB/AddMongoDB][%d] AddMongoDB default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[POST /v1/management/MongoDB/Add][%d] AddMongoDB default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *AddMongoDBDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -133,7 +133,7 @@ type AddMongoDBBody struct {
 	// Node identifier on which a service is been running. Required.
 	NodeID string `json:"node_id,omitempty"`
 
-	// MongoDB password for scraping metrics.
+	// MongoDB password for exporter and QAN agent access.
 	Password string `json:"password,omitempty"`
 
 	// The "pmm-agent" identifier which should run agents. Required.
@@ -145,19 +145,13 @@ type AddMongoDBBody struct {
 	// If true, adds qan-mongodb-profiler-agent for provided service.
 	QANMongodbProfiler bool `json:"qan_mongodb_profiler,omitempty"`
 
-	// FIXME remove
-	QANPassword string `json:"qan_password,omitempty"`
-
-	// FIXME remove
-	QANUsername string `json:"qan_username,omitempty"`
-
 	// Replication set name.
 	ReplicationSet string `json:"replication_set,omitempty"`
 
 	// Unique across all Services user-defined name. Required.
 	ServiceName string `json:"service_name,omitempty"`
 
-	// MongoDB username for scraping metrics.
+	// MongoDB username for exporter and QAN agent access.
 	Username string `json:"username,omitempty"`
 }
 

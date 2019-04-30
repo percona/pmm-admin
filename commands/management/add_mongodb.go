@@ -81,8 +81,6 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 			Username:        cmd.Username,
 			Password:        cmd.Password,
 
-			QANUsername:        cmd.Username,
-			QANPassword:        cmd.Password,
 			QANMongodbProfiler: cmd.UseProfiler,
 		},
 		Context: commands.Ctx,
