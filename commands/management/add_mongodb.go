@@ -29,20 +29,20 @@ import (
 	"github.com/percona/pmm-admin/commands"
 )
 
-var addMongoDbResultT = commands.ParseTemplate(`
+var addMongoDBResultT = commands.ParseTemplate(`
 MongoDB Service added.
 Service ID  : {{ .Service.ServiceID }}
 Service name: {{ .Service.ServiceName }}
 `)
 
 type addMongoDBResult struct {
-	Service *mongodb.AddOKBodyService `json:"service"`
+	Service *mongodb.AddMongoDBOKBodyService `json:"service"`
 }
 
 func (res *addMongoDBResult) Result() {}
 
 func (res *addMongoDBResult) String() string {
-	return commands.RenderTemplate(addMongoDbResultT, res)
+	return commands.RenderTemplate(addMongoDBResultT, res)
 }
 
 type addMongoDBCommand struct {
@@ -68,8 +68,8 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	params := &mongodb.AddParams{
-		Body: mongodb.AddBody{
+	params := &mongodb.AddMongoDBParams{
+		Body: mongodb.AddMongoDBBody{
 			PMMAgentID:  status.AgentID,
 			NodeID:      status.NodeID,
 			ServiceName: cmd.ServiceName,
@@ -86,7 +86,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 		},
 		Context: commands.Ctx,
 	}
-	resp, err := client.Default.MongoDB.Add(params)
+	resp, err := client.Default.MongoDB.AddMongoDB(params)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func init() {
 	serviceNameHelp := fmt.Sprintf("Service name. Default: %s.", serviceName)
 	AddMongoDBC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddMongoDB.ServiceName)
 
-	AddMongoDBC.Flag("username", "MySQL username.").StringVar(&AddMongoDB.Username)
-	AddMongoDBC.Flag("password", "MySQL password.").StringVar(&AddMongoDB.Password)
+	AddMongoDBC.Flag("username", "MongoDB username.").StringVar(&AddMongoDB.Username)
+	AddMongoDBC.Flag("password", "MongoDB password.").StringVar(&AddMongoDB.Password)
 	AddMongoDBC.Flag("use-profiler", "Run QAN profiler agent.").BoolVar(&AddMongoDB.UseProfiler)
 }

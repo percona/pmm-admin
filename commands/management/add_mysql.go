@@ -36,7 +36,7 @@ Service name: {{ .Service.ServiceName }}
 `)
 
 type addMySQLResult struct {
-	Service *mysql.AddMixin1OKBodyService `json:"service"`
+	Service *mysql.AddMySQLOKBodyService `json:"service"`
 }
 
 func (res *addMySQLResult) Result() {}
@@ -69,8 +69,8 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	params := &mysql.AddMixin1Params{
-		Body: mysql.AddMixin1Body{
+	params := &mysql.AddMySQLParams{
+		Body: mysql.AddMySQLBody{
 			PMMAgentID:  status.AgentID,
 			NodeID:      status.NodeID,
 			ServiceName: cmd.ServiceName,
@@ -88,7 +88,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		},
 		Context: commands.Ctx,
 	}
-	resp, err := client.Default.MySQL.AddMixin1(params)
+	resp, err := client.Default.MySQL.AddMySQL(params)
 	if err != nil {
 		return nil, err
 	}

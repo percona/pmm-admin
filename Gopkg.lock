@@ -193,7 +193,7 @@
 
 [[projects]]
   branch = "PMM-3921-mongodb-management-api"
-  digest = "1:ad16f46a96d35fc1f482c342b2f43b874fc3f466649f56d284f0ebfa0f523387"
+  digest = "1:c0cdc52623e3ddda6c3872d4a4683910158e5aca180b31aa2ae69cc5b636e75d"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -213,7 +213,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "f91a223d9cb6613ea6fd79854ff2e1ef43e7b346"
+  revision = "d5bba8b9ff34fbf4f5680ca607ada8a4efb92ac9"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
