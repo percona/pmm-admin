@@ -50,6 +50,7 @@ type addMongoDBCommand struct {
 	ServiceName string
 	Username    string
 	Password    string
+	UseExporter bool
 	UseProfiler bool
 }
 
@@ -76,7 +77,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 			Address:     host,
 			Port:        int64(port),
 
-			MongodbExporter: true,
+			MongodbExporter: cmd.UseExporter,
 			Username:        cmd.Username,
 			Password:        cmd.Password,
 
@@ -113,4 +114,5 @@ func init() {
 	AddMongoDBC.Flag("username", "MongoDB username.").StringVar(&AddMongoDB.Username)
 	AddMongoDBC.Flag("password", "MongoDB password.").StringVar(&AddMongoDB.Password)
 	AddMongoDBC.Flag("use-profiler", "Run QAN profiler agent.").BoolVar(&AddMongoDB.UseProfiler)
+	AddMongoDBC.Flag("use-exporter", "Run mongodb_exporter.").BoolVar(&AddMongoDB.UseExporter)
 }
