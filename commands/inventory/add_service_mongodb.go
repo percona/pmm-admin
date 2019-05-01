@@ -60,7 +60,7 @@ type addServiceMongoDBCommand struct {
 }
 
 func (cmd *addServiceMongoDBCommand) Run() (commands.Result, error) {
-	customLabels, err := parseCustomLabels(cmd.CustomLabels)
+	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
 	}

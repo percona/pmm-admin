@@ -61,7 +61,7 @@ type addNodeContainerCommand struct {
 }
 
 func (cmd *addNodeContainerCommand) Run() (commands.Result, error) {
-	customLabels, err := parseCustomLabels(cmd.CustomLabels)
+	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
 	}
