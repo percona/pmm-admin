@@ -60,9 +60,8 @@ Agent type                  Status     Agent ID                                 
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := strings.TrimSpace(tt.listResult.String()); got != tt.expected {
-				assert.Equal(t, strings.Split(tt.expected, "\n"), strings.Split(got, "\n"))
-			}
+			actual := strings.TrimSpace(tt.listResult.String())
+			assert.Equal(t, tt.expected, actual)
 		})
 	}
 }
