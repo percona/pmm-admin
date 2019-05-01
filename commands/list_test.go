@@ -16,56 +16,52 @@
 
 package commands
 
-import "testing"
+import (
+	"strings"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestListResultString(t *testing.T) {
-	type fields struct {
-		Services []listResultService
-		Agents   []listResultAgent
-	}
 	tests := []struct {
-		name   string
-		fields fields
-		want   string
+		name       string
+		listResult listResult
+		expected   string
 	}{
 		{
 			name: "filled",
-			fields: fields{
+			listResult: listResult{
 				Services: []listResultService{
-					{ServiceType: "mysql", ServiceID: "/service_id/test", ServiceName: "mysql-service"},
+					{ServiceType: "MySQL", ServiceID: "/service_id/4ff49c41-80a1-4030-bc02-cd76e3b0b84a", ServiceName: "mysql-service"},
 				},
 				Agents: []listResultAgent{
-					{AgentType: "mysql", AgentID: "/service_id/test", ServiceID: "/service_id/test", Status: "running"},
+					{AgentType: "mysqld_exporter", AgentID: "/agent_id/8b732ac3-8256-40b0-a98b-0fd5fa9a1140", ServiceID: "/service_id/4ff49c41-80a1-4030-bc02-cd76e3b0b84a", Status: "RUNNING"},
 				},
 			},
-			want: `Service type  Service name         Address and port  Service ID
-mysql         mysql-service                          /service_id/test
+			expected: strings.TrimSpace(`
+Service type  Service name         Address and port  Service ID
+MySQL         mysql-service                          /service_id/4ff49c41-80a1-4030-bc02-cd76e3b0b84a
 
 Agent type                  Status     Agent ID                                        Service ID
-mysql                       running    /service_id/test  /service_id/test
-`,
+mysqld_exporter             RUNNING    /agent_id/8b732ac3-8256-40b0-a98b-0fd5fa9a1140  /service_id/4ff49c41-80a1-4030-bc02-cd76e3b0b84a
+`),
 		},
 		{
-			name: "empty",
-			fields: fields{
-				Services: []listResultService{},
-				Agents:   []listResultAgent{},
-			},
-			want: `Service type  Service name         Address and port  Service ID
+			name:       "empty",
+			listResult: listResult{},
+			expected: strings.TrimSpace(`
+Service type  Service name         Address and port  Service ID
 
 Agent type                  Status     Agent ID                                        Service ID
-`,
+`),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			res := &listResult{
-				Services: tt.fields.Services,
-				Agents:   tt.fields.Agents,
-			}
-			if got := res.String(); got != tt.want {
-				t.Errorf("listResult.String() =\n%v, want\n%v", got, tt.want)
+			if got := strings.TrimSpace(tt.listResult.String()); got != tt.expected {
+				assert.Equal(t, strings.Split(tt.expected, "\n"), strings.Split(got, "\n"))
 			}
 		})
 	}
