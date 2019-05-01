@@ -192,7 +192,7 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-3793-management-api-for-postgresql"
+  branch = "PMM-2.0"
   digest = "1:999384488078c7a23d616f3142720c0f0b2dacdaef8b2e1ec9f199b0e16b6010"
   name = "github.com/percona/pmm"
   packages = [
@@ -214,7 +214,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "8de1c8dad02f19d70cbf567d3b800a499b6df6c3"
+  revision = "8fadcfb359ec6980446bd0f3f80d33347cb9be38"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
