@@ -128,7 +128,7 @@ func init() {
 	RegisterC.Arg("node-type", nodeTypeHelp).Default(nodeTypeDefault).EnumVar(&Register.NodeType, nodeTypeKeys...)
 
 	hostname, _ := os.Hostname()
-	nodeNameHelp := fmt.Sprintf("Node name. Default: %s.", hostname)
+	nodeNameHelp := fmt.Sprintf("Node name. Default: %s (autodetected).", hostname)
 	RegisterC.Arg("node-name", nodeNameHelp).Default(hostname).StringVar(&Register.NodeName)
 
 	RegisterC.Flag("machine-id", "Node machine-id. Default is autodetected.").Default(nodeinfo.MachineID).StringVar(&Register.MachineID)
