@@ -63,7 +63,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	status, err := agentlocal.GetStatus()
+	status, err := agentlocal.GetStatus(false)
 	if err != nil {
 		return nil, err
 	}
