@@ -134,8 +134,8 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 
 		Agents: agents,
 
+		Connected:        p.ServerInfo.Connected,
 		ServerClockDrift: clockDrift,
 		ServerLatency:    latency,
-		Connected:        p.ServerInfo.Connected,
 	}, nil
 }
