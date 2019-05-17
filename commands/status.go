@@ -31,10 +31,10 @@ PMM Server:
 	Version: {{ .Status.ServerVersion }}
 
 PMM-agent:
+	Connected : {{ .Status.Connected }}{{ if .Status.Connected }}
 	Time drift: {{ .Status.ServerClockDrift }}
 	Latency   : {{ .Status.ServerLatency }}
-	Connected : {{ .Status.Connected }}
-
+{{ end }}
 Agents:
 {{ range .Status.Agents }}	{{ .AgentID }} {{ .AgentType }} {{ .Status }} 
 {{ end }}
@@ -51,14 +51,13 @@ func (res *statusResult) String() string {
 }
 
 type statusCommand struct {
-	getNetworkInfo bool
 }
 
 func (cmd *statusCommand) Run() (Result, error) {
 	// Unlike list, this command uses only local pmm-agent status.
 	// It does not use PMM Server APIs.
 
-	status, err := agentlocal.GetStatus(cmd.getNetworkInfo)
+	status, err := agentlocal.GetStatus(agentlocal.RequestNetworkInfo)
 	if err != nil {
 		return nil, err
 	}

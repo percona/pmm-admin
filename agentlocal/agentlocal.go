@@ -47,6 +47,13 @@ func SetTransport(ctx context.Context, debug bool) {
 	client.Default.SetTransport(transport)
 }
 
+type NetworkInfo bool
+
+const (
+	RequestNetworkInfo      NetworkInfo = true
+	DoNotRequestNetworkInfo NetworkInfo = false
+)
+
 // ErrNotSetUp is returned by GetStatus when pmm-agent is running, but not set up.
 var ErrNotSetUp = fmt.Errorf("pmm-agent is running, but not set up")
 
@@ -61,9 +68,9 @@ type Status struct {
 
 	Agents []AgentStatus `json:"agents"`
 
+	Connected        bool
 	ServerClockDrift time.Duration
 	ServerLatency    time.Duration
-	Connected        bool
 }
 
 type AgentStatus struct {
@@ -74,10 +81,10 @@ type AgentStatus struct {
 
 // GetStatus returns local pmm-agent status.
 // As a special case, if pmm-agent is running, but not set up, ErrNotSetUp is returned.
-func GetStatus(getNetworkInfo bool) (*Status, error) {
+func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 	params := &agentlocal.StatusParams{
 		Body: agentlocal.StatusBody{
-			GetNetworkInfo: getNetworkInfo,
+			GetNetworkInfo: bool(requestNetworkInfo),
 		},
 		Context: context.TODO(),
 	}
@@ -106,7 +113,7 @@ func GetStatus(getNetworkInfo bool) (*Status, error) {
 	}
 	var clockDrift time.Duration
 	var latency time.Duration
-	if getNetworkInfo {
+	if bool(requestNetworkInfo) && res.Payload.ServerInfo.Connected {
 		clockDrift, err = time.ParseDuration(p.ServerInfo.ClockDrift)
 		if err != nil {
 			return nil, err
