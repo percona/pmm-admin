@@ -24,6 +24,8 @@ release:                        ## Build pmm-admin release binary.
 init:                           ## Installs tools to $GOPATH/bin (which is expected to be in $PATH).
 	curl https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin
 
+	go install ./vendor/golang.org/x/tools/cmd/goimports
+
 	go test -i ./...
 	go test -race -i ./...
 
