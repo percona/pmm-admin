@@ -29,7 +29,7 @@ import (
 var listAgentsResultT = commands.ParseTemplate(`
 Agents list.
 
-{{ printf "%-27s" "Agent type" }} {{ printf "%-15s" "Status" }} {{ printf "%-47s" "Agent ID" }} {{ printf "%-47s" "PMM-Agent ID" }} {{ printf "%-47s" "Service ID" }} 
+{{ printf "%-27s" "Agent type" }} {{ printf "%-15s" "Status" }} {{ printf "%-47s" "Agent ID" }} {{ printf "%-47s" "PMM-Agent ID" }} {{ printf "%-47s" "Service ID" }}
 {{ range .Agents }}
 {{- printf "%-27s" .AgentType }} {{ printf "%-15s" .Status }} {{ .AgentID }}  {{ .PMMAgentID }}  {{ .ServiceID }}
 {{ end }}
@@ -105,24 +105,6 @@ func (cmd *listAgentsCommand) Run() (commands.Result, error) {
 			Status:     getAgentStatus(a.Status, a.Disabled),
 		})
 	}
-	for _, a := range agentsRes.Payload.QANMysqlPerfschemaAgent {
-		agents = append(agents, listResultAgent{
-			AgentType:  "qan-mysql-perfschema-agent",
-			AgentID:    a.AgentID,
-			PMMAgentID: a.PMMAgentID,
-			ServiceID:  a.ServiceID,
-			Status:     getAgentStatus(a.Status, a.Disabled),
-		})
-	}
-	for _, a := range agentsRes.Payload.QANMysqlSlowlogAgent {
-		agents = append(agents, listResultAgent{
-			AgentType:  "qan-mysql-slowlog-agent",
-			AgentID:    a.AgentID,
-			PMMAgentID: a.PMMAgentID,
-			ServiceID:  a.ServiceID,
-			Status:     getAgentStatus(a.Status, a.Disabled),
-		})
-	}
 	for _, a := range agentsRes.Payload.MongodbExporter {
 		agents = append(agents, listResultAgent{
 			AgentType:  "mongodb_exporter",
@@ -141,7 +123,24 @@ func (cmd *listAgentsCommand) Run() (commands.Result, error) {
 			Status:     getAgentStatus(a.Status, a.Disabled),
 		})
 	}
-
+	for _, a := range agentsRes.Payload.QANMysqlPerfschemaAgent {
+		agents = append(agents, listResultAgent{
+			AgentType:  "qan-mysql-perfschema-agent",
+			AgentID:    a.AgentID,
+			PMMAgentID: a.PMMAgentID,
+			ServiceID:  a.ServiceID,
+			Status:     getAgentStatus(a.Status, a.Disabled),
+		})
+	}
+	for _, a := range agentsRes.Payload.QANMysqlSlowlogAgent {
+		agents = append(agents, listResultAgent{
+			AgentType:  "qan-mysql-slowlog-agent",
+			AgentID:    a.AgentID,
+			PMMAgentID: a.PMMAgentID,
+			ServiceID:  a.ServiceID,
+			Status:     getAgentStatus(a.Status, a.Disabled),
+		})
+	}
 	for _, a := range agentsRes.Payload.QANMongodbProfilerAgent {
 		agents = append(agents, listResultAgent{
 			AgentType:  "qan-mongodb-profiler-agent",

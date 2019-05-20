@@ -33,10 +33,10 @@ Nodes list.
 `)
 
 type listResultNode struct {
-	NodeType string
-	NodeName string
-	Address  string
-	NodeID   string
+	NodeType string `json:"node_type"`
+	NodeName string `json:"node_name"`
+	Address  string `json:"address"`
+	NodeID   string `json:"node_id"`
 }
 
 type listNodesResult struct {
@@ -60,23 +60,22 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	var nodes []listResultNode
 
-	for _, node := range result.Payload.Generic {
+	var nodes []listResultNode
+	for _, n := range result.Payload.Generic {
 		nodes = append(nodes, listResultNode{
 			NodeType: "Generic",
-			NodeName: node.NodeName,
-			Address:  node.Address,
-			NodeID:   node.NodeID,
+			NodeName: n.NodeName,
+			Address:  n.Address,
+			NodeID:   n.NodeID,
 		})
 	}
-
-	for _, node := range result.Payload.Container {
+	for _, n := range result.Payload.Container {
 		nodes = append(nodes, listResultNode{
-			NodeType: "Generic",
-			NodeName: node.NodeName,
-			Address:  node.Address,
-			NodeID:   node.NodeID,
+			NodeType: "Container",
+			NodeName: n.NodeName,
+			Address:  n.Address,
+			NodeID:   n.NodeID,
 		})
 	}
 

@@ -17,10 +17,11 @@
 package inventory
 
 import (
-	"github.com/percona/pmm/api/inventorypb/json/client"
-	"github.com/percona/pmm/api/inventorypb/json/client/services"
 	"net"
 	"strconv"
+
+	"github.com/percona/pmm/api/inventorypb/json/client"
+	"github.com/percona/pmm/api/inventorypb/json/client/services"
 
 	"github.com/percona/pmm-admin/commands"
 )
@@ -62,6 +63,7 @@ func (cmd *listServicesCommand) Run() (commands.Result, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	var services []listResultService
 	for _, s := range result.Payload.Mysql {
 		services = append(services, listResultService{
