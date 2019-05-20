@@ -23,7 +23,7 @@ import (
 	"github.com/percona/pmm-admin/commands"
 )
 
-var listNodeGenericResultT = commands.ParseTemplate(`
+var listNodesResultT = commands.ParseTemplate(`
 Nodes list.
 
 {{ printf "%-13s" "Node type" }} {{ printf "%-20s" "Node name" }} {{ printf "%-17s" "Address" }} {{ "Node ID" }}
@@ -40,13 +40,13 @@ type listResultNode struct {
 }
 
 type listNodesResult struct {
-	Nodes []listResultNode
+	Nodes []listResultNode `json:"nodes"`
 }
 
 func (res *listNodesResult) Result() {}
 
 func (res *listNodesResult) String() string {
-	return commands.RenderTemplate(listNodeGenericResultT, res)
+	return commands.RenderTemplate(listNodesResultT, res)
 }
 
 type listNodeCommand struct {

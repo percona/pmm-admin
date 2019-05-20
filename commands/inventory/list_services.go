@@ -25,7 +25,7 @@ import (
 	"github.com/percona/pmm-admin/commands"
 )
 
-var listServicesGenericResultT = commands.ParseTemplate(`
+var listServicesResultT = commands.ParseTemplate(`
 Services list.
 
 {{ printf "%-13s" "Service type" }} {{ printf "%-20s" "Service name" }} {{ printf "%-17s" "Address and Port" }} {{ "Service ID" }}
@@ -42,13 +42,13 @@ type listResultService struct {
 }
 
 type listServicesResult struct {
-	Services []listResultService
+	Services []listResultService `json:"services"`
 }
 
 func (res *listServicesResult) Result() {}
 
 func (res *listServicesResult) String() string {
-	return commands.RenderTemplate(listServicesGenericResultT, res)
+	return commands.RenderTemplate(listServicesResultT, res)
 }
 
 type listServicesCommand struct {

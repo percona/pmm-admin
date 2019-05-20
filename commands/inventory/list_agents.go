@@ -26,7 +26,7 @@ import (
 	"github.com/percona/pmm-admin/commands"
 )
 
-var listAgentsGenericResultT = commands.ParseTemplate(`
+var listAgentsResultT = commands.ParseTemplate(`
 Agents list.
 
 {{ printf "%-27s" "Agent type" }} {{ printf "%-15s" "Status" }} {{ printf "%-47s" "Agent ID" }} {{ printf "%-47s" "PMM-Agent ID" }} {{ printf "%-47s" "Service ID" }} 
@@ -44,13 +44,13 @@ type listResultAgent struct {
 }
 
 type listAgentsResult struct {
-	Agents []listResultAgent
+	Agents []listResultAgent `json:"agents"`
 }
 
 func (res *listAgentsResult) Result() {}
 
 func (res *listAgentsResult) String() string {
-	return commands.RenderTemplate(listAgentsGenericResultT, res)
+	return commands.RenderTemplate(listAgentsResultT, res)
 }
 
 type listAgentsCommand struct {
