@@ -192,7 +192,7 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-4080-postgres-labels"
+  branch = "PMM-2.0"
   digest = "1:b38ffdc7bcada187f87a08c8c6adbb7685691687672da615ca13b226372f7f6e"
   name = "github.com/percona/pmm"
   packages = [
@@ -215,7 +215,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "194f0f3c7c541cab114a30e2c56ae5ea2933f9fe"
+  revision = "ace935c63a6ca5bff081731844a0f8797dbe58b3"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
