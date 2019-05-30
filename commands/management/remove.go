@@ -82,12 +82,12 @@ func (cmd *removeMySQLCommand) serviceType() *string {
 // register command
 var (
 	Remove  = new(removeMySQLCommand)
-	RemoveC = kingpin.Command("remove", "Remove Service from monitoring.")
+	RemoveC = kingpin.Command("remove", "Remove Service from monitoring")
 )
 
 func init() {
-	RemoveC.Arg("service-type", "Service type(mysql, mongodb, etc.).").Default("").
+	RemoveC.Arg("service-type", "Service type(mysql, mongodb, etc.)").Default("").
 		EnumVar(&Remove.ServiceType, MySQLServiceType, MongoDBServiceType, PostgreSQLServiceType)
-	RemoveC.Arg("service-name", "Service name.").Default("").StringVar(&Remove.ServiceName)
-	RemoveC.Flag("service-id", "Service ID.").StringVar(&Remove.ServiceID)
+	RemoveC.Arg("service-name", "Service name").Default("").StringVar(&Remove.ServiceName)
+	RemoveC.Flag("service-id", "Service ID").StringVar(&Remove.ServiceID)
 }
