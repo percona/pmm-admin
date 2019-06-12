@@ -28,6 +28,7 @@ var serviceTypes = map[string]string{
 	MySQLServiceType:      service.RemoveServiceBodyServiceTypeMYSQLSERVICE,
 	MongoDBServiceType:    service.RemoveServiceBodyServiceTypeMONGODBSERVICE,
 	PostgreSQLServiceType: service.RemoveServiceBodyServiceTypePOSTGRESQLSERVICE,
+	ProxySQLServiceType:   service.RemoveServiceBodyServiceTypePROXYSQLSERVICE,
 }
 
 // Service types.
@@ -35,6 +36,7 @@ const (
 	MySQLServiceType      string = "mysql"
 	MongoDBServiceType    string = "mongodb"
 	PostgreSQLServiceType string = "postgresql"
+	ProxySQLServiceType   string = "proxysql"
 )
 
 var removeServiceGenericResultT = commands.ParseTemplate(`
