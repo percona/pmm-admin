@@ -81,7 +81,7 @@ func (a *Client) GetAction(params *GetActionParams) (*GetActionOK, error) {
 }
 
 /*
-StartMySQLExplainAction starts my SQL explain action starts my SQL e x p l a i n action
+StartMySQLExplainAction starts my SQL explain action starts my SQL e x p l a i n action with traditional output
 */
 func (a *Client) StartMySQLExplainAction(params *StartMySQLExplainActionParams) (*StartMySQLExplainActionOK, error) {
 	// TODO: Validate the params before sending
@@ -109,7 +109,7 @@ func (a *Client) StartMySQLExplainAction(params *StartMySQLExplainActionParams) 
 }
 
 /*
-StartMySQLExplainJSONAction starts my SQL explain JSON action starts my SQL JSON e x p l a i n action
+StartMySQLExplainJSONAction starts my SQL explain JSON action starts my SQL e x p l a i n action with JSON output
 */
 func (a *Client) StartMySQLExplainJSONAction(params *StartMySQLExplainJSONActionParams) (*StartMySQLExplainJSONActionOK, error) {
 	// TODO: Validate the params before sending
@@ -133,6 +133,118 @@ func (a *Client) StartMySQLExplainJSONAction(params *StartMySQLExplainJSONAction
 		return nil, err
 	}
 	return result.(*StartMySQLExplainJSONActionOK), nil
+
+}
+
+/*
+StartMySQLExplainTraditionalJSONAction starts my SQL explain traditional JSON action starts my SQL e x p l a i n action with traditional JSON output
+*/
+func (a *Client) StartMySQLExplainTraditionalJSONAction(params *StartMySQLExplainTraditionalJSONActionParams) (*StartMySQLExplainTraditionalJSONActionOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewStartMySQLExplainTraditionalJSONActionParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "StartMySQLExplainTraditionalJSONAction",
+		Method:             "POST",
+		PathPattern:        "/v0/management/Actions/StartMySQLExplainTraditionalJSON",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &StartMySQLExplainTraditionalJSONActionReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*StartMySQLExplainTraditionalJSONActionOK), nil
+
+}
+
+/*
+StartMySQLShowCreateTableAction starts my SQL show create table action starts my SQL s h o w c r e a t e t a b l e action
+*/
+func (a *Client) StartMySQLShowCreateTableAction(params *StartMySQLShowCreateTableActionParams) (*StartMySQLShowCreateTableActionOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewStartMySQLShowCreateTableActionParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "StartMySQLShowCreateTableAction",
+		Method:             "POST",
+		PathPattern:        "/v0/management/Actions/StartMySQLShowCreateTable",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &StartMySQLShowCreateTableActionReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*StartMySQLShowCreateTableActionOK), nil
+
+}
+
+/*
+StartMySQLShowIndexAction starts my SQL show index action starts my SQL s h o w i n d e x action
+*/
+func (a *Client) StartMySQLShowIndexAction(params *StartMySQLShowIndexActionParams) (*StartMySQLShowIndexActionOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewStartMySQLShowIndexActionParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "StartMySQLShowIndexAction",
+		Method:             "POST",
+		PathPattern:        "/v0/management/Actions/StartMySQLShowIndex",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &StartMySQLShowIndexActionReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*StartMySQLShowIndexActionOK), nil
+
+}
+
+/*
+StartMySQLShowTableStatusAction starts my SQL show table status action starts my SQL s h o w t a b l e s t a t u s action
+*/
+func (a *Client) StartMySQLShowTableStatusAction(params *StartMySQLShowTableStatusActionParams) (*StartMySQLShowTableStatusActionOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewStartMySQLShowTableStatusActionParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "StartMySQLShowTableStatusAction",
+		Method:             "POST",
+		PathPattern:        "/v0/management/Actions/StartMySQLShowTableStatus",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &StartMySQLShowTableStatusActionReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*StartMySQLShowTableStatusActionOK), nil
 
 }
 
