@@ -116,11 +116,11 @@ var (
 )
 
 func init() {
-	AddMongoDBC.Arg("address", "MongoDB address and port. Default: 127.0.0.1:27017").Default("127.0.0.1:27017").StringVar(&AddMongoDB.AddressPort)
+	AddMongoDBC.Arg("address", "MongoDB address and port (default: 127.0.0.1:27017)").Default("127.0.0.1:27017").StringVar(&AddMongoDB.AddressPort)
 
 	hostname, _ := os.Hostname()
 	serviceName := hostname + "-mongodb"
-	serviceNameHelp := fmt.Sprintf("Service name. Default: %s", serviceName)
+	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddMongoDBC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddMongoDB.ServiceName)
 
 	AddMongoDBC.Flag("username", "MongoDB username").StringVar(&AddMongoDB.Username)

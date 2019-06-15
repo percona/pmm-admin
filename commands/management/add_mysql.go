@@ -118,11 +118,11 @@ var (
 )
 
 func init() {
-	AddMySQLC.Arg("address", "MySQL address and port. Default: 127.0.0.1:3306").Default("127.0.0.1:3306").StringVar(&AddMySQL.AddressPort)
+	AddMySQLC.Arg("address", "MySQL address and port (default: 127.0.0.1:3306").Default("127.0.0.1:3306").StringVar(&AddMySQL.AddressPort)
 
 	hostname, _ := os.Hostname()
 	serviceName := hostname + "-mysql"
-	serviceNameHelp := fmt.Sprintf("Service name. Default: %s", serviceName)
+	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddMySQLC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddMySQL.ServiceName)
 
 	AddMySQLC.Flag("username", "MySQL username").Default("root").StringVar(&AddMySQL.Username)

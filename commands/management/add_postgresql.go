@@ -113,11 +113,11 @@ var (
 )
 
 func init() {
-	AddPostgreSQLC.Arg("address", "PostgreSQL address and port. Default: 127.0.0.1:5432").Default("127.0.0.1:5432").StringVar(&AddPostgreSQL.AddressPort)
+	AddPostgreSQLC.Arg("address", "PostgreSQL address and port (default: 127.0.0.1:5432)").Default("127.0.0.1:5432").StringVar(&AddPostgreSQL.AddressPort)
 
 	hostname, _ := os.Hostname()
 	serviceName := hostname + "-postgresql"
-	serviceNameHelp := fmt.Sprintf("Service name. Default: %s", serviceName)
+	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddPostgreSQLC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddPostgreSQL.ServiceName)
 
 	AddPostgreSQLC.Flag("username", "PostgreSQL username").Default("postgres").StringVar(&AddPostgreSQL.Username)

@@ -100,7 +100,7 @@ func init() {
 	AddNodeContainerC.Arg("name", "Node name").StringVar(&AddNodeContainer.NodeName)
 
 	AddNodeContainerC.Flag("machine-id", "Linux machine-id").StringVar(&AddNodeContainer.MachineID)
-	AddNodeContainerC.Flag("container-id", "Container identifier. If specified, must be a unique Docker container identifier").
+	AddNodeContainerC.Flag("container-id", "Container identifier; if specified, must be a unique Docker container identifier").
 		StringVar(&AddNodeContainer.ContainerID)
 	AddNodeContainerC.Flag("container-name", "Container name").StringVar(&AddNodeContainer.ContainerName)
 	AddNodeContainerC.Flag("address", "Address").StringVar(&AddNodeContainer.Address)

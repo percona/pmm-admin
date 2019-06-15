@@ -119,20 +119,20 @@ func init() {
 	if nodeinfo.PublicAddress == "" {
 		RegisterC.Arg("node-address", "Node address").Required().StringVar(&Register.Address)
 	} else {
-		help := fmt.Sprintf("Node address. Default: %s (autodetected)", nodeinfo.PublicAddress)
+		help := fmt.Sprintf("Node address (autodetected default: %s)", nodeinfo.PublicAddress)
 		RegisterC.Arg("node-address", help).Default(nodeinfo.PublicAddress).StringVar(&Register.Address)
 	}
 
 	nodeTypeDefault := nodeTypeKeys[0]
-	nodeTypeHelp := fmt.Sprintf("Node type, one of: %s. Default: %s", strings.Join(nodeTypeKeys, ", "), nodeTypeDefault)
+	nodeTypeHelp := fmt.Sprintf("Node type, one of: %s (default: %s)", strings.Join(nodeTypeKeys, ", "), nodeTypeDefault)
 	RegisterC.Arg("node-type", nodeTypeHelp).Default(nodeTypeDefault).EnumVar(&Register.NodeType, nodeTypeKeys...)
 
 	hostname, _ := os.Hostname()
-	nodeNameHelp := fmt.Sprintf("Node name. Default: %s (autodetected)", hostname)
+	nodeNameHelp := fmt.Sprintf("Node name (autodetected default: %s)", hostname)
 	RegisterC.Arg("node-name", nodeNameHelp).Default(hostname).StringVar(&Register.NodeName)
 
-	RegisterC.Flag("machine-id", "Node machine-id. Default is autodetected").Default(nodeinfo.MachineID).StringVar(&Register.MachineID)
-	RegisterC.Flag("distro", "Node OS distribution. Default is autodetected").Default(nodeinfo.Distro).StringVar(&Register.Distro)
+	RegisterC.Flag("machine-id", "Node machine-id (default is autodetected)").Default(nodeinfo.MachineID).StringVar(&Register.MachineID)
+	RegisterC.Flag("distro", "Node OS distribution (default is autodetected)").Default(nodeinfo.Distro).StringVar(&Register.Distro)
 	RegisterC.Flag("container-id", "Container ID").StringVar(&Register.ContainerID)
 	RegisterC.Flag("container-name", "Container name").StringVar(&Register.ContainerName)
 	RegisterC.Flag("node-model", "Node model").StringVar(&Register.NodeModel)

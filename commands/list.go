@@ -255,5 +255,5 @@ var (
 )
 
 func init() {
-	ListC.Flag("node-id", "Node ID. Default is autodetected").StringVar(&List.NodeID)
+	ListC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&List.NodeID)
 }
