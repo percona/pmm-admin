@@ -38,7 +38,7 @@ Custom labels: {{ .Agent.CustomLabels }}
 `)
 
 type addAgentQANPostgreSQLPgStatementsAgentResult struct {
-	Agent *agents.AddQANPostgreSQLPgStatementsAgentOKBodyQANPostgresqlPgstatementsAgent `json:"postgres_exporter"`
+	Agent *agents.AddQANPostgreSQLPgStatementsAgentOKBodyQANPostgresqlPgstatementsAgent `json:"qan_postgresql_pgstatements_agent"`
 }
 
 func (res *addAgentQANPostgreSQLPgStatementsAgentResult) Result() {}
