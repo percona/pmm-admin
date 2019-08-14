@@ -47,6 +47,8 @@ func (res *addMongoDBResult) String() string {
 
 type addMongoDBCommand struct {
 	AddressPort    string
+	NodeID         string
+	PMMAgentID     string
 	ServiceName    string
 	Username       string
 	Password       string
@@ -65,9 +67,17 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
-	if err != nil {
-		return nil, err
+	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		if err != nil {
+			return nil, err
+		}
+		if cmd.PMMAgentID == "" {
+			cmd.PMMAgentID = status.AgentID
+		}
+		if cmd.NodeID == "" {
+			cmd.NodeID = status.NodeID
+		}
 	}
 
 	host, portS, err := net.SplitHostPort(cmd.AddressPort)
@@ -81,11 +91,11 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 
 	params := &mongodb.AddMongoDBParams{
 		Body: mongodb.AddMongoDBBody{
-			NodeID:         status.NodeID,
+			NodeID:         cmd.NodeID,
 			ServiceName:    cmd.ServiceName,
 			Address:        host,
 			Port:           int64(port),
-			PMMAgentID:     status.AgentID,
+			PMMAgentID:     cmd.PMMAgentID,
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
@@ -122,6 +132,9 @@ func init() {
 	serviceName := hostname + "-mongodb"
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddMongoDBC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddMongoDB.ServiceName)
+
+	AddMongoDBC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddMongoDB.NodeID)
+	AddMongoDBC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddMongoDB.PMMAgentID)
 
 	AddMongoDBC.Flag("username", "MongoDB username").StringVar(&AddMongoDB.Username)
 	AddMongoDBC.Flag("password", "MongoDB password").StringVar(&AddMongoDB.Password)

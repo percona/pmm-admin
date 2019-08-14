@@ -48,6 +48,8 @@ func (res *addMySQLResult) String() string {
 
 type addMySQLCommand struct {
 	AddressPort    string
+	NodeID         string
+	PMMAgentID     string
 	ServiceName    string
 	Username       string
 	Password       string
@@ -71,9 +73,17 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
-	if err != nil {
-		return nil, err
+	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		if err != nil {
+			return nil, err
+		}
+		if cmd.PMMAgentID == "" {
+			cmd.PMMAgentID = status.AgentID
+		}
+		if cmd.NodeID == "" {
+			cmd.NodeID = status.NodeID
+		}
 	}
 
 	host, portS, err := net.SplitHostPort(cmd.AddressPort)
@@ -98,11 +108,11 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 
 	params := &mysql.AddMySQLParams{
 		Body: mysql.AddMySQLBody{
-			NodeID:         status.NodeID,
+			NodeID:         cmd.NodeID,
 			ServiceName:    cmd.ServiceName,
 			Address:        host,
 			Port:           int64(port),
-			PMMAgentID:     status.AgentID,
+			PMMAgentID:     cmd.PMMAgentID,
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
@@ -143,6 +153,9 @@ func init() {
 
 	AddMySQLC.Flag("username", "MySQL username").Default("root").StringVar(&AddMySQL.Username)
 	AddMySQLC.Flag("password", "MySQL password").StringVar(&AddMySQL.Password)
+
+	AddMySQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddMySQL.NodeID)
+	AddMySQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddMySQL.PMMAgentID)
 
 	querySources := []string{"slowlog", "perfschema"} // TODO add "auto"
 	querySourceHelp := fmt.Sprintf("Source of SQL queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])

@@ -47,6 +47,8 @@ func (res *addProxySQLResult) String() string {
 
 type addProxySQLCommand struct {
 	AddressPort    string
+	NodeID         string
+	PMMAgentID     string
 	ServiceName    string
 	Username       string
 	Password       string
@@ -64,9 +66,17 @@ func (cmd *addProxySQLCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
-	if err != nil {
-		return nil, err
+	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		if err != nil {
+			return nil, err
+		}
+		if cmd.PMMAgentID == "" {
+			cmd.PMMAgentID = status.AgentID
+		}
+		if cmd.NodeID == "" {
+			cmd.NodeID = status.NodeID
+		}
 	}
 
 	host, portS, err := net.SplitHostPort(cmd.AddressPort)
@@ -80,11 +90,11 @@ func (cmd *addProxySQLCommand) Run() (commands.Result, error) {
 
 	params := &proxysql.AddProxySQLParams{
 		Body: proxysql.AddProxySQLBody{
-			NodeID:         status.NodeID,
+			NodeID:         cmd.NodeID,
 			ServiceName:    cmd.ServiceName,
 			Address:        host,
 			Port:           int64(port),
-			PMMAgentID:     status.AgentID,
+			PMMAgentID:     cmd.PMMAgentID,
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
@@ -119,6 +129,9 @@ func init() {
 	serviceName := hostname + "-proxysql"
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddProxySQLC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddProxySQL.ServiceName)
+
+	AddProxySQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddProxySQL.NodeID)
+	AddProxySQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddProxySQL.PMMAgentID)
 
 	AddProxySQLC.Flag("username", "ProxySQL username").Default("admin").StringVar(&AddProxySQL.Username)
 	AddProxySQLC.Flag("password", "ProxySQL password").Default("admin").StringVar(&AddProxySQL.Password)
