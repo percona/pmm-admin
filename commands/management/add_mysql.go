@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/AlekSi/pointer"
 	"github.com/percona/pmm/api/managementpb/json/client"
 	mysql "github.com/percona/pmm/api/managementpb/json/client/my_sql"
 
@@ -48,6 +49,9 @@ func (res *addMySQLResult) String() string {
 
 type addMySQLCommand struct {
 	AddressPort    string
+	NodeID         string
+	NodeName       string
+	PMMAgentID     string
 	ServiceName    string
 	Username       string
 	Password       string
@@ -57,6 +61,9 @@ type addMySQLCommand struct {
 	CustomLabels   string
 
 	QuerySource string
+
+	Register       bool
+	RegisterParams registerCommand
 
 	// TODO remove once https://jira.percona.com/browse/PMM-4255 is done
 	UsePerfschema bool
@@ -71,9 +78,17 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
-	if err != nil {
-		return nil, err
+	if cmd.PMMAgentID == "" || (cmd.NodeID == "" && cmd.NodeName == "") {
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		if err != nil {
+			return nil, err
+		}
+		if cmd.PMMAgentID == "" {
+			cmd.PMMAgentID = status.AgentID
+		}
+		if cmd.NodeID == "" && cmd.NodeName == "" {
+			cmd.NodeID = status.NodeID
+		}
 	}
 
 	host, portS, err := net.SplitHostPort(cmd.AddressPort)
@@ -117,6 +132,29 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		},
 		Context: commands.Ctx,
 	}
+	if cmd.NodeName != "" {
+		if cmd.Register {
+			nodeCustomLabels, err := commands.ParseCustomLabels(cmd.RegisterParams.CustomLabels)
+			if err != nil {
+				return nil, err
+			}
+			params.Body.RegisterNode = &mysql.AddMySQLParamsBodyRegisterNode{
+				Address:       cmd.RegisterParams.Address,
+				Az:            cmd.RegisterParams.Az,
+				ContainerID:   cmd.RegisterParams.ContainerID,
+				ContainerName: cmd.RegisterParams.ContainerName,
+				CustomLabels:  nodeCustomLabels,
+				Distro:        cmd.RegisterParams.Distro,
+				MachineID:     cmd.RegisterParams.MachineID,
+				NodeModel:     cmd.RegisterParams.NodeModel,
+				NodeName:      cmd.NodeName,
+				NodeType:      pointer.ToString(nodeTypes[cmd.RegisterParams.NodeType]),
+				Region:        cmd.RegisterParams.Region,
+			}
+		} else {
+			params.Body.NodeName = cmd.NodeName
+		}
+	}
 	resp, err := client.Default.MySQL.AddMySQL(params)
 	if err != nil {
 		return nil, err
@@ -156,4 +194,22 @@ func init() {
 	AddMySQLC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddMySQL.CustomLabels)
 
 	AddMySQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddMySQL.SkipConnectionCheck)
+
+	AddMySQLC.Flag("register-node", "Register new node").BoolVar(&AddMySQL.Register)
+
+	AddMySQLC.Arg("node-address", "Node address").StringVar(&AddMySQL.RegisterParams.Address)
+
+	nodeTypeDefault := "remote"
+	nodeTypeHelp := fmt.Sprintf("Node type, one of: %s (default: %s)", strings.Join(nodeTypeKeys, ", "), nodeTypeDefault)
+	AddMySQLC.Arg("node-type", nodeTypeHelp).Default(nodeTypeDefault).EnumVar(&AddMySQL.RegisterParams.NodeType, nodeTypeKeys...)
+
+	AddMySQLC.Flag("node-name", "Node name").StringVar(&AddMySQL.NodeName)
+	AddMySQLC.Flag("machine-id", "Node machine-id (default is autodetected)").StringVar(&AddMySQL.RegisterParams.MachineID)
+	AddMySQLC.Flag("distro", "Node OS distribution (default is autodetected)").StringVar(&AddMySQL.RegisterParams.Distro)
+	AddMySQLC.Flag("container-id", "Container ID").StringVar(&AddMySQL.RegisterParams.ContainerID)
+	AddMySQLC.Flag("container-name", "Container name").StringVar(&AddMySQL.RegisterParams.ContainerName)
+	AddMySQLC.Flag("node-model", "Node model").StringVar(&AddMySQL.RegisterParams.NodeModel)
+	AddMySQLC.Flag("region", "Node region").StringVar(&AddMySQL.RegisterParams.Region)
+	AddMySQLC.Flag("az", "Node availability zone").StringVar(&AddMySQL.RegisterParams.Az)
+	AddMySQLC.Flag("node-custom-labels", "Custom user-assigned labels").StringVar(&AddMySQL.RegisterParams.CustomLabels)
 }
