@@ -113,11 +113,11 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 
 	params := &mysql.AddMySQLParams{
 		Body: mysql.AddMySQLBody{
-			NodeID:         status.NodeID,
+			NodeID:         cmd.NodeID,
 			ServiceName:    cmd.ServiceName,
 			Address:        host,
 			Port:           int64(port),
-			PMMAgentID:     status.AgentID,
+			PMMAgentID:     cmd.PMMAgentID,
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
