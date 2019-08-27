@@ -62,14 +62,30 @@ type addMySQLCommand struct {
 
 	QuerySource string
 
-	Register       bool
-	RegisterParams registerCommand
+	AddNode       bool
+	AddNodeParams addNodeParams
 
 	// TODO remove once https://jira.percona.com/browse/PMM-4255 is done
 	UsePerfschema bool
 	UseSlowLog    bool
 
 	SkipConnectionCheck bool
+}
+
+type addNodeParams struct {
+	NodeType      string
+	NodeName      string
+	MachineID     string
+	Distro        string
+	ContainerID   string
+	ContainerName string
+	NodeModel     string
+	Region        string
+	Az            string
+	CustomLabels  string
+	Address       string
+
+	Force bool
 }
 
 func (cmd *addMySQLCommand) Run() (commands.Result, error) {
@@ -133,23 +149,22 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		Context: commands.Ctx,
 	}
 	if cmd.NodeName != "" {
-		if cmd.Register {
-			nodeCustomLabels, err := commands.ParseCustomLabels(cmd.RegisterParams.CustomLabels)
+		if cmd.AddNode {
+			nodeCustomLabels, err := commands.ParseCustomLabels(cmd.AddNodeParams.CustomLabels)
 			if err != nil {
 				return nil, err
 			}
-			params.Body.RegisterNode = &mysql.AddMySQLParamsBodyRegisterNode{
-				Address:       cmd.RegisterParams.Address,
-				Az:            cmd.RegisterParams.Az,
-				ContainerID:   cmd.RegisterParams.ContainerID,
-				ContainerName: cmd.RegisterParams.ContainerName,
+			params.Body.AddNode = &mysql.AddMySQLParamsBodyAddNode{
+				Az:            cmd.AddNodeParams.Az,
+				ContainerID:   cmd.AddNodeParams.ContainerID,
+				ContainerName: cmd.AddNodeParams.ContainerName,
 				CustomLabels:  nodeCustomLabels,
-				Distro:        cmd.RegisterParams.Distro,
-				MachineID:     cmd.RegisterParams.MachineID,
-				NodeModel:     cmd.RegisterParams.NodeModel,
+				Distro:        cmd.AddNodeParams.Distro,
+				MachineID:     cmd.AddNodeParams.MachineID,
+				NodeModel:     cmd.AddNodeParams.NodeModel,
 				NodeName:      cmd.NodeName,
-				NodeType:      pointer.ToString(nodeTypes[cmd.RegisterParams.NodeType]),
-				Region:        cmd.RegisterParams.Region,
+				NodeType:      pointer.ToString(nodeTypes[cmd.AddNodeParams.NodeType]),
+				Region:        cmd.AddNodeParams.Region,
 			}
 		} else {
 			params.Body.NodeName = cmd.NodeName
@@ -195,21 +210,21 @@ func init() {
 
 	AddMySQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddMySQL.SkipConnectionCheck)
 
-	AddMySQLC.Flag("register-node", "Register new node").BoolVar(&AddMySQL.Register)
+	AddMySQLC.Flag("add-node", "Add new node").BoolVar(&AddMySQL.AddNode)
 
-	AddMySQLC.Arg("node-address", "Node address").StringVar(&AddMySQL.RegisterParams.Address)
+	AddMySQLC.Arg("node-address", "Node address").StringVar(&AddMySQL.AddNodeParams.Address)
 
 	nodeTypeDefault := "remote"
 	nodeTypeHelp := fmt.Sprintf("Node type, one of: %s (default: %s)", strings.Join(nodeTypeKeys, ", "), nodeTypeDefault)
-	AddMySQLC.Arg("node-type", nodeTypeHelp).Default(nodeTypeDefault).EnumVar(&AddMySQL.RegisterParams.NodeType, nodeTypeKeys...)
+	AddMySQLC.Arg("node-type", nodeTypeHelp).Default(nodeTypeDefault).EnumVar(&AddMySQL.AddNodeParams.NodeType, nodeTypeKeys...)
 
 	AddMySQLC.Flag("node-name", "Node name").StringVar(&AddMySQL.NodeName)
-	AddMySQLC.Flag("machine-id", "Node machine-id (default is autodetected)").StringVar(&AddMySQL.RegisterParams.MachineID)
-	AddMySQLC.Flag("distro", "Node OS distribution (default is autodetected)").StringVar(&AddMySQL.RegisterParams.Distro)
-	AddMySQLC.Flag("container-id", "Container ID").StringVar(&AddMySQL.RegisterParams.ContainerID)
-	AddMySQLC.Flag("container-name", "Container name").StringVar(&AddMySQL.RegisterParams.ContainerName)
-	AddMySQLC.Flag("node-model", "Node model").StringVar(&AddMySQL.RegisterParams.NodeModel)
-	AddMySQLC.Flag("region", "Node region").StringVar(&AddMySQL.RegisterParams.Region)
-	AddMySQLC.Flag("az", "Node availability zone").StringVar(&AddMySQL.RegisterParams.Az)
-	AddMySQLC.Flag("node-custom-labels", "Custom user-assigned labels").StringVar(&AddMySQL.RegisterParams.CustomLabels)
+	AddMySQLC.Flag("machine-id", "Node machine-id (default is autodetected)").StringVar(&AddMySQL.AddNodeParams.MachineID)
+	AddMySQLC.Flag("distro", "Node OS distribution (default is autodetected)").StringVar(&AddMySQL.AddNodeParams.Distro)
+	AddMySQLC.Flag("container-id", "Container ID").StringVar(&AddMySQL.AddNodeParams.ContainerID)
+	AddMySQLC.Flag("container-name", "Container name").StringVar(&AddMySQL.AddNodeParams.ContainerName)
+	AddMySQLC.Flag("node-model", "Node model").StringVar(&AddMySQL.AddNodeParams.NodeModel)
+	AddMySQLC.Flag("region", "Node region").StringVar(&AddMySQL.AddNodeParams.Region)
+	AddMySQLC.Flag("az", "Node availability zone").StringVar(&AddMySQL.AddNodeParams.Az)
+	AddMySQLC.Flag("node-custom-labels", "Custom user-assigned labels").StringVar(&AddMySQL.AddNodeParams.CustomLabels)
 }
