@@ -59,6 +59,8 @@ type addPostgreSQLCommand struct {
 	QuerySource string
 
 	SkipConnectionCheck bool
+	TLS                 bool
+	TLSSkipVerify       bool
 }
 
 func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
@@ -104,6 +106,8 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			QANPostgresqlPgstatementsAgent: usePgStatements,
 
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
+			TLS:                 cmd.TLS,
+			TLSSkipVerify:       cmd.TLSSkipVerify,
 		},
 		Context: commands.Ctx,
 	}
@@ -144,4 +148,7 @@ func init() {
 	AddPostgreSQLC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddPostgreSQL.CustomLabels)
 
 	AddPostgreSQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddPostgreSQL.SkipConnectionCheck)
+	AddPostgreSQLC.Flag("tls", "Enable TLS for PostgreSQL connection").BoolVar(&AddPostgreSQL.TLS)
+	AddPostgreSQLC.Flag("tls-skip-verify", "Skip TLS certificate validation (use ssl-mode= require instead of verify-full").
+		BoolVar(&AddPostgreSQL.SkipConnectionCheck)
 }
