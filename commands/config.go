@@ -112,7 +112,7 @@ func (cmd *configCommand) Run() (Result, error) {
 		Output: strings.TrimSpace(string(b)),
 	}
 	if switchedToTLS {
-		res.Warning = `Warning: TODO explain why we switched to TLS`
+		res.Warning = `Warning: PMM Server requires TLS communications with client.`
 	}
 	return res, err
 }
