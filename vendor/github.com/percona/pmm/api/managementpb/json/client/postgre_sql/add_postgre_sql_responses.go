@@ -26,14 +26,12 @@ type AddPostgreSQLReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *AddPostgreSQLReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewAddPostgreSQLOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	default:
 		result := NewAddPostgreSQLDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -61,6 +59,10 @@ type AddPostgreSQLOK struct {
 
 func (o *AddPostgreSQLOK) Error() string {
 	return fmt.Sprintf("[POST /v0/management/PostgreSQL/Add][%d] addPostgreSqlOk  %+v", 200, o.Payload)
+}
+
+func (o *AddPostgreSQLOK) GetPayload() *AddPostgreSQLOKBody {
+	return o.Payload
 }
 
 func (o *AddPostgreSQLOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -99,6 +101,10 @@ func (o *AddPostgreSQLDefault) Code() int {
 
 func (o *AddPostgreSQLDefault) Error() string {
 	return fmt.Sprintf("[POST /v0/management/PostgreSQL/Add][%d] AddPostgreSQL default  %+v", o._statusCode, o.Payload)
+}
+
+func (o *AddPostgreSQLDefault) GetPayload() *AddPostgreSQLDefaultBody {
+	return o.Payload
 }
 
 func (o *AddPostgreSQLDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -153,6 +159,14 @@ type AddPostgreSQLBody struct {
 
 	// Skip connection check.
 	SkipConnectionCheck bool `json:"skip_connection_check,omitempty"`
+
+	// // Use SSL for PostgreSQL connection
+	TLS bool `json:"tls,omitempty"`
+
+	// // Skip SSL certificates validation.
+	//  // true : ssl-mode=require
+	//  // false: ssl-mode=verify-full
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
 
 	// PostgreSQL username for scraping metrics.
 	Username string `json:"username,omitempty"`
@@ -357,6 +371,12 @@ type AddPostgreSQLOKBodyPostgresExporter struct {
 	// AgentStatus represents actual Agent status.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
+
+	// Use TLS for database connections.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS certificate and hostname validation. Uses sslmode=required instead of verify-full.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
 
 	// PostgreSQL username for scraping metrics.
 	Username string `json:"username,omitempty"`

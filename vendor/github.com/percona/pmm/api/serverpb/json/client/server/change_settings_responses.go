@@ -24,14 +24,12 @@ type ChangeSettingsReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *ChangeSettingsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewChangeSettingsOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	default:
 		result := NewChangeSettingsDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -59,6 +57,10 @@ type ChangeSettingsOK struct {
 
 func (o *ChangeSettingsOK) Error() string {
 	return fmt.Sprintf("[POST /v1/Settings/Change][%d] changeSettingsOk  %+v", 200, o.Payload)
+}
+
+func (o *ChangeSettingsOK) GetPayload() *ChangeSettingsOKBody {
+	return o.Payload
 }
 
 func (o *ChangeSettingsOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -99,6 +101,10 @@ func (o *ChangeSettingsDefault) Error() string {
 	return fmt.Sprintf("[POST /v1/Settings/Change][%d] ChangeSettings default  %+v", o._statusCode, o.Payload)
 }
 
+func (o *ChangeSettingsDefault) GetPayload() *ChangeSettingsDefaultBody {
+	return o.Payload
+}
+
 func (o *ChangeSettingsDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(ChangeSettingsDefaultBody)
@@ -115,6 +121,9 @@ func (o *ChangeSettingsDefault) readResponse(response runtime.ClientResponse, co
 swagger:model ChangeSettingsBody
 */
 type ChangeSettingsBody struct {
+
+	// A number of full days for Prometheus and QAN data retention. Should have a suffix in JSON: 2592000s, 43200m, 720h.
+	DataRetention string `json:"data_retention,omitempty"`
 
 	// disable telemetry
 	DisableTelemetry bool `json:"disable_telemetry,omitempty"`
@@ -278,11 +287,14 @@ swagger:model ChangeSettingsOKBodySettings
 */
 type ChangeSettingsOKBodySettings struct {
 
+	// data retention
+	DataRetention string `json:"data_retention,omitempty"`
+
 	// metrics resolutions
 	MetricsResolutions *ChangeSettingsOKBodySettingsMetricsResolutions `json:"metrics_resolutions,omitempty"`
 
-	// telemetry
-	Telemetry bool `json:"telemetry,omitempty"`
+	// telemetry enabled
+	TelemetryEnabled bool `json:"telemetry_enabled,omitempty"`
 
 	// updates disabled
 	UpdatesDisabled bool `json:"updates_disabled,omitempty"`
@@ -343,13 +355,13 @@ swagger:model ChangeSettingsOKBodySettingsMetricsResolutions
 */
 type ChangeSettingsOKBodySettingsMetricsResolutions struct {
 
-	// High resolution. Suffix 's' is required in JSON: 1s, 60s, 300s.
+	// High resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Hr string `json:"hr,omitempty"`
 
-	// Low resolution. Suffix 's' is required in JSON: 1s, 60s, 300s.
+	// Low resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Lr string `json:"lr,omitempty"`
 
-	// Medium resolution. Suffix 's' is required in JSON: 1s, 60s, 300s.
+	// Medium resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Mr string `json:"mr,omitempty"`
 }
 
@@ -381,13 +393,13 @@ swagger:model ChangeSettingsParamsBodyMetricsResolutions
 */
 type ChangeSettingsParamsBodyMetricsResolutions struct {
 
-	// High resolution. Suffix 's' is required in JSON: 1s, 60s, 300s.
+	// High resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Hr string `json:"hr,omitempty"`
 
-	// Low resolution. Suffix 's' is required in JSON: 1s, 60s, 300s.
+	// Low resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Lr string `json:"lr,omitempty"`
 
-	// Medium resolution. Suffix 's' is required in JSON: 1s, 60s, 300s.
+	// Medium resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Mr string `json:"mr,omitempty"`
 }
 

@@ -24,14 +24,12 @@ type GetSettingsReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetSettingsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetSettingsOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	default:
 		result := NewGetSettingsDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -59,6 +57,10 @@ type GetSettingsOK struct {
 
 func (o *GetSettingsOK) Error() string {
 	return fmt.Sprintf("[POST /v1/Settings/Get][%d] getSettingsOk  %+v", 200, o.Payload)
+}
+
+func (o *GetSettingsOK) GetPayload() *GetSettingsOKBody {
+	return o.Payload
 }
 
 func (o *GetSettingsOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -97,6 +99,10 @@ func (o *GetSettingsDefault) Code() int {
 
 func (o *GetSettingsDefault) Error() string {
 	return fmt.Sprintf("[POST /v1/Settings/Get][%d] GetSettings default  %+v", o._statusCode, o.Payload)
+}
+
+func (o *GetSettingsDefault) GetPayload() *GetSettingsDefaultBody {
+	return o.Payload
 }
 
 func (o *GetSettingsDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -213,11 +219,14 @@ swagger:model GetSettingsOKBodySettings
 */
 type GetSettingsOKBodySettings struct {
 
+	// data retention
+	DataRetention string `json:"data_retention,omitempty"`
+
 	// metrics resolutions
 	MetricsResolutions *GetSettingsOKBodySettingsMetricsResolutions `json:"metrics_resolutions,omitempty"`
 
-	// telemetry
-	Telemetry bool `json:"telemetry,omitempty"`
+	// telemetry enabled
+	TelemetryEnabled bool `json:"telemetry_enabled,omitempty"`
 
 	// updates disabled
 	UpdatesDisabled bool `json:"updates_disabled,omitempty"`
@@ -278,13 +287,13 @@ swagger:model GetSettingsOKBodySettingsMetricsResolutions
 */
 type GetSettingsOKBodySettingsMetricsResolutions struct {
 
-	// High resolution. Suffix 's' is required in JSON: 1s, 60s, 300s.
+	// High resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Hr string `json:"hr,omitempty"`
 
-	// Low resolution. Suffix 's' is required in JSON: 1s, 60s, 300s.
+	// Low resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Lr string `json:"lr,omitempty"`
 
-	// Medium resolution. Suffix 's' is required in JSON: 1s, 60s, 300s.
+	// Medium resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Mr string `json:"mr,omitempty"`
 }
 
