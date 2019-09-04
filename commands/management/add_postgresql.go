@@ -48,6 +48,8 @@ func (res *addPostgreSQLResult) String() string {
 
 type addPostgreSQLCommand struct {
 	AddressPort    string
+	NodeID         string
+	PMMAgentID     string
 	ServiceName    string
 	Username       string
 	Password       string
@@ -67,9 +69,17 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
-	if err != nil {
-		return nil, err
+	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		if err != nil {
+			return nil, err
+		}
+		if cmd.PMMAgentID == "" {
+			cmd.PMMAgentID = status.AgentID
+		}
+		if cmd.NodeID == "" {
+			cmd.NodeID = status.NodeID
+		}
 	}
 
 	host, portS, err := net.SplitHostPort(cmd.AddressPort)
@@ -89,11 +99,11 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 
 	params := &postgresql.AddPostgreSQLParams{
 		Body: postgresql.AddPostgreSQLBody{
-			NodeID:         status.NodeID,
+			NodeID:         cmd.NodeID,
 			ServiceName:    cmd.ServiceName,
 			Address:        host,
 			Port:           int64(port),
-			PMMAgentID:     status.AgentID,
+			PMMAgentID:     cmd.PMMAgentID,
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
@@ -130,6 +140,9 @@ func init() {
 	serviceName := hostname + "-postgresql"
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddPostgreSQLC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddPostgreSQL.ServiceName)
+
+	AddPostgreSQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddPostgreSQL.NodeID)
+	AddPostgreSQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddPostgreSQL.PMMAgentID)
 
 	AddPostgreSQLC.Flag("username", "PostgreSQL username").Default("postgres").StringVar(&AddPostgreSQL.Username)
 	AddPostgreSQLC.Flag("password", "PostgreSQL password").StringVar(&AddPostgreSQL.Password)
