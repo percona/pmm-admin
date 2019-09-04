@@ -36,7 +36,7 @@ Az        : {{ .Node.Az }}
 `)
 
 type addNodeRemoteResult struct {
-	Node *nodes.AddRemoteNodeOKBodyRemote `json:"Remote"`
+	Node *nodes.AddRemoteNodeOKBodyRemote `json:"remote"`
 }
 
 func (res *addNodeRemoteResult) Result() {}
@@ -82,7 +82,7 @@ func (cmd *addNodeRemoteCommand) Run() (commands.Result, error) {
 // register command
 var (
 	AddNodeRemote  = new(addNodeRemoteCommand)
-	AddNodeRemoteC = addNodeC.Command("Remote", "Add Remote node to inventory")
+	AddNodeRemoteC = addNodeC.Command("remote", "Add Remote node to inventory")
 )
 
 func init() {

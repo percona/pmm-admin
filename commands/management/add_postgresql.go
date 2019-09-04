@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/AlekSi/pointer"
 	"github.com/percona/pmm/api/managementpb/json/client"
 	postgresql "github.com/percona/pmm/api/managementpb/json/client/postgre_sql"
 
@@ -49,6 +50,7 @@ func (res *addPostgreSQLResult) String() string {
 type addPostgreSQLCommand struct {
 	AddressPort    string
 	NodeID         string
+	NodeName       string
 	PMMAgentID     string
 	ServiceName    string
 	Username       string
@@ -60,6 +62,9 @@ type addPostgreSQLCommand struct {
 
 	QuerySource string
 
+	AddNode       bool
+	AddNodeParams addNodeParams
+
 	SkipConnectionCheck bool
 }
 
@@ -69,7 +74,7 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
+	if cmd.PMMAgentID == "" || (cmd.NodeID == "" && cmd.NodeName == "") {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
 			return nil, err
@@ -77,7 +82,7 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 		if cmd.PMMAgentID == "" {
 			cmd.PMMAgentID = status.AgentID
 		}
-		if cmd.NodeID == "" {
+		if cmd.NodeID == "" && cmd.NodeName == "" {
 			cmd.NodeID = status.NodeID
 		}
 	}
@@ -116,6 +121,28 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
 		},
 		Context: commands.Ctx,
+	}
+	if cmd.NodeName != "" {
+		if cmd.AddNode {
+			nodeCustomLabels, err := commands.ParseCustomLabels(cmd.AddNodeParams.CustomLabels)
+			if err != nil {
+				return nil, err
+			}
+			params.Body.AddNode = &postgresql.AddPostgreSQLParamsBodyAddNode{
+				Az:            cmd.AddNodeParams.Az,
+				ContainerID:   cmd.AddNodeParams.ContainerID,
+				ContainerName: cmd.AddNodeParams.ContainerName,
+				CustomLabels:  nodeCustomLabels,
+				Distro:        cmd.AddNodeParams.Distro,
+				MachineID:     cmd.AddNodeParams.MachineID,
+				NodeModel:     cmd.AddNodeParams.NodeModel,
+				NodeName:      cmd.NodeName,
+				NodeType:      pointer.ToString(nodeTypes[cmd.AddNodeParams.NodeType]),
+				Region:        cmd.AddNodeParams.Region,
+			}
+		} else {
+			params.Body.NodeName = cmd.NodeName
+		}
 	}
 	resp, err := client.Default.PostgreSQL.AddPostgreSQL(params)
 	if err != nil {
@@ -157,4 +184,8 @@ func init() {
 	AddPostgreSQLC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddPostgreSQL.CustomLabels)
 
 	AddPostgreSQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddPostgreSQL.SkipConnectionCheck)
+
+	AddPostgreSQLC.Flag("add-node", "Add new node").BoolVar(&AddPostgreSQL.AddNode)
+	AddPostgreSQLC.Flag("node-name", "Node name").StringVar(&AddPostgreSQL.NodeName)
+	addNodeFlags(AddPostgreSQLC, &AddPostgreSQL.AddNodeParams)
 }
