@@ -23,6 +23,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/alecthomas/units"
+
 	"github.com/percona/pmm/api/managementpb/json/client"
 	mysql "github.com/percona/pmm/api/managementpb/json/client/my_sql"
 
@@ -63,6 +65,7 @@ type addMySQLCommand struct {
 	UseSlowLog    bool
 
 	SkipConnectionCheck bool
+	SizeSlowLogs        units.Base2Bytes
 }
 
 func (cmd *addMySQLCommand) Run() (commands.Result, error) {
@@ -114,6 +117,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			QANMysqlPerfschema: usePerfschema,
 
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
+			SizeSlowLogs:        int64(cmd.SizeSlowLogs),
 		},
 		Context: commands.Ctx,
 	}
@@ -149,6 +153,7 @@ func init() {
 	AddMySQLC.Flag("query-source", querySourceHelp).Default(querySources[0]).EnumVar(&AddMySQL.QuerySource, querySources...)
 	AddMySQLC.Flag("use-perfschema", "Run QAN perf schema agent").Hidden().BoolVar(&AddMySQL.UsePerfschema)
 	AddMySQLC.Flag("use-slowlog", "Run QAN slow log agent").Hidden().BoolVar(&AddMySQL.UseSlowLog)
+	AddMySQLC.Flag("size-slow-logs", "Rotate slow logs. (0 = no rotation)").Default("1GB").BytesVar(&AddMySQL.SizeSlowLogs)
 
 	AddMySQLC.Flag("environment", "Environment name").StringVar(&AddMySQL.Environment)
 	AddMySQLC.Flag("cluster", "Cluster name").StringVar(&AddMySQL.Cluster)

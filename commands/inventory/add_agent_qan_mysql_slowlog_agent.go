@@ -17,6 +17,8 @@
 package inventory
 
 import (
+	"github.com/alecthomas/units"
+
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
 
@@ -53,6 +55,7 @@ type addAgentQANMySQLSlowlogAgentCommand struct {
 	Password            string
 	CustomLabels        string
 	SkipConnectionCheck bool
+	SizeSlowLogs        units.Base2Bytes
 }
 
 func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
@@ -68,6 +71,7 @@ func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
 			Password:            cmd.Password,
 			CustomLabels:        customLabels,
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
+			SizeSlowLogs:        int64(cmd.SizeSlowLogs),
 		},
 		Context: commands.Ctx,
 	}
@@ -94,4 +98,5 @@ func init() {
 	AddAgentQANMySQLSlowlogAgentC.Flag("password", "MySQL password for scraping metrics").StringVar(&AddAgentQANMySQLSlowlogAgent.Password)
 	AddAgentQANMySQLSlowlogAgentC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentQANMySQLSlowlogAgent.CustomLabels)
 	AddAgentQANMySQLSlowlogAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMySQLSlowlogAgent.SkipConnectionCheck)
+	AddAgentQANMySQLSlowlogAgentC.Flag("size-slow-logs", "Rotate slow logs. (0 = no rotation)").Default("1GB").BytesVar(&AddAgentQANMySQLSlowlogAgent.SizeSlowLogs)
 }
