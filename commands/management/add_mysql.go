@@ -62,7 +62,8 @@ type addMySQLCommand struct {
 	UsePerfschema bool
 	UseSlowLog    bool
 
-	SkipConnectionCheck bool
+	DisableQueryExamples bool
+	SkipConnectionCheck  bool
 }
 
 func (cmd *addMySQLCommand) Run() (commands.Result, error) {
@@ -113,7 +114,8 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			QANMysqlSlowlog:    useSlowLog,
 			QANMysqlPerfschema: usePerfschema,
 
-			SkipConnectionCheck: cmd.SkipConnectionCheck,
+			DisableQueryExamples: cmd.DisableQueryExamples,
+			SkipConnectionCheck:  cmd.SkipConnectionCheck,
 		},
 		Context: commands.Ctx,
 	}
@@ -149,6 +151,7 @@ func init() {
 	AddMySQLC.Flag("query-source", querySourceHelp).Default(querySources[0]).EnumVar(&AddMySQL.QuerySource, querySources...)
 	AddMySQLC.Flag("use-perfschema", "Run QAN perf schema agent").Hidden().BoolVar(&AddMySQL.UsePerfschema)
 	AddMySQLC.Flag("use-slowlog", "Run QAN slow log agent").Hidden().BoolVar(&AddMySQL.UseSlowLog)
+	AddMySQLC.Flag("disable-query-examples", "Skip query examples").BoolVar(&AddMySQL.DisableQueryExamples)
 
 	AddMySQLC.Flag("environment", "Environment name").StringVar(&AddMySQL.Environment)
 	AddMySQLC.Flag("cluster", "Cluster name").StringVar(&AddMySQL.Cluster)
