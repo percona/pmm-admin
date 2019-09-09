@@ -76,8 +76,6 @@ func (cmd *addServicePostgreSQLCommand) Run() (commands.Result, error) {
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
 			CustomLabels:   customLabels,
-			TLS:            cmd.TLS,
-			TLSSkipVerify:  cmd.TLSSkipVerify,
 		},
 		Context: commands.Ctx,
 	}
