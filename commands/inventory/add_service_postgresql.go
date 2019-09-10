@@ -33,8 +33,6 @@ Environment    : {{ .Service.Environment }}
 Cluster name   : {{ .Service.Cluster }}
 Replication set: {{ .Service.ReplicationSet }}
 Custom labels  : {{ .Service.CustomLabels }}
-TLS            : {{ .Service.TLS }}
-TLS skip verify: {{ .Service.TLSSkipVerify }}
 `)
 
 type addServicePostgreSQLResult struct {
@@ -56,8 +54,6 @@ type addServicePostgreSQLCommand struct {
 	Cluster        string
 	ReplicationSet string
 	CustomLabels   string
-	TLS            bool
-	TLSSkipVerify  bool
 }
 
 func (cmd *addServicePostgreSQLCommand) Run() (commands.Result, error) {
@@ -104,7 +100,4 @@ func init() {
 	AddServicePostgreSQLC.Flag("cluster", "Cluster name").StringVar(&AddServicePostgreSQL.Cluster)
 	AddServicePostgreSQLC.Flag("replication-set", "Replication set name").StringVar(&AddServicePostgreSQL.ReplicationSet)
 	AddServicePostgreSQLC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddServicePostgreSQL.CustomLabels)
-	AddServicePostgreSQLC.Flag("tls", "Enable TLS when connecting to PostgreSQL").BoolVar(&AddServicePostgreSQL.TLS)
-	AddServicePostgreSQLC.Flag("tls-skip-verify", "Skip TLS certificates validation (use ssl-mode=required instead of verify-full").
-		BoolVar(&AddServicePostgreSQL.TLSSkipVerify)
 }
