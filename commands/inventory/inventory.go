@@ -20,10 +20,14 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+// Hide inventory commands from help.
+// TODO https://jira.percona.com/browse/PMM-4042
+const hide = true
+
 // register commands
 var (
-	inventoryC       = kingpin.Command("inventory", "Inventory commands")
-	inventoryListC   = inventoryC.Command("list", "List inventory commands")
-	inventoryAddC    = inventoryC.Command("add", "Add to inventory commands")
-	inventoryRemoveC = inventoryC.Command("remove", "Remove from inventory commands")
+	inventoryC       = kingpin.Command("inventory", "Inventory commands").Hide(hide)
+	inventoryListC   = inventoryC.Command("list", "List inventory commands").Hide(hide)
+	inventoryAddC    = inventoryC.Command("add", "Add to inventory commands").Hide(hide)
+	inventoryRemoveC = inventoryC.Command("remove", "Remove from inventory commands").Hide(hide)
 )
