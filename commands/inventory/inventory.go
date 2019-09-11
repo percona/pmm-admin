@@ -20,8 +20,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-// Hide inventory commands from help.
-// TODO https://jira.percona.com/browse/PMM-4042
+// Hide inventory commands from help by default.
 const hide = true
 
 // register commands
