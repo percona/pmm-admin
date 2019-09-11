@@ -17,6 +17,8 @@
 package inventory
 
 import (
+	"fmt"
+
 	"github.com/alecthomas/units"
 
 	"github.com/percona/pmm/api/inventorypb/json/client"
@@ -49,13 +51,14 @@ func (res *addAgentQANMySQLSlowlogAgentResult) String() string {
 }
 
 type addAgentQANMySQLSlowlogAgentCommand struct {
-	PMMAgentID          string
-	ServiceID           string
-	Username            string
-	Password            string
-	CustomLabels        string
-	SkipConnectionCheck bool
-	SizeSlowLogs        units.Base2Bytes
+	PMMAgentID           string
+	ServiceID            string
+	Username             string
+	Password             string
+	CustomLabels         string
+	SkipConnectionCheck  bool
+	DisableQueryExamples bool
+	MaxSlowlogFileSize   units.Base2Bytes
 }
 
 func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
@@ -63,15 +66,17 @@ func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	params := &agents.AddQANMySQLSlowlogAgentParams{
 		Body: agents.AddQANMySQLSlowlogAgentBody{
-			PMMAgentID:          cmd.PMMAgentID,
-			ServiceID:           cmd.ServiceID,
-			Username:            cmd.Username,
-			Password:            cmd.Password,
-			CustomLabels:        customLabels,
-			SkipConnectionCheck: cmd.SkipConnectionCheck,
-			SizeSlowLogs:        int64(cmd.SizeSlowLogs),
+			PMMAgentID:           cmd.PMMAgentID,
+			ServiceID:            cmd.ServiceID,
+			Username:             cmd.Username,
+			Password:             cmd.Password,
+			CustomLabels:         customLabels,
+			SkipConnectionCheck:  cmd.SkipConnectionCheck,
+			MaxSlowlogFileSize:   fmt.Sprintf("%d", cmd.MaxSlowlogFileSize),
+			DisableQueryExamples: cmd.DisableQueryExamples,
 		},
 		Context: commands.Ctx,
 	}
@@ -98,5 +103,6 @@ func init() {
 	AddAgentQANMySQLSlowlogAgentC.Flag("password", "MySQL password for scraping metrics").StringVar(&AddAgentQANMySQLSlowlogAgent.Password)
 	AddAgentQANMySQLSlowlogAgentC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentQANMySQLSlowlogAgent.CustomLabels)
 	AddAgentQANMySQLSlowlogAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMySQLSlowlogAgent.SkipConnectionCheck)
-	AddAgentQANMySQLSlowlogAgentC.Flag("size-slow-logs", "Rotate slow logs. (0 = no rotation)").Default("1GB").BytesVar(&AddAgentQANMySQLSlowlogAgent.SizeSlowLogs)
+	AddAgentQANMySQLSlowlogAgentC.Flag("disable-query-examples", "Skip query examples").BoolVar(&AddAgentQANMySQLSlowlogAgent.DisableQueryExamples)
+	AddAgentQANMySQLSlowlogAgentC.Flag("size-slow-logs", "Rotate slow logs. (0 = no rotation)").Default("1GB").BytesVar(&AddAgentQANMySQLSlowlogAgent.MaxSlowlogFileSize)
 }
