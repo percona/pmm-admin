@@ -241,7 +241,7 @@
 
 [[projects]]
   branch = "PMM-2.0"
-  digest = "1:ec388ddb7686a77efafd971ea5fd337162ae2c3f760630d37a71d3e99ef6fe01"
+  digest = "1:46aad6b2cd38449e5667145b0d32f594431ec6449d5e52ccab332a0865494a93"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -265,7 +265,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "b1a083f56015e1dfb9728f7cc0a1fd131c3d4fde"
+  revision = "f8fed450fcb387e906b21fa1bf14a63366250204"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
@@ -381,12 +381,12 @@
   revision = "e9bb7d36c0606a2c422dffe30db7d628ebeb9302"
 
 [[projects]]
-  branch = "v2.2.6-no-dots"
-  digest = "1:b1d8828d22d5fd5326651f3babc8f27786d7f6de5632db5d0ba85a5ec8376cd9"
+  branch = "v2.2.6-percona"
+  digest = "1:65f2385f4890821d672a45ea6800fd59e2f7cf94cd385d56baf2390f031e4633"
   name = "gopkg.in/alecthomas/kingpin.v2"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "4af15a15e8da9f856bb620212713c58e1e27e388"
+  revision = "33f03abf8b596e750f3cc9d66a2555d6cc3daa78"
   source = "https://github.com/Percona-Lab/kingpin.git"
 
 [[projects]]

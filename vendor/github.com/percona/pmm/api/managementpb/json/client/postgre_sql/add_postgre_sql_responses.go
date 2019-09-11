@@ -168,10 +168,12 @@ type AddPostgreSQLBody struct {
 	// Skip connection check.
 	SkipConnectionCheck bool `json:"skip_connection_check,omitempty"`
 
-	// Use TLS for database connections.
+	// // Use SSL for PostgreSQL connection
 	TLS bool `json:"tls,omitempty"`
 
-	// Skip TLS certificate and hostname validation. Uses sslmode=required instead of verify-full.
+	// // Skip SSL certificates validation.
+	//  // true : ssl-mode=require
+	//  // false: ssl-mode=verify-full
 	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
 
 	// PostgreSQL username for scraping metrics.
@@ -528,12 +530,6 @@ type AddPostgreSQLOKBodyQANPostgresqlPgstatementsAgent struct {
 	// AgentStatus represents actual Agent status.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
-
-	// Use TLS for database connections.
-	TLS bool `json:"tls,omitempty"`
-
-	// Skip TLS certificate and hostname validation.
-	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
 
 	// PostgreSQL username for getting pg stat statements data.
 	Username string `json:"username,omitempty"`

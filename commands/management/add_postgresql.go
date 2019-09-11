@@ -1,18 +1,17 @@
 // pmm-admin
-// Copyright (C) 2018 Percona LLC
+// Copyright 2019 Percona LLC
 //
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU Affero General Public License for more details.
+//  http://www.apache.org/licenses/LICENSE-2.0
 //
-// You should have received a copy of the GNU Affero General Public License
-// along with this program. If not, see <https://www.gnu.org/licenses/>.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package management
 
@@ -66,6 +65,8 @@ type addPostgreSQLCommand struct {
 	AddNodeParams addNodeParams
 
 	SkipConnectionCheck bool
+	TLS                 bool
+	TLSSkipVerify       bool
 }
 
 func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
@@ -119,6 +120,8 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			QANPostgresqlPgstatementsAgent: usePgStatements,
 
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
+			TLS:                 cmd.TLS,
+			TLSSkipVerify:       cmd.TLSSkipVerify,
 		},
 		Context: commands.Ctx,
 	}
@@ -184,6 +187,10 @@ func init() {
 	AddPostgreSQLC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddPostgreSQL.CustomLabels)
 
 	AddPostgreSQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddPostgreSQL.SkipConnectionCheck)
+	AddPostgreSQLC.Flag("tls", "Use TLS/SSL to connect to PostgreSQL").
+		BoolVar(&AddPostgreSQL.TLS)
+	AddPostgreSQLC.Flag("tls-skip-verify", "Skip TLS/SSL certificates validation (uses ssl-mode=require instead of verify-full)").
+		BoolVar(&AddPostgreSQL.TLSSkipVerify)
 
 	AddPostgreSQLC.Flag("add-node", "Add new node").BoolVar(&AddPostgreSQL.AddNode)
 	AddPostgreSQLC.Flag("node-name", "Node name").StringVar(&AddPostgreSQL.NodeName)
