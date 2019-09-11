@@ -103,5 +103,5 @@ func init() {
 	AddAgentQANMySQLSlowlogAgentC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentQANMySQLSlowlogAgent.CustomLabels)
 	AddAgentQANMySQLSlowlogAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMySQLSlowlogAgent.SkipConnectionCheck)
 	AddAgentQANMySQLSlowlogAgentC.Flag("disable-query-examples", "Skip query examples").BoolVar(&AddAgentQANMySQLSlowlogAgent.DisableQueryExamples)
-	AddAgentQANMySQLSlowlogAgentC.Flag("size-slow-logs", "Rotate slow logs. (0 = no rotation)").Default("1GB").BytesVar(&AddAgentQANMySQLSlowlogAgent.MaxSlowlogFileSize)
+	AddAgentQANMySQLSlowlogAgentC.Flag("size-slow-logs", "Rotate slow logs. (0 = no rotation)").BytesVar(&AddAgentQANMySQLSlowlogAgent.MaxSlowlogFileSize)
 }
