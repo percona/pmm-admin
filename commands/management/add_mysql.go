@@ -22,9 +22,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/alecthomas/units"
-
 	"github.com/AlekSi/pointer"
+	"github.com/alecthomas/units"
 	"github.com/percona/pmm/api/managementpb/json/client"
 	mysql "github.com/percona/pmm/api/managementpb/json/client/my_sql"
 
@@ -66,13 +65,9 @@ type addMySQLCommand struct {
 	AddNode       bool
 	AddNodeParams addNodeParams
 
-	// TODO remove once https://jira.percona.com/browse/PMM-4255 is done
-	UsePerfschema bool
-	UseSlowLog    bool
-
 	SkipConnectionCheck  bool
-	MaxSlowlogFileSize   units.Base2Bytes
 	DisableQueryExamples bool
+	MaxSlowlogFileSize   units.Base2Bytes
 }
 
 func (cmd *addMySQLCommand) Run() (commands.Result, error) {
@@ -103,15 +98,17 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	// ignore query source if old flags are present for compatibility
-	useSlowLog, usePerfschema := cmd.UseSlowLog, cmd.UsePerfschema
-	if !(useSlowLog || usePerfschema) {
-		switch cmd.QuerySource {
-		case "slowlog":
-			useSlowLog = true
-		case "perfschema":
-			usePerfschema = true
-		}
+	var useSlowLog, usePerfschema bool
+	switch cmd.QuerySource {
+	case "slowlog":
+		useSlowLog = true
+	case "perfschema":
+		usePerfschema = true
+	}
+
+	// tweak according to API docs
+	if cmd.MaxSlowlogFileSize == 0 {
+		cmd.MaxSlowlogFileSize = -1
 	}
 
 	params := &mysql.AddMySQLParams{
@@ -132,8 +129,8 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			QANMysqlPerfschema: usePerfschema,
 
 			SkipConnectionCheck:  cmd.SkipConnectionCheck,
-			MaxSlowlogFileSize:   fmt.Sprintf("%d", cmd.MaxSlowlogFileSize),
 			DisableQueryExamples: cmd.DisableQueryExamples,
+			MaxSlowlogFileSize:   strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
 		},
 		Context: commands.Ctx,
 	}
@@ -193,10 +190,8 @@ func init() {
 	querySources := []string{"slowlog", "perfschema"} // TODO add "auto"
 	querySourceHelp := fmt.Sprintf("Source of SQL queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
 	AddMySQLC.Flag("query-source", querySourceHelp).Default(querySources[0]).EnumVar(&AddMySQL.QuerySource, querySources...)
-	AddMySQLC.Flag("use-perfschema", "Run QAN perf schema agent").Hidden().BoolVar(&AddMySQL.UsePerfschema)
-	AddMySQLC.Flag("use-slowlog", "Run QAN slow log agent").Hidden().BoolVar(&AddMySQL.UseSlowLog)
-	AddMySQLC.Flag("size-slow-logs", "Rotate slow logs. (0 = no rotation)").Default("1GB").BytesVar(&AddMySQL.MaxSlowlogFileSize)
-	AddMySQLC.Flag("disable-query-examples", "Skip query examples").BoolVar(&AddMySQL.DisableQueryExamples)
+	AddMySQLC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddMySQL.DisableQueryExamples)
+	AddMySQLC.Flag("size-slow-logs", "Rotate slow log file at this size (0 disables rotation)").Default("1GB").BytesVar(&AddMySQL.MaxSlowlogFileSize)
 
 	AddMySQLC.Flag("environment", "Environment name").StringVar(&AddMySQL.Environment)
 	AddMySQLC.Flag("cluster", "Cluster name").StringVar(&AddMySQL.Cluster)

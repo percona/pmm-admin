@@ -16,10 +16,9 @@
 package inventory
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/alecthomas/units"
-
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
 
@@ -28,15 +27,17 @@ import (
 
 var addAgentQANMySQLSlowlogAgentResultT = commands.ParseTemplate(`
 QAN MySQL slowlog agent added.
-Agent ID     : {{ .Agent.AgentID }}
-PMM-Agent ID : {{ .Agent.PMMAgentID }}
-Service ID   : {{ .Agent.ServiceID }}
-Username     : {{ .Agent.Username }}
-Password     : {{ .Agent.Password }}
+Agent ID         : {{ .Agent.AgentID }}
+PMM-Agent ID     : {{ .Agent.PMMAgentID }}
+Service ID       : {{ .Agent.ServiceID }}
+Username         : {{ .Agent.Username }}
+Password         : {{ .Agent.Password }}
+Query examples   : {{ .QueryExamples }}
+Slowlog rotation : {{ .SlowlogRotation }}
 
-Status       : {{ .Agent.Status }}
-Disabled     : {{ .Agent.Disabled }}
-Custom labels: {{ .Agent.CustomLabels }}
+Status           : {{ .Agent.Status }}
+Disabled         : {{ .Agent.Disabled }}
+Custom labels    : {{ .Agent.CustomLabels }}
 `)
 
 type addAgentQANMySQLSlowlogAgentResult struct {
@@ -47,6 +48,18 @@ func (res *addAgentQANMySQLSlowlogAgentResult) Result() {}
 
 func (res *addAgentQANMySQLSlowlogAgentResult) String() string {
 	return commands.RenderTemplate(addAgentQANMySQLSlowlogAgentResultT, res)
+}
+
+func (res *addAgentQANMySQLSlowlogAgentResult) QueryExamples() string {
+	if res.Agent.QueryExamplesDisabled {
+		return "disabled"
+	}
+	return "enabled"
+}
+
+func (res *addAgentQANMySQLSlowlogAgentResult) SlowlogRotation() string {
+	// TODO units.ParseBase2Bytes, etc
+	return res.Agent.MaxSlowlogFileSize
 }
 
 type addAgentQANMySQLSlowlogAgentCommand struct {
@@ -74,8 +87,8 @@ func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
 			Password:             cmd.Password,
 			CustomLabels:         customLabels,
 			SkipConnectionCheck:  cmd.SkipConnectionCheck,
-			MaxSlowlogFileSize:   fmt.Sprintf("%d", cmd.MaxSlowlogFileSize),
 			DisableQueryExamples: cmd.DisableQueryExamples,
+			MaxSlowlogFileSize:   strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
 		},
 		Context: commands.Ctx,
 	}
@@ -102,6 +115,6 @@ func init() {
 	AddAgentQANMySQLSlowlogAgentC.Flag("password", "MySQL password for scraping metrics").StringVar(&AddAgentQANMySQLSlowlogAgent.Password)
 	AddAgentQANMySQLSlowlogAgentC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentQANMySQLSlowlogAgent.CustomLabels)
 	AddAgentQANMySQLSlowlogAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMySQLSlowlogAgent.SkipConnectionCheck)
-	AddAgentQANMySQLSlowlogAgentC.Flag("disable-query-examples", "Skip query examples").BoolVar(&AddAgentQANMySQLSlowlogAgent.DisableQueryExamples)
-	AddAgentQANMySQLSlowlogAgentC.Flag("size-slow-logs", "Rotate slow logs. (0 = no rotation)").BytesVar(&AddAgentQANMySQLSlowlogAgent.MaxSlowlogFileSize)
+	AddAgentQANMySQLSlowlogAgentC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddAgentQANMySQLSlowlogAgent.DisableQueryExamples)
+	AddAgentQANMySQLSlowlogAgentC.Flag("size-slow-logs", "Rotate slow log file at this size (0 disables rotation)").BytesVar(&AddAgentQANMySQLSlowlogAgent.MaxSlowlogFileSize)
 }
