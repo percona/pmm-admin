@@ -24,15 +24,17 @@ import (
 
 var addAgentQANMongoDBProfilerAgentResultT = commands.ParseTemplate(`
 QAN MongoDB profiler agent added.
-Agent ID     : {{ .Agent.AgentID }}
-PMM-Agent ID : {{ .Agent.PMMAgentID }}
-Service ID   : {{ .Agent.ServiceID }}
-Username     : {{ .Agent.Username }}
-Password     : {{ .Agent.Password }}
+Agent ID       : {{ .Agent.AgentID }}
+PMM-Agent ID   : {{ .Agent.PMMAgentID }}
+Service ID     : {{ .Agent.ServiceID }}
+Username       : {{ .Agent.Username }}
+Password       : {{ .Agent.Password }}
 
-Status       : {{ .Agent.Status }}
-Disabled     : {{ .Agent.Disabled }}
-Custom labels: {{ .Agent.CustomLabels }}
+Status         : {{ .Agent.Status }}
+Disabled       : {{ .Agent.Disabled }}
+Custom labels  : {{ .Agent.CustomLabels }}
+Enable TLS     : {{ .Agent.TLS }}
+Skip TLS Verify: {{ .Agent.TLSSkipVerify }}
 `)
 
 type addAgentQANMongoDBProfilerAgentResult struct {
@@ -52,6 +54,8 @@ type addAgentQANMongoDBProfilerAgentCommand struct {
 	Password            string
 	CustomLabels        string
 	SkipConnectionCheck bool
+	TLS                 bool
+	TLSSkipVerify       bool
 }
 
 func (cmd *addAgentQANMongoDBProfilerAgentCommand) Run() (commands.Result, error) {
@@ -67,6 +71,8 @@ func (cmd *addAgentQANMongoDBProfilerAgentCommand) Run() (commands.Result, error
 			Password:            cmd.Password,
 			CustomLabels:        customLabels,
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
+			TLS:                 cmd.TLS,
+			TLSSkipVerify:       cmd.TLSSkipVerify,
 		},
 		Context: commands.Ctx,
 	}
@@ -93,4 +99,8 @@ func init() {
 	AddAgentQANMongoDBProfilerAgentC.Flag("password", "MongoDB password for scraping metrics").StringVar(&AddAgentQANMongoDBProfilerAgent.Password)
 	AddAgentQANMongoDBProfilerAgentC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentQANMongoDBProfilerAgent.CustomLabels)
 	AddAgentQANMongoDBProfilerAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMongoDBProfilerAgent.SkipConnectionCheck)
+	AddAgentQANMongoDBProfilerAgentC.Flag("tls", "Use TLS/SSL to connect to the database").
+		BoolVar(&AddAgentQANMongoDBProfilerAgent.TLS)
+	AddAgentQANMongoDBProfilerAgentC.Flag("tls-skip-verify", "Skip TLS/SSL certificates validation").
+		BoolVar(&AddAgentQANMongoDBProfilerAgent.TLSSkipVerify)
 }

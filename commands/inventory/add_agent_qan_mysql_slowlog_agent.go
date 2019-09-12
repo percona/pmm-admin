@@ -24,15 +24,17 @@ import (
 
 var addAgentQANMySQLSlowlogAgentResultT = commands.ParseTemplate(`
 QAN MySQL slowlog agent added.
-Agent ID     : {{ .Agent.AgentID }}
-PMM-Agent ID : {{ .Agent.PMMAgentID }}
-Service ID   : {{ .Agent.ServiceID }}
-Username     : {{ .Agent.Username }}
-Password     : {{ .Agent.Password }}
+Agent ID       : {{ .Agent.AgentID }}
+PMM-Agent ID   : {{ .Agent.PMMAgentID }}
+Service ID     : {{ .Agent.ServiceID }}
+Username       : {{ .Agent.Username }}
+Password       : {{ .Agent.Password }}
 
-Status       : {{ .Agent.Status }}
-Disabled     : {{ .Agent.Disabled }}
-Custom labels: {{ .Agent.CustomLabels }}
+Status         : {{ .Agent.Status }}
+Disabled       : {{ .Agent.Disabled }}
+Custom labels  : {{ .Agent.CustomLabels }}
+Enable TLS     : {{ .Agent.TLS }}
+Skip TLS Verify: {{ .Agent.TLSSkipVerify }}
 `)
 
 type addAgentQANMySQLSlowlogAgentResult struct {
@@ -52,6 +54,8 @@ type addAgentQANMySQLSlowlogAgentCommand struct {
 	Password            string
 	CustomLabels        string
 	SkipConnectionCheck bool
+	TLS                 bool
+	TLSSkipVerify       bool
 }
 
 func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
@@ -67,6 +71,8 @@ func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
 			Password:            cmd.Password,
 			CustomLabels:        customLabels,
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
+			TLS:                 cmd.TLS,
+			TLSSkipVerify:       cmd.TLSSkipVerify,
 		},
 		Context: commands.Ctx,
 	}
@@ -93,4 +99,6 @@ func init() {
 	AddAgentQANMySQLSlowlogAgentC.Flag("password", "MySQL password for scraping metrics").StringVar(&AddAgentQANMySQLSlowlogAgent.Password)
 	AddAgentQANMySQLSlowlogAgentC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentQANMySQLSlowlogAgent.CustomLabels)
 	AddAgentQANMySQLSlowlogAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMySQLSlowlogAgent.SkipConnectionCheck)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls", "Use TLS/SSL to connect to the database").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLS)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls-skip-verify", "Skip TLS/SSL certificates validation").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLSSkipVerify)
 }

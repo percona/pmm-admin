@@ -100,7 +100,7 @@ func init() {
 	AddAgentPostgresExporterC.Flag("password", "PostgreSQL password for scraping metrics").StringVar(&AddAgentPostgresExporter.Password)
 	AddAgentPostgresExporterC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentPostgresExporter.CustomLabels)
 	AddAgentPostgresExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentPostgresExporter.SkipConnectionCheck)
-	AddAgentPostgresExporterC.Flag("tls", "Use TLS/SSL to connect to PostgreSQL").
+	AddAgentPostgresExporterC.Flag("tls", "Use TLS/SSL to connect to the database").
 		BoolVar(&AddAgentPostgresExporter.TLS)
 	AddAgentPostgresExporterC.Flag("tls-skip-verify", "Skip TLS/SSL certificates validation (uses ssl-mode=require instead of verify-full)").
 		BoolVar(&AddAgentPostgresExporter.TLSSkipVerify)
