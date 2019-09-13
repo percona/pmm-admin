@@ -24,24 +24,18 @@ import (
 
 var addAgentQANMySQLPerfSchemaAgentResultT = commands.ParseTemplate(`
 QAN MySQL perf schema agent added.
-Agent ID       : {{ .Agent.AgentID }}
-PMM-Agent ID   : {{ .Agent.PMMAgentID }}
-Service ID     : {{ .Agent.ServiceID }}
-Username       : {{ .Agent.Username }}
-Password       : {{ .Agent.Password }}
-<<<<<<< HEAD
-=======
-Query examples : {{ .QueryExamples }}
->>>>>>> master
+Agent ID              : {{ .Agent.AgentID }}
+PMM-Agent ID          : {{ .Agent.PMMAgentID }}
+Service ID            : {{ .Agent.ServiceID }}
+Username              : {{ .Agent.Username }}
+Password              : {{ .Agent.Password }}
+Query examples        : {{ .QueryExamples }}
+TLS enabled           : {{ .Agent.TLS }}
+Skip TLS verification : {{ .Agent.TLSSkipVerify }}
 
-Status         : {{ .Agent.Status }}
-Disabled       : {{ .Agent.Disabled }}
-Custom labels  : {{ .Agent.CustomLabels }}
-<<<<<<< HEAD
-Enable TLS     : {{ .Agent.TLS }}
-Skip TLS Verify: {{ .Agent.TLSSkipVerify }}
-=======
->>>>>>> master
+Status                : {{ .Agent.Status }}
+Disabled              : {{ .Agent.Disabled }}
+Custom labels         : {{ .Agent.CustomLabels }}
 `)
 
 type addAgentQANMySQLPerfSchemaAgentResult struct {

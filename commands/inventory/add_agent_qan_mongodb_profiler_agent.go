@@ -24,17 +24,17 @@ import (
 
 var addAgentQANMongoDBProfilerAgentResultT = commands.ParseTemplate(`
 QAN MongoDB profiler agent added.
-Agent ID       : {{ .Agent.AgentID }}
-PMM-Agent ID   : {{ .Agent.PMMAgentID }}
-Service ID     : {{ .Agent.ServiceID }}
-Username       : {{ .Agent.Username }}
-Password       : {{ .Agent.Password }}
+Agent ID              : {{ .Agent.AgentID }}
+PMM-Agent ID          : {{ .Agent.PMMAgentID }}
+Service ID            : {{ .Agent.ServiceID }}
+Username              : {{ .Agent.Username }}
+Password              : {{ .Agent.Password }}
+TLS enabled           : {{ .Agent.TLS }}
+Skip TLS verification : {{ .Agent.TLSSkipVerify }}
 
-Status         : {{ .Agent.Status }}
-Disabled       : {{ .Agent.Disabled }}
-Custom labels  : {{ .Agent.CustomLabels }}
-Enable TLS     : {{ .Agent.TLS }}
-Skip TLS Verify: {{ .Agent.TLSSkipVerify }}
+Status                : {{ .Agent.Status }}
+Disabled              : {{ .Agent.Disabled }}
+Custom labels         : {{ .Agent.CustomLabels }}
 `)
 
 type addAgentQANMongoDBProfilerAgentResult struct {

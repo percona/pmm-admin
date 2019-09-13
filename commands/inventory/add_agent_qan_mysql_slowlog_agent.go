@@ -27,19 +27,19 @@ import (
 
 var addAgentQANMySQLSlowlogAgentResultT = commands.ParseTemplate(`
 QAN MySQL slowlog agent added.
-Agent ID         : {{ .Agent.AgentID }}
-PMM-Agent ID     : {{ .Agent.PMMAgentID }}
-Service ID       : {{ .Agent.ServiceID }}
-Username         : {{ .Agent.Username }}
-Password         : {{ .Agent.Password }}
-Query examples   : {{ .QueryExamples }}
-Slowlog rotation : {{ .SlowlogRotation }}
-Enable TLS     : {{ .Agent.TLS }}
-Skip TLS Verify: {{ .Agent.TLSSkipVerify }}
+Agent ID              : {{ .Agent.AgentID }}
+PMM-Agent ID          : {{ .Agent.PMMAgentID }}
+Service ID            : {{ .Agent.ServiceID }}
+Username              : {{ .Agent.Username }}
+Password              : {{ .Agent.Password }}
+Query examples        : {{ .QueryExamples }}
+Slowlog rotation      : {{ .SlowlogRotation }}
+TLS enabled           : {{ .Agent.TLS }}
+Skip TLS verification : {{ .Agent.TLSSkipVerify }}
 
-Status           : {{ .Agent.Status }}
-Disabled         : {{ .Agent.Disabled }}
-Custom labels    : {{ .Agent.CustomLabels }}
+Status                : {{ .Agent.Status }}
+Disabled              : {{ .Agent.Disabled }}
+Custom labels         : {{ .Agent.CustomLabels }}
 `)
 
 type addAgentQANMySQLSlowlogAgentResult struct {
