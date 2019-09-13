@@ -62,6 +62,10 @@ type addMySQLCommand struct {
 
 	QuerySource string
 
+	// TODO remove once https://jira.percona.com/browse/PMM-4255 is really done
+	UsePerfschema bool
+	UseSlowLog    bool
+
 	AddNode       bool
 	AddNodeParams addNodeParams
 
@@ -98,12 +102,15 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	var useSlowLog, usePerfschema bool
-	switch cmd.QuerySource {
-	case "slowlog":
-		useSlowLog = true
-	case "perfschema":
-		usePerfschema = true
+	// ignore query source if old flags are present for compatibility
+	useSlowLog, usePerfschema := cmd.UseSlowLog, cmd.UsePerfschema
+	if !(useSlowLog || usePerfschema) {
+		switch cmd.QuerySource {
+		case "slowlog":
+			useSlowLog = true
+		case "perfschema":
+			usePerfschema = true
+		}
 	}
 
 	// tweak according to API docs
@@ -190,6 +197,8 @@ func init() {
 	querySources := []string{"slowlog", "perfschema"} // TODO add "auto"
 	querySourceHelp := fmt.Sprintf("Source of SQL queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
 	AddMySQLC.Flag("query-source", querySourceHelp).Default(querySources[0]).EnumVar(&AddMySQL.QuerySource, querySources...)
+	AddMySQLC.Flag("use-perfschema", "Run QAN perf schema agent").Hidden().BoolVar(&AddMySQL.UsePerfschema)
+	AddMySQLC.Flag("use-slowlog", "Run QAN slow log agent").Hidden().BoolVar(&AddMySQL.UseSlowLog)
 	AddMySQLC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddMySQL.DisableQueryExamples)
 	AddMySQLC.Flag("size-slow-logs", "Rotate slow log file at this size (0 disables rotation)").Default("1GB").BytesVar(&AddMySQL.MaxSlowlogFileSize)
 
