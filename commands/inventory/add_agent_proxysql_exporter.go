@@ -100,8 +100,6 @@ func init() {
 	AddAgentProxysqlExporterC.Flag("password", "ProxySQL password for scraping metrics").Default("admin").StringVar(&AddAgentProxysqlExporter.Password)
 	AddAgentProxysqlExporterC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentProxysqlExporter.CustomLabels)
 	AddAgentProxysqlExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentProxysqlExporter.SkipConnectionCheck)
-	AddAgentProxysqlExporterC.Flag("tls", "Use TLS/SSL to connect to ProxySQL").
-		BoolVar(&AddAgentProxysqlExporter.TLS)
-	AddAgentProxysqlExporterC.Flag("tls-skip-verify", "Skip TLS/SSL certificates validation").
-		BoolVar(&AddAgentProxysqlExporter.TLSSkipVerify)
+	AddAgentProxysqlExporterC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentProxysqlExporter.TLS)
+	AddAgentProxysqlExporterC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentProxysqlExporter.TLSSkipVerify)
 }

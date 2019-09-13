@@ -101,5 +101,5 @@ func init() {
 	AddAgentMysqldExporterC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentMysqldExporter.CustomLabels)
 	AddAgentMysqldExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentMysqldExporter.SkipConnectionCheck)
 	AddAgentMysqldExporterC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentMysqldExporter.TLS)
-	AddAgentMysqldExporterC.Flag("tls-skip-verify", "Use TLS to connect to the database").BoolVar(&AddAgentMysqldExporter.TLSSkipVerify)
+	AddAgentMysqldExporterC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentMysqldExporter.TLSSkipVerify)
 }

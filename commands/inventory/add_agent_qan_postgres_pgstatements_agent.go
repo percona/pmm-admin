@@ -100,8 +100,6 @@ func init() {
 	AddAgentQANPostgreSQLPgStatementsAgentC.Flag("password", "PostgreSQL password for QAN agent").StringVar(&AddAgentQANPostgreSQLPgStatementsAgent.Password)
 	AddAgentQANPostgreSQLPgStatementsAgentC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentQANPostgreSQLPgStatementsAgent.CustomLabels)
 	AddAgentQANPostgreSQLPgStatementsAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANPostgreSQLPgStatementsAgent.SkipConnectionCheck)
-	AddAgentQANPostgreSQLPgStatementsAgentC.Flag("tls", "Use TLS/SSL to connect to the database").
-		BoolVar(&AddAgentQANPostgreSQLPgStatementsAgent.TLS)
-	AddAgentQANPostgreSQLPgStatementsAgentC.Flag("tls-skip-verify", "Skip TLS/SSL certificates validation (uses ssl-mode=require instead of verify-full)").
-		BoolVar(&AddAgentQANPostgreSQLPgStatementsAgent.TLSSkipVerify)
+	AddAgentQANPostgreSQLPgStatementsAgentC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentQANPostgreSQLPgStatementsAgent.TLS)
+	AddAgentQANPostgreSQLPgStatementsAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANPostgreSQLPgStatementsAgent.TLSSkipVerify)
 }

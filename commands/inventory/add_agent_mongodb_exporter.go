@@ -101,5 +101,5 @@ func init() {
 	AddAgentMongodbExporterC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentMongodbExporter.CustomLabels)
 	AddAgentMongodbExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentMongodbExporter.SkipConnectionCheck)
 	AddAgentMongodbExporterC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentMongodbExporter.TLS)
-	AddAgentMongodbExporterC.Flag("tls-skip-verify", "Skip TLS/SSL certificates validation").BoolVar(&AddAgentMongodbExporter.TLSSkipVerify)
+	AddAgentMongodbExporterC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentMongodbExporter.TLSSkipVerify)
 }

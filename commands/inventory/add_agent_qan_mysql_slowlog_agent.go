@@ -124,6 +124,6 @@ func init() {
 	AddAgentQANMySQLSlowlogAgentC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddAgentQANMySQLSlowlogAgent.DisableQueryExamples)
 	AddAgentQANMySQLSlowlogAgentC.Flag("size-slow-logs", "Rotate slow log file at this size (default: 0; 0 or negative value disables rotation)").
 		BytesVar(&AddAgentQANMySQLSlowlogAgent.MaxSlowlogFileSize)
-	AddAgentQANMySQLSlowlogAgentC.Flag("tls", "Use TLS/SSL to connect to the database").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLS)
-	AddAgentQANMySQLSlowlogAgentC.Flag("tls-skip-verify", "Skip TLS/SSL certificates validation").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLSSkipVerify)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLS)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLSSkipVerify)
 }

@@ -99,8 +99,6 @@ func init() {
 	AddAgentQANMongoDBProfilerAgentC.Flag("password", "MongoDB password for scraping metrics").StringVar(&AddAgentQANMongoDBProfilerAgent.Password)
 	AddAgentQANMongoDBProfilerAgentC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentQANMongoDBProfilerAgent.CustomLabels)
 	AddAgentQANMongoDBProfilerAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMongoDBProfilerAgent.SkipConnectionCheck)
-	AddAgentQANMongoDBProfilerAgentC.Flag("tls", "Use TLS/SSL to connect to the database").
-		BoolVar(&AddAgentQANMongoDBProfilerAgent.TLS)
-	AddAgentQANMongoDBProfilerAgentC.Flag("tls-skip-verify", "Skip TLS/SSL certificates validation").
-		BoolVar(&AddAgentQANMongoDBProfilerAgent.TLSSkipVerify)
+	AddAgentQANMongoDBProfilerAgentC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentQANMongoDBProfilerAgent.TLS)
+	AddAgentQANMongoDBProfilerAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANMongoDBProfilerAgent.TLSSkipVerify)
 }

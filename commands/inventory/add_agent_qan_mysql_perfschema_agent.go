@@ -110,8 +110,6 @@ func init() {
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentQANMySQLPerfSchemaAgent.CustomLabels)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.SkipConnectionCheck)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.DisableQueryExamples)
-	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls", "Use TLS/SSL to connect to the database").
-		BoolVar(&AddAgentQANMySQLPerfSchemaAgent.TLS)
-	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-skip-verify", "Skip TLS/SSL certificates validation").
-		BoolVar(&AddAgentQANMySQLPerfSchemaAgent.TLSSkipVerify)
+	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.TLS)
+	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.TLSSkipVerify)
 }
