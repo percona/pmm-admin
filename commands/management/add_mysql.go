@@ -113,11 +113,6 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		}
 	}
 
-	// tweak according to API docs
-	if cmd.MaxSlowlogFileSize == 0 {
-		cmd.MaxSlowlogFileSize = -1
-	}
-
 	params := &mysql.AddMySQLParams{
 		Body: mysql.AddMySQLBody{
 			NodeID:         cmd.NodeID,
@@ -200,7 +195,8 @@ func init() {
 	AddMySQLC.Flag("use-perfschema", "Run QAN perf schema agent").Hidden().BoolVar(&AddMySQL.UsePerfschema)
 	AddMySQLC.Flag("use-slowlog", "Run QAN slow log agent").Hidden().BoolVar(&AddMySQL.UseSlowLog)
 	AddMySQLC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddMySQL.DisableQueryExamples)
-	AddMySQLC.Flag("size-slow-logs", "Rotate slow log file at this size (0 disables rotation)").Default("1GB").BytesVar(&AddMySQL.MaxSlowlogFileSize)
+	AddMySQLC.Flag("size-slow-logs", "Rotate slow log file at this size (default: 1GB; negative value disables rotation)").
+		BytesVar(&AddMySQL.MaxSlowlogFileSize)
 
 	AddMySQLC.Flag("environment", "Environment name").StringVar(&AddMySQL.Environment)
 	AddMySQLC.Flag("cluster", "Cluster name").StringVar(&AddMySQL.Cluster)
