@@ -16,6 +16,9 @@
 package inventory
 
 import (
+	"strconv"
+
+	"github.com/alecthomas/units"
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
 
@@ -24,17 +27,19 @@ import (
 
 var addAgentQANMySQLSlowlogAgentResultT = commands.ParseTemplate(`
 QAN MySQL slowlog agent added.
-Agent ID       : {{ .Agent.AgentID }}
-PMM-Agent ID   : {{ .Agent.PMMAgentID }}
-Service ID     : {{ .Agent.ServiceID }}
-Username       : {{ .Agent.Username }}
-Password       : {{ .Agent.Password }}
-
-Status         : {{ .Agent.Status }}
-Disabled       : {{ .Agent.Disabled }}
-Custom labels  : {{ .Agent.CustomLabels }}
+Agent ID         : {{ .Agent.AgentID }}
+PMM-Agent ID     : {{ .Agent.PMMAgentID }}
+Service ID       : {{ .Agent.ServiceID }}
+Username         : {{ .Agent.Username }}
+Password         : {{ .Agent.Password }}
+Query examples   : {{ .QueryExamples }}
+Slowlog rotation : {{ .SlowlogRotation }}
 Enable TLS     : {{ .Agent.TLS }}
 Skip TLS Verify: {{ .Agent.TLSSkipVerify }}
+
+Status           : {{ .Agent.Status }}
+Disabled         : {{ .Agent.Disabled }}
+Custom labels    : {{ .Agent.CustomLabels }}
 `)
 
 type addAgentQANMySQLSlowlogAgentResult struct {
@@ -47,15 +52,29 @@ func (res *addAgentQANMySQLSlowlogAgentResult) String() string {
 	return commands.RenderTemplate(addAgentQANMySQLSlowlogAgentResultT, res)
 }
 
+func (res *addAgentQANMySQLSlowlogAgentResult) QueryExamples() string {
+	if res.Agent.QueryExamplesDisabled {
+		return "disabled"
+	}
+	return "enabled"
+}
+
+func (res *addAgentQANMySQLSlowlogAgentResult) SlowlogRotation() string {
+	// TODO units.ParseBase2Bytes, etc
+	return res.Agent.MaxSlowlogFileSize
+}
+
 type addAgentQANMySQLSlowlogAgentCommand struct {
-	PMMAgentID          string
-	ServiceID           string
-	Username            string
-	Password            string
-	CustomLabels        string
-	SkipConnectionCheck bool
-	TLS                 bool
-	TLSSkipVerify       bool
+	PMMAgentID           string
+	ServiceID            string
+	Username             string
+	Password             string
+	CustomLabels         string
+	SkipConnectionCheck  bool
+	DisableQueryExamples bool
+	MaxSlowlogFileSize   units.Base2Bytes
+	TLS                  bool
+	TLSSkipVerify        bool
 }
 
 func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
@@ -63,16 +82,19 @@ func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	params := &agents.AddQANMySQLSlowlogAgentParams{
 		Body: agents.AddQANMySQLSlowlogAgentBody{
-			PMMAgentID:          cmd.PMMAgentID,
-			ServiceID:           cmd.ServiceID,
-			Username:            cmd.Username,
-			Password:            cmd.Password,
-			CustomLabels:        customLabels,
-			SkipConnectionCheck: cmd.SkipConnectionCheck,
-			TLS:                 cmd.TLS,
-			TLSSkipVerify:       cmd.TLSSkipVerify,
+			PMMAgentID:           cmd.PMMAgentID,
+			ServiceID:            cmd.ServiceID,
+			Username:             cmd.Username,
+			Password:             cmd.Password,
+			CustomLabels:         customLabels,
+			SkipConnectionCheck:  cmd.SkipConnectionCheck,
+			DisableQueryExamples: cmd.DisableQueryExamples,
+			MaxSlowlogFileSize:   strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
+			TLS:                  cmd.TLS,
+			TLSSkipVerify:        cmd.TLSSkipVerify,
 		},
 		Context: commands.Ctx,
 	}
@@ -99,6 +121,9 @@ func init() {
 	AddAgentQANMySQLSlowlogAgentC.Flag("password", "MySQL password for scraping metrics").StringVar(&AddAgentQANMySQLSlowlogAgent.Password)
 	AddAgentQANMySQLSlowlogAgentC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentQANMySQLSlowlogAgent.CustomLabels)
 	AddAgentQANMySQLSlowlogAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMySQLSlowlogAgent.SkipConnectionCheck)
+	AddAgentQANMySQLSlowlogAgentC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddAgentQANMySQLSlowlogAgent.DisableQueryExamples)
+	AddAgentQANMySQLSlowlogAgentC.Flag("size-slow-logs", "Rotate slow log file at this size (default: 0; 0 or negative value disables rotation)").
+		BytesVar(&AddAgentQANMySQLSlowlogAgent.MaxSlowlogFileSize)
 	AddAgentQANMySQLSlowlogAgentC.Flag("tls", "Use TLS/SSL to connect to the database").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLS)
 	AddAgentQANMySQLSlowlogAgentC.Flag("tls-skip-verify", "Skip TLS/SSL certificates validation").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLSSkipVerify)
 }

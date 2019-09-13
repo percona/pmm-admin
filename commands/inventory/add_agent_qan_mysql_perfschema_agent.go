@@ -29,12 +29,19 @@ PMM-Agent ID   : {{ .Agent.PMMAgentID }}
 Service ID     : {{ .Agent.ServiceID }}
 Username       : {{ .Agent.Username }}
 Password       : {{ .Agent.Password }}
+<<<<<<< HEAD
+=======
+Query examples : {{ .QueryExamples }}
+>>>>>>> master
 
 Status         : {{ .Agent.Status }}
 Disabled       : {{ .Agent.Disabled }}
 Custom labels  : {{ .Agent.CustomLabels }}
+<<<<<<< HEAD
 Enable TLS     : {{ .Agent.TLS }}
 Skip TLS Verify: {{ .Agent.TLSSkipVerify }}
+=======
+>>>>>>> master
 `)
 
 type addAgentQANMySQLPerfSchemaAgentResult struct {
@@ -47,15 +54,23 @@ func (res *addAgentQANMySQLPerfSchemaAgentResult) String() string {
 	return commands.RenderTemplate(addAgentQANMySQLPerfSchemaAgentResultT, res)
 }
 
+func (res *addAgentQANMySQLPerfSchemaAgentResult) QueryExamples() string {
+	if res.Agent.QueryExamplesDisabled {
+		return "disabled"
+	}
+	return "enabled"
+}
+
 type addAgentQANMySQLPerfSchemaAgentCommand struct {
-	PMMAgentID          string
-	ServiceID           string
-	Username            string
-	Password            string
-	CustomLabels        string
-	SkipConnectionCheck bool
-	TLS                 bool
-	TLSSkipVerify       bool
+	PMMAgentID           string
+	ServiceID            string
+	Username             string
+	Password             string
+	CustomLabels         string
+	SkipConnectionCheck  bool
+	DisableQueryExamples bool
+	TLS                  bool
+	TLSSkipVerify        bool
 }
 
 func (cmd *addAgentQANMySQLPerfSchemaAgentCommand) Run() (commands.Result, error) {
@@ -65,14 +80,15 @@ func (cmd *addAgentQANMySQLPerfSchemaAgentCommand) Run() (commands.Result, error
 	}
 	params := &agents.AddQANMySQLPerfSchemaAgentParams{
 		Body: agents.AddQANMySQLPerfSchemaAgentBody{
-			PMMAgentID:          cmd.PMMAgentID,
-			ServiceID:           cmd.ServiceID,
-			Username:            cmd.Username,
-			Password:            cmd.Password,
-			CustomLabels:        customLabels,
-			SkipConnectionCheck: cmd.SkipConnectionCheck,
-			TLS:                 cmd.TLS,
-			TLSSkipVerify:       cmd.TLSSkipVerify,
+			PMMAgentID:           cmd.PMMAgentID,
+			ServiceID:            cmd.ServiceID,
+			Username:             cmd.Username,
+			Password:             cmd.Password,
+			CustomLabels:         customLabels,
+			SkipConnectionCheck:  cmd.SkipConnectionCheck,
+			DisableQueryExamples: cmd.DisableQueryExamples,
+			TLS:                  cmd.TLS,
+			TLSSkipVerify:        cmd.TLSSkipVerify,
 		},
 		Context: commands.Ctx,
 	}
@@ -99,6 +115,7 @@ func init() {
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("password", "MySQL password for scraping metrics").StringVar(&AddAgentQANMySQLPerfSchemaAgent.Password)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentQANMySQLPerfSchemaAgent.CustomLabels)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.SkipConnectionCheck)
+	AddAgentQANMySQLPerfSchemaAgentC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.DisableQueryExamples)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls", "Use TLS/SSL to connect to the database").
 		BoolVar(&AddAgentQANMySQLPerfSchemaAgent.TLS)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-skip-verify", "Skip TLS/SSL certificates validation").
