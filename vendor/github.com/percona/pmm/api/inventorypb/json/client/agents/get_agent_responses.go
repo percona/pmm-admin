@@ -226,9 +226,6 @@ type GetAgentOKBody struct {
 
 	// qan postgresql pgstatements agent
 	QANPostgresqlPgstatementsAgent *GetAgentOKBodyQANPostgresqlPgstatementsAgent `json:"qan_postgresql_pgstatements_agent,omitempty"`
-
-	// rds exporter
-	RDSExporter *GetAgentOKBodyRDSExporter `json:"rds_exporter,omitempty"`
 }
 
 // Validate validates this get agent OK body
@@ -276,10 +273,6 @@ func (o *GetAgentOKBody) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := o.validateQANPostgresqlPgstatementsAgent(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := o.validateRDSExporter(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -487,24 +480,6 @@ func (o *GetAgentOKBody) validateQANPostgresqlPgstatementsAgent(formats strfmt.R
 	return nil
 }
 
-func (o *GetAgentOKBody) validateRDSExporter(formats strfmt.Registry) error {
-
-	if swag.IsZero(o.RDSExporter) { // not required
-		return nil
-	}
-
-	if o.RDSExporter != nil {
-		if err := o.RDSExporter.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("getAgentOk" + "." + "rds_exporter")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 // MarshalBinary interface implementation
 func (o *GetAgentOKBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
@@ -580,9 +555,6 @@ type GetAgentOKBodyMongodbExporter struct {
 
 	// Listen port for scraping metrics.
 	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// MongoDB password for scraping metrics.
-	Password string `json:"password,omitempty"`
 
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
@@ -691,7 +663,7 @@ func (o *GetAgentOKBodyMongodbExporter) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*GetAgentOKBodyMysqldExporter MySQLdExporter runs on Generic or Container Node and exposes MySQL and AmazonRDSMySQL Service metrics.
+/*GetAgentOKBodyMysqldExporter MySQLdExporter runs on Generic or Container Node and exposes MySQL Service metrics.
 swagger:model GetAgentOKBodyMysqldExporter
 */
 type GetAgentOKBodyMysqldExporter struct {
@@ -707,9 +679,6 @@ type GetAgentOKBodyMysqldExporter struct {
 
 	// Listen port for scraping metrics.
 	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// MySQL password for scraping metrics.
-	Password string `json:"password,omitempty"`
 
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
@@ -988,9 +957,6 @@ type GetAgentOKBodyPostgresExporter struct {
 	// Listen port for scraping metrics.
 	ListenPort int64 `json:"listen_port,omitempty"`
 
-	// PostgreSQL password for scraping metrics.
-	Password string `json:"password,omitempty"`
-
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -1098,7 +1064,7 @@ func (o *GetAgentOKBodyPostgresExporter) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*GetAgentOKBodyProxysqlExporter ProxySQLExporter runs on Generic or Container Node and exposes MySQL and AmazonRDSMySQL Service metrics.
+/*GetAgentOKBodyProxysqlExporter ProxySQLExporter runs on Generic or Container Node and exposes MySQL Service metrics.
 swagger:model GetAgentOKBodyProxysqlExporter
 */
 type GetAgentOKBodyProxysqlExporter struct {
@@ -1114,9 +1080,6 @@ type GetAgentOKBodyProxysqlExporter struct {
 
 	// Listen port for scraping metrics.
 	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// ProxySQL password for scraping metrics.
-	Password string `json:"password,omitempty"`
 
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
@@ -1241,9 +1204,6 @@ type GetAgentOKBodyQANMongodbProfilerAgent struct {
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
-	// MongoDB password for getting profiler data.
-	Password string `json:"password,omitempty"`
-
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -1364,9 +1324,6 @@ type GetAgentOKBodyQANMysqlPerfschemaAgent struct {
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
-
-	// MySQL password for getting performance data.
-	Password string `json:"password,omitempty"`
 
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
@@ -1495,9 +1452,6 @@ type GetAgentOKBodyQANMysqlSlowlogAgent struct {
 	// Slowlog file is rotated at this size if > 0.
 	MaxSlowlogFileSize string `json:"max_slowlog_file_size,omitempty"`
 
-	// MySQL password for getting performance data.
-	Password string `json:"password,omitempty"`
-
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -1622,9 +1576,6 @@ type GetAgentOKBodyQANPostgresqlPgstatementsAgent struct {
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
-	// PostgreSQL password for getting pg stat statements data.
-	Password string `json:"password,omitempty"`
-
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -1725,121 +1676,6 @@ func (o *GetAgentOKBodyQANPostgresqlPgstatementsAgent) MarshalBinary() ([]byte, 
 // UnmarshalBinary interface implementation
 func (o *GetAgentOKBodyQANPostgresqlPgstatementsAgent) UnmarshalBinary(b []byte) error {
 	var res GetAgentOKBodyQANPostgresqlPgstatementsAgent
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*o = res
-	return nil
-}
-
-/*GetAgentOKBodyRDSExporter RDSExporter runs on Generic or Container Node and exposes RemoteAmazonRDS Node and AmazonRDSMySQL Service metrics.
-swagger:model GetAgentOKBodyRDSExporter
-*/
-type GetAgentOKBodyRDSExporter struct {
-
-	// Unique randomly generated instance identifier.
-	AgentID string `json:"agent_id,omitempty"`
-
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
-
-	// Desired Agent status: enabled (false) or disabled (true).
-	Disabled bool `json:"disabled,omitempty"`
-
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// The pmm-agent identifier which runs this instance.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
-
-	// A list of Service identifiers (Node identifiers are extracted from Services).
-	ServiceIds []string `json:"service_ids"`
-
-	// AgentStatus represents actual Agent status.
-	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
-	Status *string `json:"status,omitempty"`
-}
-
-// Validate validates this get agent OK body RDS exporter
-func (o *GetAgentOKBodyRDSExporter) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := o.validateStatus(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-var getAgentOkBodyRdsExporterTypeStatusPropEnum []interface{}
-
-func init() {
-	var res []string
-	if err := json.Unmarshal([]byte(`["AGENT_STATUS_INVALID","STARTING","RUNNING","WAITING","STOPPING","DONE"]`), &res); err != nil {
-		panic(err)
-	}
-	for _, v := range res {
-		getAgentOkBodyRdsExporterTypeStatusPropEnum = append(getAgentOkBodyRdsExporterTypeStatusPropEnum, v)
-	}
-}
-
-const (
-
-	// GetAgentOKBodyRDSExporterStatusAGENTSTATUSINVALID captures enum value "AGENT_STATUS_INVALID"
-	GetAgentOKBodyRDSExporterStatusAGENTSTATUSINVALID string = "AGENT_STATUS_INVALID"
-
-	// GetAgentOKBodyRDSExporterStatusSTARTING captures enum value "STARTING"
-	GetAgentOKBodyRDSExporterStatusSTARTING string = "STARTING"
-
-	// GetAgentOKBodyRDSExporterStatusRUNNING captures enum value "RUNNING"
-	GetAgentOKBodyRDSExporterStatusRUNNING string = "RUNNING"
-
-	// GetAgentOKBodyRDSExporterStatusWAITING captures enum value "WAITING"
-	GetAgentOKBodyRDSExporterStatusWAITING string = "WAITING"
-
-	// GetAgentOKBodyRDSExporterStatusSTOPPING captures enum value "STOPPING"
-	GetAgentOKBodyRDSExporterStatusSTOPPING string = "STOPPING"
-
-	// GetAgentOKBodyRDSExporterStatusDONE captures enum value "DONE"
-	GetAgentOKBodyRDSExporterStatusDONE string = "DONE"
-)
-
-// prop value enum
-func (o *GetAgentOKBodyRDSExporter) validateStatusEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, getAgentOkBodyRdsExporterTypeStatusPropEnum); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (o *GetAgentOKBodyRDSExporter) validateStatus(formats strfmt.Registry) error {
-
-	if swag.IsZero(o.Status) { // not required
-		return nil
-	}
-
-	// value enum
-	if err := o.validateStatusEnum("getAgentOk"+"."+"rds_exporter"+"."+"status", "body", *o.Status); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (o *GetAgentOKBodyRDSExporter) MarshalBinary() ([]byte, error) {
-	if o == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(o)
-}
-
-// UnmarshalBinary interface implementation
-func (o *GetAgentOKBodyRDSExporter) UnmarshalBinary(b []byte) error {
-	var res GetAgentOKBodyRDSExporter
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

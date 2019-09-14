@@ -278,7 +278,7 @@ func (o *ChangeMySQLdExporterOKBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*ChangeMySQLdExporterOKBodyMysqldExporter MySQLdExporter runs on Generic or Container Node and exposes MySQL and AmazonRDSMySQL Service metrics.
+/*ChangeMySQLdExporterOKBodyMysqldExporter MySQLdExporter runs on Generic or Container Node and exposes MySQL Service metrics.
 swagger:model ChangeMySQLdExporterOKBodyMysqldExporter
 */
 type ChangeMySQLdExporterOKBodyMysqldExporter struct {
@@ -294,9 +294,6 @@ type ChangeMySQLdExporterOKBodyMysqldExporter struct {
 
 	// Listen port for scraping metrics.
 	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// MySQL password for scraping metrics.
-	Password string `json:"password,omitempty"`
 
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`

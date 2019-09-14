@@ -410,7 +410,7 @@ func (o *AddMySQLOKBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*AddMySQLOKBodyMysqldExporter MySQLdExporter runs on Generic or Container Node and exposes MySQL and AmazonRDSMySQL Service metrics.
+/*AddMySQLOKBodyMysqldExporter MySQLdExporter runs on Generic or Container Node and exposes MySQL Service metrics.
 swagger:model AddMySQLOKBodyMysqldExporter
 */
 type AddMySQLOKBodyMysqldExporter struct {
@@ -426,9 +426,6 @@ type AddMySQLOKBodyMysqldExporter struct {
 
 	// Listen port for scraping metrics.
 	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// MySQL password for scraping metrics.
-	Password string `json:"password,omitempty"`
 
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
@@ -550,9 +547,6 @@ type AddMySQLOKBodyQANMysqlPerfschema struct {
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
-
-	// MySQL password for getting performance data.
-	Password string `json:"password,omitempty"`
 
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
@@ -680,9 +674,6 @@ type AddMySQLOKBodyQANMysqlSlowlog struct {
 
 	// Slowlog file is rotated at this size if > 0.
 	MaxSlowlogFileSize string `json:"max_slowlog_file_size,omitempty"`
-
-	// MySQL password for getting performance data.
-	Password string `json:"password,omitempty"`
 
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
@@ -881,7 +872,7 @@ type AddMySQLParamsBodyAddNode struct {
 	NodeName string `json:"node_name,omitempty"`
 
 	// NodeType describes supported Node types.
-	// Enum: [NODE_TYPE_INVALID GENERIC_NODE CONTAINER_NODE REMOTE_NODE REMOTE_AMAZON_RDS_NODE]
+	// Enum: [NODE_TYPE_INVALID GENERIC_NODE CONTAINER_NODE REMOTE_NODE]
 	NodeType *string `json:"node_type,omitempty"`
 
 	// Node region.
@@ -906,7 +897,7 @@ var addMySqlParamsBodyAddNodeTypeNodeTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["NODE_TYPE_INVALID","GENERIC_NODE","CONTAINER_NODE","REMOTE_NODE","REMOTE_AMAZON_RDS_NODE"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["NODE_TYPE_INVALID","GENERIC_NODE","CONTAINER_NODE","REMOTE_NODE"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -927,9 +918,6 @@ const (
 
 	// AddMySQLParamsBodyAddNodeNodeTypeREMOTENODE captures enum value "REMOTE_NODE"
 	AddMySQLParamsBodyAddNodeNodeTypeREMOTENODE string = "REMOTE_NODE"
-
-	// AddMySQLParamsBodyAddNodeNodeTypeREMOTEAMAZONRDSNODE captures enum value "REMOTE_AMAZON_RDS_NODE"
-	AddMySQLParamsBodyAddNodeNodeTypeREMOTEAMAZONRDSNODE string = "REMOTE_AMAZON_RDS_NODE"
 )
 
 // prop value enum
