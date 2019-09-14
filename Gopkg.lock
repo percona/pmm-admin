@@ -240,7 +240,7 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-3786-api-cleanups"
+  branch = "PMM-2.0"
   digest = "1:a1afd9e2041a062dd51952db2934f10bd2bed1bd7ed5a1c1a305df7ed198d123"
   name = "github.com/percona/pmm"
   packages = [
@@ -265,7 +265,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "68e3939c2b40af02fc81687617759c8330f25208"
+  revision = "f6f5d6ea356ed9e37c2cd4aa9403acd6e48dbab0"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
