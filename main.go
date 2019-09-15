@@ -169,11 +169,11 @@ func main() {
 	case management.RegisterC.FullCommand():
 		command = management.Register
 
-	case management.AddMongoDBC.FullCommand():
-		command = management.AddMongoDB
-
 	case management.AddMySQLC.FullCommand():
 		command = management.AddMySQL
+
+	case management.AddMongoDBC.FullCommand():
+		command = management.AddMongoDB
 
 	case management.AddPostgreSQLC.FullCommand():
 		command = management.AddPostgreSQL
@@ -226,11 +226,11 @@ func main() {
 	case inventory.AddAgentNodeExporterC.FullCommand():
 		command = inventory.AddAgentNodeExporter
 
-	case inventory.AddAgentMongodbExporterC.FullCommand():
-		command = inventory.AddAgentMongodbExporter
-
 	case inventory.AddAgentMysqldExporterC.FullCommand():
 		command = inventory.AddAgentMysqldExporter
+
+	case inventory.AddAgentMongodbExporterC.FullCommand():
+		command = inventory.AddAgentMongodbExporter
 
 	case inventory.AddAgentPostgresExporterC.FullCommand():
 		command = inventory.AddAgentPostgresExporter
@@ -256,8 +256,8 @@ func main() {
 	case commands.ListC.FullCommand():
 		command = commands.List
 
-	case commands.StatusC.FullCommand():
-		command = commands.Status
+	case commands.SummaryC.FullCommand():
+		command = commands.Summary
 
 	case commands.ConfigC.FullCommand():
 		command = commands.Config
