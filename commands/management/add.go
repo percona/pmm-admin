@@ -32,7 +32,7 @@ var (
 	}
 
 	// valid Node types for AddNodeParams
-	addNodeTypeKeys = []string{"remote", "generic", "container"}
+	addNodeTypeKeys = []string{"generic", "container", "remote"}
 )
 
 // register command
