@@ -22,7 +22,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/AlekSi/pointer"
 	"github.com/percona/pmm/api/managementpb/json/client"
 	mongodb "github.com/percona/pmm/api/managementpb/json/client/mongo_db"
 
@@ -49,7 +48,6 @@ func (res *addMongoDBResult) String() string {
 type addMongoDBCommand struct {
 	AddressPort    string
 	NodeID         string
-	NodeName       string
 	PMMAgentID     string
 	ServiceName    string
 	Username       string
@@ -58,9 +56,6 @@ type addMongoDBCommand struct {
 	Cluster        string
 	ReplicationSet string
 	CustomLabels   string
-
-	AddNode       bool
-	AddNodeParams addNodeParams
 
 	QuerySource string
 	UseProfiler bool // TODO remove once https://jira.percona.com/browse/PMM-4255 is done
@@ -76,7 +71,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	if cmd.PMMAgentID == "" || (cmd.NodeID == "" && cmd.NodeName == "") {
+	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
 			return nil, err
@@ -84,7 +79,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 		if cmd.PMMAgentID == "" {
 			cmd.PMMAgentID = status.AgentID
 		}
-		if cmd.NodeID == "" && cmd.NodeName == "" {
+		if cmd.NodeID == "" {
 			cmd.NodeID = status.NodeID
 		}
 	}
@@ -131,28 +126,6 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 		},
 		Context: commands.Ctx,
 	}
-	if cmd.NodeName != "" {
-		if cmd.AddNode {
-			nodeCustomLabels, err := commands.ParseCustomLabels(cmd.AddNodeParams.CustomLabels)
-			if err != nil {
-				return nil, err
-			}
-			params.Body.AddNode = &mongodb.AddMongoDBParamsBodyAddNode{
-				Az:            cmd.AddNodeParams.Az,
-				ContainerID:   cmd.AddNodeParams.ContainerID,
-				ContainerName: cmd.AddNodeParams.ContainerName,
-				CustomLabels:  nodeCustomLabels,
-				Distro:        cmd.AddNodeParams.Distro,
-				MachineID:     cmd.AddNodeParams.MachineID,
-				NodeModel:     cmd.AddNodeParams.NodeModel,
-				NodeName:      cmd.NodeName,
-				NodeType:      pointer.ToString(allNodeTypes[cmd.AddNodeParams.NodeType]),
-				Region:        cmd.AddNodeParams.Region,
-			}
-		} else {
-			params.Body.NodeName = cmd.NodeName
-		}
-	}
 	resp, err := client.Default.MongoDB.AddMongoDB(params)
 	if err != nil {
 		return nil, err
@@ -196,8 +169,4 @@ func init() {
 	AddMongoDBC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddMongoDB.SkipConnectionCheck)
 	AddMongoDBC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMongoDB.TLS)
 	AddMongoDBC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMongoDB.TLSSkipVerify)
-
-	AddMongoDBC.Flag("add-node", "Add new node").BoolVar(&AddMongoDB.AddNode)
-	AddMongoDBC.Flag("node-name", "Node name").StringVar(&AddMongoDB.NodeName)
-	addNodeFlags(AddMongoDBC, &AddMongoDB.AddNodeParams)
 }
