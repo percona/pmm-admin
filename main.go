@@ -167,6 +167,9 @@ func main() {
 	case commands.ListC.FullCommand():
 		command = commands.List
 
+	case commands.StatusC.FullCommand():
+		logrus.Warn("`status` command is deprecated. Use `summary` instead.")
+		fallthrough
 	case commands.SummaryC.FullCommand():
 		command = commands.Summary
 

@@ -67,6 +67,7 @@ func (cmd *summaryCommand) Run() (Result, error) {
 var (
 	Summary  = new(summaryCommand)
 	SummaryC = kingpin.Command("summary", "")
+	StatusC  = kingpin.Command("status", "").Hidden() // TODO remove it https://jira.percona.com/browse/PMM-4704
 )
 
 func init() {
