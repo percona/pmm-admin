@@ -17,44 +17,22 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
 	"os/signal"
 
-	"github.com/go-openapi/runtime"
-	httptransport "github.com/go-openapi/runtime/client"
-	inventorypb "github.com/percona/pmm/api/inventorypb/json/client"
-	managementpb "github.com/percona/pmm/api/managementpb/json/client"
-	serverpb "github.com/percona/pmm/api/serverpb/json/client"
-	"github.com/percona/pmm/utils/tlsconfig"
 	"github.com/percona/pmm/version"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
 	"github.com/percona/pmm-admin/commands/inventory"
 	"github.com/percona/pmm-admin/commands/management"
 	"github.com/percona/pmm-admin/logger"
 )
-
-type errFromNginx string
-
-func (e errFromNginx) Error() string {
-	return "response from nginx: " + string(e)
-}
-
-func (e errFromNginx) GoString() string {
-	return fmt.Sprintf("errFromNginx(%q)", string(e))
-}
 
 func main() {
 	kingpin.CommandLine.Name = "pmm-admin"
@@ -95,74 +73,7 @@ func main() {
 		cancel()
 	}()
 
-	agentlocal.SetTransport(ctx, commands.GlobalFlags.Debug || commands.GlobalFlags.Trace)
-
-	if *serverURLF == "" {
-		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
-		if err != nil {
-			if err == agentlocal.ErrNotSetUp {
-				logrus.Fatalf("Failed to get PMM Server parameters from local pmm-agent: %s.\n"+
-					"Please run `pmm-admin config` with --server-url flag.", err)
-			}
-			logrus.Fatalf("Failed to get PMM Server parameters from local pmm-agent: %s.\n"+
-				"Please use --server-url flag to specify PMM Server URL.", err)
-		}
-		commands.GlobalFlags.ServerURL = status.ServerURL
-		commands.GlobalFlags.ServerInsecureTLS = status.ServerInsecureTLS
-	} else {
-		var err error
-		commands.GlobalFlags.ServerURL, err = url.Parse(*serverURLF)
-		if err != nil {
-			logrus.Fatalf("Invalid PMM Server URL %q: %s.", *serverURLF, err)
-		}
-		if commands.GlobalFlags.ServerURL.Path == "" {
-			commands.GlobalFlags.ServerURL.Path = "/"
-		}
-		switch commands.GlobalFlags.ServerURL.Scheme {
-		case "http", "https":
-			// nothing
-		default:
-			logrus.Fatalf("Invalid PMM Server URL %q: scheme (https:// or http://) is missing.", *serverURLF)
-		}
-		if commands.GlobalFlags.ServerURL.Host == "" {
-			logrus.Fatalf("Invalid PMM Server URL %q: host is missing.", *serverURLF)
-		}
-	}
-
-	// use JSON APIs over HTTP/1.1
-	transport := httptransport.New(commands.GlobalFlags.ServerURL.Host, commands.GlobalFlags.ServerURL.Path, []string{commands.GlobalFlags.ServerURL.Scheme})
-	if u := commands.GlobalFlags.ServerURL.User; u != nil {
-		password, _ := u.Password()
-		transport.DefaultAuthentication = httptransport.BasicAuth(u.Username(), password)
-	}
-	transport.SetLogger(logrus.WithField("component", "server-transport"))
-	transport.SetDebug(commands.GlobalFlags.Debug || commands.GlobalFlags.Trace)
-	transport.Context = ctx
-
-	// set error handlers for nginx responses if pmm-managed is down
-	errorConsumer := runtime.ConsumerFunc(func(reader io.Reader, data interface{}) error {
-		b, _ := ioutil.ReadAll(reader)
-		return errFromNginx(string(b))
-	})
-	transport.Consumers = map[string]runtime.Consumer{
-		runtime.JSONMime:    runtime.JSONConsumer(),
-		runtime.HTMLMime:    errorConsumer,
-		runtime.TextMime:    errorConsumer,
-		runtime.DefaultMime: errorConsumer,
-	}
-
-	// disable HTTP/2, set TLS config
-	httpTransport := transport.Transport.(*http.Transport)
-	httpTransport.TLSNextProto = map[string]func(string, *tls.Conn) http.RoundTripper{}
-	if commands.GlobalFlags.ServerURL.Scheme == "https" {
-		httpTransport.TLSClientConfig = tlsconfig.Get()
-		httpTransport.TLSClientConfig.ServerName = commands.GlobalFlags.ServerURL.Hostname()
-		httpTransport.TLSClientConfig.InsecureSkipVerify = commands.GlobalFlags.ServerInsecureTLS
-	}
-
-	inventorypb.Default.SetTransport(transport)
-	managementpb.Default.SetTransport(transport)
-	serverpb.Default.SetTransport(transport)
+	commands.SetupClients(ctx, *serverURLF)
 
 	var command commands.Command
 	switch cmd {
@@ -334,9 +245,3 @@ func main() {
 		os.Exit(1)
 	}
 }
-
-// check interfaces
-var (
-	_ error          = errFromNginx("")
-	_ fmt.GoStringer = errFromNginx("")
-)
