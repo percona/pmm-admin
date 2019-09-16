@@ -101,6 +101,8 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 	switch cmd.QuerySource {
 	case "pgstatements":
 		usePgStatements = true
+	case "none":
+		// nothing
 	}
 
 	params := &postgresql.AddPostgreSQLParams{
@@ -177,7 +179,7 @@ func init() {
 	AddPostgreSQLC.Flag("username", "PostgreSQL username").Default("postgres").StringVar(&AddPostgreSQL.Username)
 	AddPostgreSQLC.Flag("password", "PostgreSQL password").StringVar(&AddPostgreSQL.Password)
 
-	querySources := []string{"pgstatements"} // TODO add "auto"
+	querySources := []string{"pgstatements", "none"} // TODO add "auto"
 	querySourceHelp := fmt.Sprintf("Source of SQL queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
 	AddPostgreSQLC.Flag("query-source", querySourceHelp).Default(querySources[0]).EnumVar(&AddPostgreSQL.QuerySource, querySources...)
 

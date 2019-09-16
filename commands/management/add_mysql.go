@@ -112,6 +112,8 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			useSlowLog = true
 		case "perfschema":
 			usePerfschema = true
+		case "none":
+			// nothing
 		}
 	}
 
@@ -193,7 +195,7 @@ func init() {
 	AddMySQLC.Flag("username", "MySQL username").Default("root").StringVar(&AddMySQL.Username)
 	AddMySQLC.Flag("password", "MySQL password").StringVar(&AddMySQL.Password)
 
-	querySources := []string{"slowlog", "perfschema"} // TODO add "auto"
+	querySources := []string{"slowlog", "perfschema", "none"} // TODO add "auto"
 	querySourceHelp := fmt.Sprintf("Source of SQL queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
 	AddMySQLC.Flag("query-source", querySourceHelp).Default(querySources[0]).EnumVar(&AddMySQL.QuerySource, querySources...)
 	AddMySQLC.Flag("use-perfschema", "Run QAN perf schema agent").Hidden().BoolVar(&AddMySQL.UsePerfschema)

@@ -104,6 +104,8 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 		switch cmd.QuerySource {
 		case "profiler":
 			useProfiler = true
+		case "none":
+			// nothing
 		}
 	}
 
@@ -181,7 +183,7 @@ func init() {
 	AddMongoDBC.Flag("username", "MongoDB username").StringVar(&AddMongoDB.Username)
 	AddMongoDBC.Flag("password", "MongoDB password").StringVar(&AddMongoDB.Password)
 
-	querySources := []string{"profiler"} // TODO add "auto"
+	querySources := []string{"profiler", "none"} // TODO add "auto"
 	querySourceHelp := fmt.Sprintf("Source of queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
 	AddMongoDBC.Flag("query-source", querySourceHelp).Default(querySources[0]).EnumVar(&AddMongoDB.QuerySource, querySources...)
 	AddMongoDBC.Flag("use-profiler", "Run QAN profiler agent").Hidden().BoolVar(&AddMongoDB.UseProfiler)
