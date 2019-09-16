@@ -126,12 +126,12 @@ var (
 )
 
 func init() {
-	AddProxySQLC.Arg("address", "ProxySQL address and port (default: 127.0.0.1:3306)").Default("127.0.0.1:6032").StringVar(&AddProxySQL.AddressPort)
-
 	hostname, _ := os.Hostname()
 	serviceName := hostname + "-proxysql"
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddProxySQLC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddProxySQL.ServiceName)
+
+	AddProxySQLC.Arg("address", "ProxySQL address and port (default: 127.0.0.1:3306)").Default("127.0.0.1:6032").StringVar(&AddProxySQL.AddressPort)
 
 	AddProxySQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddProxySQL.NodeID)
 	AddProxySQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddProxySQL.PMMAgentID)
