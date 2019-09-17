@@ -231,6 +231,10 @@ func main() {
 			fmt.Println(res.String())
 		}
 
+		if err.Stderr != nil {
+			logrus.Debugf("%s, stderr:\n%s", err.String(), err.Stderr)
+		}
+
 		os.Exit(err.ExitCode())
 
 	default:
