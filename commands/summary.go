@@ -28,6 +28,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -83,7 +84,7 @@ func getServerLogs(serverURL *url.URL, serverInsecureTLS bool) (*bytes.Reader, e
 	return bytes.NewReader(b), nil
 }
 
-func addServerData(serverURL *url.URL, serverInsecureTLS bool, zipW *zip.Writer) error {
+func addServerData(zipW *zip.Writer, serverURL *url.URL, serverInsecureTLS bool) error {
 	bytesR, err := getServerLogs(serverURL, serverInsecureTLS)
 	if err != nil {
 		return err
@@ -121,11 +122,64 @@ func addServerData(serverURL *url.URL, serverInsecureTLS bool, zipW *zip.Writer)
 	return nil
 }
 
-func addClientData(status *agent_local.StatusOKBody, zipW *zip.Writer) error {
-	b, err := json.MarshalIndent(status, "", "  ")
+func addClientFile(zipW *zip.Writer, name string) {
+	if name == "" {
+		return
+	}
+
+	b, err := ioutil.ReadFile(name) //nolint:gosec
+	if err != nil {
+		logrus.Debugf("%s", err)
+		b = []byte(err.Error())
+	}
+	m := time.Now()
+	if fi, _ := os.Stat(name); fi != nil {
+		m = fi.ModTime()
+	}
+
+	w, err := zipW.CreateHeader(&zip.FileHeader{
+		Name:     path.Join("client", filepath.Base(name)),
+		Method:   zip.Deflate,
+		Modified: m,
+	})
+	if err == nil {
+		_, err = w.Write(b)
+	}
 	if err != nil {
 		logrus.Debugf("%s", err)
 	}
+}
+
+func addClientCommand(zipW *zip.Writer, name string, cmd Command) {
+	var b []byte
+	res, err := cmd.Run()
+	if res != nil {
+		b = append([]byte(res.String()), "\n\n"...)
+	}
+	if err != nil {
+		b = append(b, err.Error()...)
+	}
+
+	w, err := zipW.CreateHeader(&zip.FileHeader{
+		Name:     path.Join("client", name),
+		Method:   zip.Deflate,
+		Modified: time.Now(),
+	})
+	if err == nil {
+		_, err = w.Write(b)
+	}
+	if err != nil {
+		logrus.Debugf("%s", err)
+	}
+}
+
+func addClientData(zipW *zip.Writer, status *agent_local.StatusOKBody) error {
+	b, err := json.MarshalIndent(status, "", "  ")
+	if err != nil {
+		logrus.Debugf("%s", err)
+		b = []byte(err.Error())
+	}
+	b = append(b, '\n')
 	w, err := zipW.CreateHeader(&zip.FileHeader{
 		Name:     "client/status.json",
 		Method:   zip.Deflate,
@@ -138,16 +192,14 @@ func addClientData(status *agent_local.StatusOKBody, zipW *zip.Writer) error {
 		logrus.Debugf("%s", err)
 	}
 
+	addClientFile(zipW, status.ConfigFilepath)
+
+	addClientCommand(zipW, "list.txt", &listCommand{NodeID: status.RunsOnNodeID})
+
 	return nil
 }
 
-func (cmd *summaryCommand) makeArchive() (err error) {
-	var status *agent_local.StatusOKBody
-	if status, err = agentlocal.GetRawStatus(context.TODO(), agentlocal.RequestNetworkInfo); err != nil {
-		err = errors.WithStack(err)
-		return
-	}
-
+func (cmd *summaryCommand) makeArchive(status *agent_local.StatusOKBody) (err error) {
 	var f *os.File
 	if f, err = os.Create(cmd.Filename); err != nil {
 		err = errors.WithStack(err)
@@ -166,17 +218,21 @@ func (cmd *summaryCommand) makeArchive() (err error) {
 		}
 	}()
 
-	if e := addClientData(status, zipW); e != nil {
+	if e := addClientData(zipW, status); e != nil {
 		logrus.Warnf("Failed to add client data: %s", e)
 		logrus.Debugf("%+v", e)
 	}
 
 	if si := status.ServerInfo; si != nil {
-		if u, e := url.Parse(si.URL); e == nil {
-			if e := addServerData(u, si.InsecureTLS, zipW); e != nil {
-				logrus.Warnf("Failed to add server data: %s", e)
-				logrus.Debugf("%+v", e)
-			}
+		u, e := url.Parse(si.URL)
+		if e != nil {
+			logrus.Warnf("Failed to add server data: %s", e)
+			logrus.Debugf("%+v", e)
+			return
+		}
+		if e = addServerData(zipW, u, si.InsecureTLS); e != nil {
+			logrus.Warnf("Failed to add server data: %s", e)
+			logrus.Debugf("%+v", e)
 		}
 	}
 
@@ -184,7 +240,12 @@ func (cmd *summaryCommand) makeArchive() (err error) {
 }
 
 func (cmd *summaryCommand) Run() (Result, error) {
-	if err := cmd.makeArchive(); err != nil {
+	status, err := agentlocal.GetRawStatus(context.TODO(), agentlocal.RequestNetworkInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cmd.makeArchive(status); err != nil {
 		return nil, err
 	}
 
