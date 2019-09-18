@@ -16,17 +16,12 @@
 package commands
 
 import (
-	"fmt"
-	"os"
-	"strings"
-	"time"
-
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/agentlocal"
 )
 
-var summaryResultT = ParseTemplate(`
+var statusResultT = ParseTemplate(`
 Agent ID: {{ .PMMAgentStatus.AgentID }}
 Node ID : {{ .PMMAgentStatus.NodeID }}
 
@@ -44,49 +39,35 @@ Agents:
 {{ end }}
 `)
 
-type summaryResult struct {
+type statusResult struct {
 	PMMAgentStatus *agentlocal.Status `json:"pmm_agent_status"`
 }
 
-func (res *summaryResult) Result() {}
+func (res *statusResult) Result() {}
 
-func (res *summaryResult) String() string {
-	return RenderTemplate(summaryResultT, res)
+func (res *statusResult) String() string {
+	return RenderTemplate(statusResultT, res)
 }
 
 type statusCommand struct {
-	Archive         bool
-	ArchiveFilename string
 }
 
 func (cmd *statusCommand) Run() (Result, error) {
+	// Unlike list, this command uses only local pmm-agent status.
+	// It does not use PMM Server APIs.
+
 	status, err := agentlocal.GetStatus(agentlocal.RequestNetworkInfo)
 	if err != nil {
 		return nil, err
 	}
 
-	res := &summaryResult{
+	return &statusResult{
 		PMMAgentStatus: status,
-	}
-	if !cmd.Archive {
-		return res, nil
-	}
-
-	return res, nil
+	}, nil
 }
 
 // register command
 var (
-	Summary  = new(statusCommand)
-	SummaryC = kingpin.Command("summary", "Show summary status information")
-	StatusC  = kingpin.Command("status", "").Hidden() // TODO remove it https://jira.percona.com/browse/PMM-4704
+	Status  = new(statusCommand)
+	StatusC = kingpin.Command("status", "Show information about local pmm-agent")
 )
-
-func init() {
-	SummaryC.Flag("archive", "Generate summary archive file").BoolVar(&Summary.Archive)
-
-	hostname, _ := os.Hostname()
-	archiveFilename := fmt.Sprintf("summary_%s_%s.zip",
-		strings.Replace(hostname, ".", "_", -1), time.Now().Format("2006_01_02_15_04_05"))
-	SummaryC.Flag("archive-file", "Summary archive filename").Default(archiveFilename).StringVar(&Summary.ArchiveFilename)
-}

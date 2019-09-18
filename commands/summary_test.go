@@ -16,26 +16,29 @@
 package commands
 
 import (
+	"context"
 	"io/ioutil"
 	"os"
 	"testing"
 
-	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/percona/pmm-admin/agentlocal"
 )
 
 func TestSummary(t *testing.T) {
+	agentlocal.SetTransport(context.TODO(), true)
+
 	f, err := ioutil.TempFile("", "pmm-admin-test-summary")
 	require.NoError(t, err)
 	assert.NoError(t, f.Close())
-	defer func() {
-		assert.NoError(t, os.Remove(f.Name()))
-	}()
 
+	filename := f.Name()
+	t.Log(filename)
 	cmd := &summaryCommand{
-		Archive: true,
+		Filename: filename,
 	}
-	err = cmd.makeArchive(&agentlocal.Status{})
-	require.NoError(t, err)
+	require.NoError(t, cmd.makeArchive())
+	assert.NoError(t, os.Remove(filename))
 }

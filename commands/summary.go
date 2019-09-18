@@ -18,8 +18,11 @@ package commands
 import (
 	"archive/zip"
 	"bytes"
+	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -28,33 +31,20 @@ import (
 	"strings"
 	"time"
 
+	agent_local "github.com/percona/pmm/api/agentlocalpb/json/client/agent_local"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/agentlocal"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 var summaryResultT = ParseTemplate(`
-Agent ID: {{ .PMMAgentStatus.AgentID }}
-Node ID : {{ .PMMAgentStatus.NodeID }}
-
-PMM Server:
-	URL    : {{ .PMMAgentStatus.ServerURL }}
-	Version: {{ .PMMAgentStatus.ServerVersion }}
-
-PMM-agent:
-	Connected : {{ .PMMAgentStatus.Connected }}{{ if .PMMAgentStatus.Connected }}
-	Time drift: {{ .PMMAgentStatus.ServerClockDrift }}
-	Latency   : {{ .PMMAgentStatus.ServerLatency }}
-{{ end }}
-Agents:
-{{ range .PMMAgentStatus.Agents }}	{{ .AgentID }} {{ .AgentType }} {{ .Status }}
-{{ end }}
+{{ .Filename }} created.
 `)
 
 type summaryResult struct {
-	PMMAgentStatus *agentlocal.Status `json:"pmm_agent_status"`
+	Filename string `json:"filename"`
 }
 
 func (res *summaryResult) Result() {}
@@ -64,8 +54,7 @@ func (res *summaryResult) String() string {
 }
 
 type summaryCommand struct {
-	Archive         bool
-	ArchiveFilename string
+	Filename string
 }
 
 func getServerLogs(serverURL *url.URL, serverInsecureTLS bool) (*bytes.Reader, error) {
@@ -94,17 +83,73 @@ func getServerLogs(serverURL *url.URL, serverInsecureTLS bool) (*bytes.Reader, e
 	return bytes.NewReader(b), nil
 }
 
-func addServerLogs(r *bytes.Reader, zipW *zip.Writer) error {
-	zipR, err := zip.NewReader(r, r.Size())
+func addServerData(serverURL *url.URL, serverInsecureTLS bool, zipW *zip.Writer) error {
+	bytesR, err := getServerLogs(serverURL, serverInsecureTLS)
+	if err != nil {
+		return err
+	}
+
+	zipR, err := zip.NewReader(bytesR, bytesR.Size())
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	// zipR.
+
+	for _, rf := range zipR.File {
+		w, err := zipW.CreateHeader(&zip.FileHeader{
+			Name:     path.Join("server", rf.Name),
+			Method:   zip.Deflate,
+			Modified: rf.Modified,
+		})
+		if err != nil {
+			logrus.Debugf("%s", err)
+			continue
+		}
+
+		r, err := rf.Open()
+		if err != nil {
+			logrus.Debugf("%s", err)
+			continue
+		}
+		_, err = io.Copy(w, r)
+		_ = r.Close()
+		if err != nil {
+			logrus.Debugf("%s", err)
+			continue
+		}
+	}
+
+	return nil
 }
 
-func (cmd *summaryCommand) makeArchive(status *agentlocal.Status) (err error) {
+func addClientData(status *agent_local.StatusOKBody, zipW *zip.Writer) error {
+	b, err := json.MarshalIndent(status, "", "  ")
+	if err != nil {
+		logrus.Debugf("%s", err)
+	}
+	w, err := zipW.CreateHeader(&zip.FileHeader{
+		Name:     "client/status.json",
+		Method:   zip.Deflate,
+		Modified: time.Now(),
+	})
+	if err == nil {
+		_, err = w.Write(b)
+	}
+	if err != nil {
+		logrus.Debugf("%s", err)
+	}
+
+	return nil
+}
+
+func (cmd *summaryCommand) makeArchive() (err error) {
+	var status *agent_local.StatusOKBody
+	if status, err = agentlocal.GetRawStatus(context.TODO(), agentlocal.RequestNetworkInfo); err != nil {
+		err = errors.WithStack(err)
+		return
+	}
+
 	var f *os.File
-	if f, err = os.Create(cmd.ArchiveFilename); err != nil {
+	if f, err = os.Create(cmd.Filename); err != nil {
 		err = errors.WithStack(err)
 		return
 	}
@@ -114,61 +159,49 @@ func (cmd *summaryCommand) makeArchive(status *agentlocal.Status) (err error) {
 		}
 	}()
 
-	w := zip.NewWriter(f)
+	zipW := zip.NewWriter(f)
 	defer func() {
-		if e := w.Close(); e != nil && err == nil {
+		if e := zipW.Close(); e != nil && err == nil {
 			err = errors.WithStack(e)
 		}
 	}()
 
-	serverZip, e := getServerLogs(status.ServerURL, status.ServerInsecureTLS)
-	if e != nil {
-		logrus.Debugf("Failed to get logs.zip from server: %+v", e)
+	if e := addClientData(status, zipW); e != nil {
+		logrus.Warnf("Failed to add client data: %s", e)
+		logrus.Debugf("%+v", e)
 	}
-	if serverZip != nil {
-		for _, sf := range serverZip.File {
-			h, e := w.CreateHeader(&zip.FileHeader{
-				Name:     path.Join("server", sf.Name),
-				Method:   zip.Deflate,
-				Modified: sf.Modified,
-			})
-			if e != nil {
-				logrus.Debugf("%s", e)
-				continue
+
+	if si := status.ServerInfo; si != nil {
+		if u, e := url.Parse(si.URL); e == nil {
+			if e := addServerData(u, si.InsecureTLS, zipW); e != nil {
+				logrus.Warnf("Failed to add server data: %s", e)
+				logrus.Debugf("%+v", e)
 			}
-			sf.
 		}
 	}
-	return nil
+
+	return //nolint:nakedret
 }
 
 func (cmd *summaryCommand) Run() (Result, error) {
-	status, err := agentlocal.GetStatus(agentlocal.RequestNetworkInfo)
-	if err != nil {
+	if err := cmd.makeArchive(); err != nil {
 		return nil, err
 	}
 
-	res := &summaryResult{
-		PMMAgentStatus: status,
-	}
-	if !cmd.Archive {
-		return res, nil
-	}
-
-	return res, nil
+	return &summaryResult{
+		Filename: cmd.Filename,
+	}, nil
 }
 
 // register command
 var (
 	Summary  = new(summaryCommand)
-	SummaryC = kingpin.Command("summary", "Show summary status information")
+	SummaryC = kingpin.Command("summary", "Fetch system data for diagnostics")
 )
 
 func init() {
-	SummaryC.Flag("archive", "Generate summary archive file").BoolVar(&Summary.Archive)
-
 	hostname, _ := os.Hostname()
-	archiveFilename := fmt.Sprintf("summary_%s_%s.zip",
+	filename := fmt.Sprintf("summary_%s_%s.zip",
 		strings.Replace(hostname, ".", "_", -1), time.Now().Format("2006_01_02_15_04_05"))
-	SummaryC.Flag("archive-file", "Summary archive filename").Default(archiveFilename).StringVar(&Summary.ArchiveFilename)
+	SummaryC.Flag("filename", "Summary archive filename").Default(filename).StringVar(&Summary.Filename)
 }
