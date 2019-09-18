@@ -32,7 +32,6 @@ import (
 	"strings"
 	"time"
 
-	agent_local "github.com/percona/pmm/api/agentlocalpb/json/client/agent_local"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -77,6 +76,9 @@ func getServerLogs(serverURL *url.URL, serverInsecureTLS bool) (*bytes.Reader, e
 	}
 	defer resp.Body.Close() //nolint:errcheck
 
+	if resp.StatusCode != 200 {
+		return nil, errors.Errorf("status code %d", resp.StatusCode)
+	}
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -173,7 +175,12 @@ func addClientCommand(zipW *zip.Writer, name string, cmd Command) {
 	}
 }
 
-func addClientData(zipW *zip.Writer, status *agent_local.StatusOKBody) error {
+func addClientData(zipW *zip.Writer) error {
+	status, err := agentlocal.GetRawStatus(context.TODO(), agentlocal.RequestNetworkInfo)
+	if err != nil {
+		return err
+	}
+
 	b, err := json.MarshalIndent(status, "", "  ")
 	if err != nil {
 		logrus.Debugf("%s", err)
@@ -199,7 +206,7 @@ func addClientData(zipW *zip.Writer, status *agent_local.StatusOKBody) error {
 	return nil
 }
 
-func (cmd *summaryCommand) makeArchive(status *agent_local.StatusOKBody) (err error) {
+func (cmd *summaryCommand) makeArchive() (err error) {
 	var f *os.File
 	if f, err = os.Create(cmd.Filename); err != nil {
 		err = errors.WithStack(err)
@@ -218,34 +225,21 @@ func (cmd *summaryCommand) makeArchive(status *agent_local.StatusOKBody) (err er
 		}
 	}()
 
-	if e := addClientData(zipW, status); e != nil {
+	if e := addClientData(zipW); e != nil {
 		logrus.Warnf("Failed to add client data: %s", e)
 		logrus.Debugf("%+v", e)
 	}
 
-	if si := status.ServerInfo; si != nil {
-		u, e := url.Parse(si.URL)
-		if e != nil {
-			logrus.Warnf("Failed to add server data: %s", e)
-			logrus.Debugf("%+v", e)
-			return
-		}
-		if e = addServerData(zipW, u, si.InsecureTLS); e != nil {
-			logrus.Warnf("Failed to add server data: %s", e)
-			logrus.Debugf("%+v", e)
-		}
+	if e := addServerData(zipW, GlobalFlags.ServerURL, GlobalFlags.ServerInsecureTLS); e != nil {
+		logrus.Warnf("Failed to add server data: %s", e)
+		logrus.Debugf("%+v", e)
 	}
 
 	return //nolint:nakedret
 }
 
 func (cmd *summaryCommand) Run() (Result, error) {
-	status, err := agentlocal.GetRawStatus(context.TODO(), agentlocal.RequestNetworkInfo)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := cmd.makeArchive(status); err != nil {
+	if err := cmd.makeArchive(); err != nil {
 		return nil, err
 	}
 

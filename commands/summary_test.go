@@ -21,7 +21,6 @@ import (
 	"os"
 	"testing"
 
-	agent_local "github.com/percona/pmm/api/agentlocalpb/json/client/agent_local"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -40,7 +39,8 @@ func TestSummary(t *testing.T) {
 	cmd := &summaryCommand{
 		Filename: filename,
 	}
-	status := &agent_local.StatusOKBody{}
-	require.NoError(t, cmd.makeArchive(status))
+	res, err := cmd.Run()
+	require.NoError(t, err)
+	assert.NotNil(t, res)
 	assert.NoError(t, os.Remove(filename))
 }
