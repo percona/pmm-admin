@@ -14,3 +14,28 @@
 // limitations under the License.
 
 package commands
+
+import (
+	"io/ioutil"
+	"os"
+	"testing"
+
+	"github.com/percona/pmm-admin/agentlocal"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestSummary(t *testing.T) {
+	f, err := ioutil.TempFile("", "pmm-admin-test-summary")
+	require.NoError(t, err)
+	assert.NoError(t, f.Close())
+	defer func() {
+		assert.NoError(t, os.Remove(f.Name()))
+	}()
+
+	cmd := &summaryCommand{
+		Archive: true,
+	}
+	err = cmd.makeArchive(&agentlocal.Status{})
+	require.NoError(t, err)
+}

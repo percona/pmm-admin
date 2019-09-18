@@ -16,23 +16,14 @@
 package commands
 
 import (
-	"archive/zip"
-	"bytes"
-	"crypto/tls"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"net/url"
 	"os"
-	"path"
 	"strings"
 	"time"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/agentlocal"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 var summaryResultT = ParseTemplate(`
@@ -63,86 +54,12 @@ func (res *summaryResult) String() string {
 	return RenderTemplate(summaryResultT, res)
 }
 
-type summaryCommand struct {
+type statusCommand struct {
 	Archive         bool
 	ArchiveFilename string
 }
 
-func getServerLogs(serverURL *url.URL, serverInsecureTLS bool) (*bytes.Reader, error) {
-	transport := new(http.Transport)
-	if serverInsecureTLS {
-		transport.TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: true, //nolint:gosec
-		}
-	}
-	client := &http.Client{
-		Transport: transport,
-	}
-	u := serverURL.ResolveReference(&url.URL{
-		Path: "logs.zip",
-	})
-	resp, err := client.Get(u.String())
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	defer resp.Body.Close() //nolint:errcheck
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	return bytes.NewReader(b), nil
-}
-
-func addServerLogs(r *bytes.Reader, zipW *zip.Writer) error {
-	zipR, err := zip.NewReader(r, r.Size())
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	// zipR.
-}
-
-func (cmd *summaryCommand) makeArchive(status *agentlocal.Status) (err error) {
-	var f *os.File
-	if f, err = os.Create(cmd.ArchiveFilename); err != nil {
-		err = errors.WithStack(err)
-		return
-	}
-	defer func() {
-		if e := f.Close(); e != nil && err == nil {
-			err = errors.WithStack(e)
-		}
-	}()
-
-	w := zip.NewWriter(f)
-	defer func() {
-		if e := w.Close(); e != nil && err == nil {
-			err = errors.WithStack(e)
-		}
-	}()
-
-	serverZip, e := getServerLogs(status.ServerURL, status.ServerInsecureTLS)
-	if e != nil {
-		logrus.Debugf("Failed to get logs.zip from server: %+v", e)
-	}
-	if serverZip != nil {
-		for _, sf := range serverZip.File {
-			h, e := w.CreateHeader(&zip.FileHeader{
-				Name:     path.Join("server", sf.Name),
-				Method:   zip.Deflate,
-				Modified: sf.Modified,
-			})
-			if e != nil {
-				logrus.Debugf("%s", e)
-				continue
-			}
-			sf.
-		}
-	}
-	return nil
-}
-
-func (cmd *summaryCommand) Run() (Result, error) {
+func (cmd *statusCommand) Run() (Result, error) {
 	status, err := agentlocal.GetStatus(agentlocal.RequestNetworkInfo)
 	if err != nil {
 		return nil, err
@@ -160,8 +77,9 @@ func (cmd *summaryCommand) Run() (Result, error) {
 
 // register command
 var (
-	Summary  = new(summaryCommand)
+	Summary  = new(statusCommand)
 	SummaryC = kingpin.Command("summary", "Show summary status information")
+	StatusC  = kingpin.Command("status", "").Hidden() // TODO remove it https://jira.percona.com/browse/PMM-4704
 )
 
 func init() {
