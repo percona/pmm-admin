@@ -51,7 +51,8 @@ type configCommand struct {
 	Region    string
 	Az        string
 
-	Force bool
+	Force             bool
+	DontStorePassword bool
 }
 
 func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
@@ -97,6 +98,9 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 	}
 	if cmd.Force {
 		res = append(res, "--force")
+	}
+	if cmd.DontStorePassword {
+		res = append(res, "--dont-store-password")
 	}
 	res = append(res, cmd.NodeAddress, cmd.NodeType, cmd.NodeName)
 	return //nolint:nakedret
@@ -148,4 +152,5 @@ func init() {
 	ConfigC.Flag("az", "Node availability zone").StringVar(&Config.Az)
 
 	ConfigC.Flag("force", "Remove Node with that name with all dependent Services and Agents if one exist").BoolVar(&Config.Force)
+	ConfigC.Flag("dont-store-password", "Do not store password in configuration file").BoolVar(&Config.DontStorePassword)
 }
