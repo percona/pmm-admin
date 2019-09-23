@@ -146,9 +146,10 @@ func (e errFromNginx) GoString() string {
 }
 
 // SetupClients configures local and PMM Server API clients.
-func SetupClients(ctx context.Context, serverURL string) {
+func SetupClients(ctx context.Context, serverURL, serverUsername, serverPassword string, serverInsecureTLS bool) {
 	agentlocal.SetTransport(ctx, GlobalFlags.Debug || GlobalFlags.Trace)
 
+	// set server URL
 	if serverURL == "" {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
@@ -179,6 +180,29 @@ func SetupClients(ctx context.Context, serverURL string) {
 		if GlobalFlags.ServerURL.Host == "" {
 			logrus.Fatalf("Invalid PMM Server URL %q: host is missing.", serverURL)
 		}
+	}
+
+	// override username, password, insecure-tls if given
+	if serverUsername != "" || serverPassword != "" {
+		var newUsername, newPassword string
+		if GlobalFlags.ServerURL.User != nil {
+			newUsername = GlobalFlags.ServerURL.User.Username()
+			newPassword, _ = GlobalFlags.ServerURL.User.Password()
+		}
+		if serverUsername != "" {
+			newUsername = serverUsername
+		}
+		if serverPassword != "" {
+			newPassword = serverPassword
+		}
+		if newPassword != "" {
+			GlobalFlags.ServerURL.User = url.UserPassword(newUsername, newPassword)
+		} else {
+			GlobalFlags.ServerURL.User = url.User(newUsername)
+		}
+	}
+	if serverInsecureTLS {
+		GlobalFlags.ServerInsecureTLS = true
 	}
 
 	// use JSON APIs over HTTP/1.1
