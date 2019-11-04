@@ -114,6 +114,7 @@ func main() {
 		inventory.AddAgentQANMySQLSlowlogAgentC.FullCommand():           inventory.AddAgentQANMySQLSlowlogAgent,
 		inventory.AddAgentQANMongoDBProfilerAgentC.FullCommand():        inventory.AddAgentQANMongoDBProfilerAgent,
 		inventory.AddAgentQANPostgreSQLPgStatementsAgentC.FullCommand(): inventory.AddAgentQANPostgreSQLPgStatementsAgent,
+		inventory.AddAgentRDSExporterC.FullCommand():                    inventory.AddAgentRDSExporter,
 
 		inventory.RemoveAgentC.FullCommand(): inventory.RemoveAgent,
 
@@ -123,6 +124,7 @@ func main() {
 		commands.ConfigC.FullCommand():  commands.Config,
 	}
 	command := allCommands[cmd]
+
 	if command == nil {
 		logrus.Panicf("Unhandled command %q. Please report this bug.", cmd)
 	}

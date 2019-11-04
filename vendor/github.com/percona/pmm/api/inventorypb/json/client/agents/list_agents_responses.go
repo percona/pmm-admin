@@ -125,13 +125,13 @@ swagger:model ListAgentsBody
 */
 type ListAgentsBody struct {
 
-	// Return only Agents that provide insights for that Node.
-	// Exactly one of these parameters should be present: pmm_agent_id, node_id, service_id.
-	NodeID string `json:"node_id,omitempty"`
-
 	// Return only Agents started by this pmm-agent.
 	// Exactly one of these parameters should be present: pmm_agent_id, node_id, service_id.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+
+	// Return only Agents that provide insights for that Node.
+	// Exactly one of these parameters should be present: pmm_agent_id, node_id, service_id.
+	NodeID string `json:"node_id,omitempty"`
 
 	// Return only Agents that provide insights for that Service.
 	// Exactly one of these parameters should be present: pmm_agent_id, node_id, service_id.
@@ -204,17 +204,17 @@ swagger:model ListAgentsOKBody
 */
 type ListAgentsOKBody struct {
 
-	// mongodb exporter
-	MongodbExporter []*MongodbExporterItems0 `json:"mongodb_exporter"`
-
-	// mysqld exporter
-	MysqldExporter []*MysqldExporterItems0 `json:"mysqld_exporter"`
+	// pmm agent
+	PMMAgent []*PMMAgentItems0 `json:"pmm_agent"`
 
 	// node exporter
 	NodeExporter []*NodeExporterItems0 `json:"node_exporter"`
 
-	// pmm agent
-	PMMAgent []*PMMAgentItems0 `json:"pmm_agent"`
+	// mysqld exporter
+	MysqldExporter []*MysqldExporterItems0 `json:"mysqld_exporter"`
+
+	// mongodb exporter
+	MongodbExporter []*MongodbExporterItems0 `json:"mongodb_exporter"`
 
 	// postgres exporter
 	PostgresExporter []*PostgresExporterItems0 `json:"postgres_exporter"`
@@ -222,28 +222,27 @@ type ListAgentsOKBody struct {
 	// proxysql exporter
 	ProxysqlExporter []*ProxysqlExporterItems0 `json:"proxysql_exporter"`
 
-	// qan mongodb profiler agent
-	QANMongodbProfilerAgent []*QANMongodbProfilerAgentItems0 `json:"qan_mongodb_profiler_agent"`
-
 	// qan mysql perfschema agent
 	QANMysqlPerfschemaAgent []*QANMysqlPerfschemaAgentItems0 `json:"qan_mysql_perfschema_agent"`
 
 	// qan mysql slowlog agent
 	QANMysqlSlowlogAgent []*QANMysqlSlowlogAgentItems0 `json:"qan_mysql_slowlog_agent"`
 
+	// qan mongodb profiler agent
+	QANMongodbProfilerAgent []*QANMongodbProfilerAgentItems0 `json:"qan_mongodb_profiler_agent"`
+
 	// qan postgresql pgstatements agent
 	QANPostgresqlPgstatementsAgent []*QANPostgresqlPgstatementsAgentItems0 `json:"qan_postgresql_pgstatements_agent"`
+
+	// rds exporter
+	RDSExporter []*RDSExporterItems0 `json:"rds_exporter"`
 }
 
 // Validate validates this list agents OK body
 func (o *ListAgentsOKBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := o.validateMongodbExporter(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := o.validateMysqldExporter(formats); err != nil {
+	if err := o.validatePMMAgent(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -251,7 +250,11 @@ func (o *ListAgentsOKBody) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := o.validatePMMAgent(formats); err != nil {
+	if err := o.validateMysqldExporter(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateMongodbExporter(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -263,10 +266,6 @@ func (o *ListAgentsOKBody) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := o.validateQANMongodbProfilerAgent(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := o.validateQANMysqlPerfschemaAgent(formats); err != nil {
 		res = append(res, err)
 	}
@@ -275,7 +274,15 @@ func (o *ListAgentsOKBody) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := o.validateQANMongodbProfilerAgent(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.validateQANPostgresqlPgstatementsAgent(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateRDSExporter(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -285,46 +292,21 @@ func (o *ListAgentsOKBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (o *ListAgentsOKBody) validateMongodbExporter(formats strfmt.Registry) error {
+func (o *ListAgentsOKBody) validatePMMAgent(formats strfmt.Registry) error {
 
-	if swag.IsZero(o.MongodbExporter) { // not required
+	if swag.IsZero(o.PMMAgent) { // not required
 		return nil
 	}
 
-	for i := 0; i < len(o.MongodbExporter); i++ {
-		if swag.IsZero(o.MongodbExporter[i]) { // not required
+	for i := 0; i < len(o.PMMAgent); i++ {
+		if swag.IsZero(o.PMMAgent[i]) { // not required
 			continue
 		}
 
-		if o.MongodbExporter[i] != nil {
-			if err := o.MongodbExporter[i].Validate(formats); err != nil {
+		if o.PMMAgent[i] != nil {
+			if err := o.PMMAgent[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("listAgentsOk" + "." + "mongodb_exporter" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (o *ListAgentsOKBody) validateMysqldExporter(formats strfmt.Registry) error {
-
-	if swag.IsZero(o.MysqldExporter) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(o.MysqldExporter); i++ {
-		if swag.IsZero(o.MysqldExporter[i]) { // not required
-			continue
-		}
-
-		if o.MysqldExporter[i] != nil {
-			if err := o.MysqldExporter[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("listAgentsOk" + "." + "mysqld_exporter" + "." + strconv.Itoa(i))
+					return ve.ValidateName("listAgentsOk" + "." + "pmm_agent" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -360,21 +342,46 @@ func (o *ListAgentsOKBody) validateNodeExporter(formats strfmt.Registry) error {
 	return nil
 }
 
-func (o *ListAgentsOKBody) validatePMMAgent(formats strfmt.Registry) error {
+func (o *ListAgentsOKBody) validateMysqldExporter(formats strfmt.Registry) error {
 
-	if swag.IsZero(o.PMMAgent) { // not required
+	if swag.IsZero(o.MysqldExporter) { // not required
 		return nil
 	}
 
-	for i := 0; i < len(o.PMMAgent); i++ {
-		if swag.IsZero(o.PMMAgent[i]) { // not required
+	for i := 0; i < len(o.MysqldExporter); i++ {
+		if swag.IsZero(o.MysqldExporter[i]) { // not required
 			continue
 		}
 
-		if o.PMMAgent[i] != nil {
-			if err := o.PMMAgent[i].Validate(formats); err != nil {
+		if o.MysqldExporter[i] != nil {
+			if err := o.MysqldExporter[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("listAgentsOk" + "." + "pmm_agent" + "." + strconv.Itoa(i))
+					return ve.ValidateName("listAgentsOk" + "." + "mysqld_exporter" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (o *ListAgentsOKBody) validateMongodbExporter(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.MongodbExporter) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.MongodbExporter); i++ {
+		if swag.IsZero(o.MongodbExporter[i]) { // not required
+			continue
+		}
+
+		if o.MongodbExporter[i] != nil {
+			if err := o.MongodbExporter[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("listAgentsOk" + "." + "mongodb_exporter" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -435,31 +442,6 @@ func (o *ListAgentsOKBody) validateProxysqlExporter(formats strfmt.Registry) err
 	return nil
 }
 
-func (o *ListAgentsOKBody) validateQANMongodbProfilerAgent(formats strfmt.Registry) error {
-
-	if swag.IsZero(o.QANMongodbProfilerAgent) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(o.QANMongodbProfilerAgent); i++ {
-		if swag.IsZero(o.QANMongodbProfilerAgent[i]) { // not required
-			continue
-		}
-
-		if o.QANMongodbProfilerAgent[i] != nil {
-			if err := o.QANMongodbProfilerAgent[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("listAgentsOk" + "." + "qan_mongodb_profiler_agent" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
 func (o *ListAgentsOKBody) validateQANMysqlPerfschemaAgent(formats strfmt.Registry) error {
 
 	if swag.IsZero(o.QANMysqlPerfschemaAgent) { // not required
@@ -510,6 +492,31 @@ func (o *ListAgentsOKBody) validateQANMysqlSlowlogAgent(formats strfmt.Registry)
 	return nil
 }
 
+func (o *ListAgentsOKBody) validateQANMongodbProfilerAgent(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.QANMongodbProfilerAgent) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.QANMongodbProfilerAgent); i++ {
+		if swag.IsZero(o.QANMongodbProfilerAgent[i]) { // not required
+			continue
+		}
+
+		if o.QANMongodbProfilerAgent[i] != nil {
+			if err := o.QANMongodbProfilerAgent[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("listAgentsOk" + "." + "qan_mongodb_profiler_agent" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 func (o *ListAgentsOKBody) validateQANPostgresqlPgstatementsAgent(formats strfmt.Registry) error {
 
 	if swag.IsZero(o.QANPostgresqlPgstatementsAgent) { // not required
@@ -525,6 +532,31 @@ func (o *ListAgentsOKBody) validateQANPostgresqlPgstatementsAgent(formats strfmt
 			if err := o.QANPostgresqlPgstatementsAgent[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("listAgentsOk" + "." + "qan_postgresql_pgstatements_agent" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (o *ListAgentsOKBody) validateRDSExporter(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.RDSExporter) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.RDSExporter); i++ {
+		if swag.IsZero(o.RDSExporter[i]) { // not required
+			continue
+		}
+
+		if o.RDSExporter[i] != nil {
+			if err := o.RDSExporter[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("listAgentsOk" + "." + "rds_exporter" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -561,20 +593,29 @@ type MongodbExporterItems0 struct {
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// The pmm-agent identifier which runs this instance.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
-
 	// Service identifier.
 	ServiceID string `json:"service_id,omitempty"`
+
+	// MongoDB username for scraping metrics.
+	Username string `json:"username,omitempty"`
+
+	// Use TLS for database connections.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS certificate and hostname validation.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -585,15 +626,6 @@ type MongodbExporterItems0 struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
-
-	// Use TLS for database connections.
-	TLS bool `json:"tls,omitempty"`
-
-	// Skip TLS certificate and hostname validation.
-	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
-
-	// MongoDB username for scraping metrics.
-	Username string `json:"username,omitempty"`
 }
 
 // Validate validates this mongodb exporter items0
@@ -691,20 +723,29 @@ type MysqldExporterItems0 struct {
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// The pmm-agent identifier which runs this instance.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
-
 	// Service identifier.
 	ServiceID string `json:"service_id,omitempty"`
+
+	// MySQL username for scraping metrics.
+	Username string `json:"username,omitempty"`
+
+	// Use TLS for database connections.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS certificate and hostname validation.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -715,15 +756,6 @@ type MysqldExporterItems0 struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
-
-	// Use TLS for database connections.
-	TLS bool `json:"tls,omitempty"`
-
-	// Skip TLS certificate and hostname validation.
-	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
-
-	// MySQL username for scraping metrics.
-	Username string `json:"username,omitempty"`
 }
 
 // Validate validates this mysqld exporter items0
@@ -821,17 +853,17 @@ type NodeExporterItems0 struct {
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
 	// Listen port for scraping metrics.
 	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// The pmm-agent identifier which runs this instance.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -939,14 +971,14 @@ type PMMAgentItems0 struct {
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
-	// True if Agent is running and connected to pmm-managed.
-	Connected bool `json:"connected,omitempty"`
+	// Node identifier where this instance runs.
+	RunsOnNodeID string `json:"runs_on_node_id,omitempty"`
 
 	// Custom user-assigned labels.
 	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
-	// Node identifier where this instance runs.
-	RunsOnNodeID string `json:"runs_on_node_id,omitempty"`
+	// True if Agent is running and connected to pmm-managed.
+	Connected bool `json:"connected,omitempty"`
 }
 
 // Validate validates this PMM agent items0
@@ -980,20 +1012,29 @@ type PostgresExporterItems0 struct {
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// The pmm-agent identifier which runs this instance.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
-
 	// Service identifier.
 	ServiceID string `json:"service_id,omitempty"`
+
+	// PostgreSQL username for scraping metrics.
+	Username string `json:"username,omitempty"`
+
+	// Use TLS for database connections.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS certificate and hostname validation. Uses sslmode=required instead of verify-full.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -1004,15 +1045,6 @@ type PostgresExporterItems0 struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
-
-	// Use TLS for database connections.
-	TLS bool `json:"tls,omitempty"`
-
-	// Skip TLS certificate and hostname validation. Uses sslmode=required instead of verify-full.
-	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
-
-	// PostgreSQL username for scraping metrics.
-	Username string `json:"username,omitempty"`
 }
 
 // Validate validates this postgres exporter items0
@@ -1110,20 +1142,29 @@ type ProxysqlExporterItems0 struct {
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// The pmm-agent identifier which runs this instance.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
-
 	// Service identifier.
 	ServiceID string `json:"service_id,omitempty"`
+
+	// ProxySQL username for scraping metrics.
+	Username string `json:"username,omitempty"`
+
+	// Use TLS for database connections.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS certificate and hostname validation.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -1134,15 +1175,6 @@ type ProxysqlExporterItems0 struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
-
-	// Use TLS for database connections.
-	TLS bool `json:"tls,omitempty"`
-
-	// Skip TLS certificate and hostname validation.
-	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
-
-	// ProxySQL username for scraping metrics.
-	Username string `json:"username,omitempty"`
 }
 
 // Validate validates this proxysql exporter items0
@@ -1240,17 +1272,26 @@ type QANMongodbProfilerAgentItems0 struct {
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
-	// The pmm-agent identifier which runs this instance.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
-
 	// Service identifier.
 	ServiceID string `json:"service_id,omitempty"`
+
+	// MongoDB username for getting profiler data.
+	Username string `json:"username,omitempty"`
+
+	// Use TLS for database connections.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS certificate and hostname validation.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -1261,15 +1302,6 @@ type QANMongodbProfilerAgentItems0 struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
-
-	// Use TLS for database connections.
-	TLS bool `json:"tls,omitempty"`
-
-	// Skip TLS certificate and hostname validation.
-	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
-
-	// MongoDB username for getting profiler data.
-	Username string `json:"username,omitempty"`
 }
 
 // Validate validates this QAN mongodb profiler agent items0
@@ -1367,20 +1399,29 @@ type QANMysqlPerfschemaAgentItems0 struct {
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
-	// The pmm-agent identifier which runs this instance.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+	// Service identifier.
+	ServiceID string `json:"service_id,omitempty"`
+
+	// MySQL username for getting performance data.
+	Username string `json:"username,omitempty"`
+
+	// Use TLS for database connections.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS certificate and hostname validation.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
 
 	// True if query examples are disabled.
 	QueryExamplesDisabled bool `json:"query_examples_disabled,omitempty"`
 
-	// Service identifier.
-	ServiceID string `json:"service_id,omitempty"`
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -1391,15 +1432,6 @@ type QANMysqlPerfschemaAgentItems0 struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
-
-	// Use TLS for database connections.
-	TLS bool `json:"tls,omitempty"`
-
-	// Skip TLS certificate and hostname validation.
-	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
-
-	// MySQL username for getting performance data.
-	Username string `json:"username,omitempty"`
 }
 
 // Validate validates this QAN mysql perfschema agent items0
@@ -1497,23 +1529,32 @@ type QANMysqlSlowlogAgentItems0 struct {
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
-	// Slowlog file is rotated at this size if > 0.
-	MaxSlowlogFileSize string `json:"max_slowlog_file_size,omitempty"`
+	// Service identifier.
+	ServiceID string `json:"service_id,omitempty"`
 
-	// The pmm-agent identifier which runs this instance.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+	// MySQL username for getting performance data.
+	Username string `json:"username,omitempty"`
+
+	// Use TLS for database connections.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS certificate and hostname validation.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
 
 	// query examples disabled
 	QueryExamplesDisabled bool `json:"query_examples_disabled,omitempty"`
 
-	// Service identifier.
-	ServiceID string `json:"service_id,omitempty"`
+	// Slowlog file is rotated at this size if > 0.
+	MaxSlowlogFileSize string `json:"max_slowlog_file_size,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -1524,15 +1565,6 @@ type QANMysqlSlowlogAgentItems0 struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
-
-	// Use TLS for database connections.
-	TLS bool `json:"tls,omitempty"`
-
-	// Skip TLS certificate and hostname validation.
-	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
-
-	// MySQL username for getting performance data.
-	Username string `json:"username,omitempty"`
 }
 
 // Validate validates this QAN mysql slowlog agent items0
@@ -1630,17 +1662,26 @@ type QANPostgresqlPgstatementsAgentItems0 struct {
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
-	// The pmm-agent identifier which runs this instance.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
-
 	// Service identifier.
 	ServiceID string `json:"service_id,omitempty"`
+
+	// PostgreSQL username for getting pg stat statements data.
+	Username string `json:"username,omitempty"`
+
+	// Use TLS for database connections.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS certificate and hostname validation.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -1651,15 +1692,6 @@ type QANPostgresqlPgstatementsAgentItems0 struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
-
-	// Use TLS for database connections.
-	TLS bool `json:"tls,omitempty"`
-
-	// Skip TLS certificate and hostname validation.
-	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
-
-	// PostgreSQL username for getting pg stat statements data.
-	Username string `json:"username,omitempty"`
 }
 
 // Validate validates this QAN postgresql pgstatements agent items0
@@ -1742,6 +1774,136 @@ func (o *QANPostgresqlPgstatementsAgentItems0) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (o *QANPostgresqlPgstatementsAgentItems0) UnmarshalBinary(b []byte) error {
 	var res QANPostgresqlPgstatementsAgentItems0
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*RDSExporterItems0 RDSExporter runs on Generic or Container Node and exposes RDS Service metrics.
+swagger:model RDSExporterItems0
+*/
+type RDSExporterItems0 struct {
+
+	// Unique randomly generated instance identifier.
+	AgentID string `json:"agent_id,omitempty"`
+
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+
+	// Desired Agent status: enabled (false) or disabled (true).
+	Disabled bool `json:"disabled,omitempty"`
+
+	// Service identifier.
+	ServiceID string `json:"service_id,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// Node ID. We use it to get the node and from the node we can extract the AWS region
+	NodeID string `json:"node_id,omitempty"`
+
+	// AWS Access Key ID
+	AWSAccessKeyID string `json:"aws_access_key_id,omitempty"`
+
+	// AWS Secret Access Key
+	AWSSecretAccessKey string `json:"aws_secret_access_key,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
+
+	// AgentStatus represents actual Agent status.
+	//
+	//  - STARTING: Agent is starting.
+	//  - RUNNING: Agent is running.
+	//  - WAITING: Agent encountered error and will be restarted automatically soon.
+	//  - STOPPING: Agent is stopping.
+	//  - DONE: Agent finished.
+	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
+	Status *string `json:"status,omitempty"`
+}
+
+// Validate validates this RDS exporter items0
+func (o *RDSExporterItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var rdsExporterItems0TypeStatusPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["AGENT_STATUS_INVALID","STARTING","RUNNING","WAITING","STOPPING","DONE"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		rdsExporterItems0TypeStatusPropEnum = append(rdsExporterItems0TypeStatusPropEnum, v)
+	}
+}
+
+const (
+
+	// RDSExporterItems0StatusAGENTSTATUSINVALID captures enum value "AGENT_STATUS_INVALID"
+	RDSExporterItems0StatusAGENTSTATUSINVALID string = "AGENT_STATUS_INVALID"
+
+	// RDSExporterItems0StatusSTARTING captures enum value "STARTING"
+	RDSExporterItems0StatusSTARTING string = "STARTING"
+
+	// RDSExporterItems0StatusRUNNING captures enum value "RUNNING"
+	RDSExporterItems0StatusRUNNING string = "RUNNING"
+
+	// RDSExporterItems0StatusWAITING captures enum value "WAITING"
+	RDSExporterItems0StatusWAITING string = "WAITING"
+
+	// RDSExporterItems0StatusSTOPPING captures enum value "STOPPING"
+	RDSExporterItems0StatusSTOPPING string = "STOPPING"
+
+	// RDSExporterItems0StatusDONE captures enum value "DONE"
+	RDSExporterItems0StatusDONE string = "DONE"
+)
+
+// prop value enum
+func (o *RDSExporterItems0) validateStatusEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, rdsExporterItems0TypeStatusPropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *RDSExporterItems0) validateStatus(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Status) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateStatusEnum("status", "body", *o.Status); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *RDSExporterItems0) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *RDSExporterItems0) UnmarshalBinary(b []byte) error {
+	var res RDSExporterItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
