@@ -69,6 +69,7 @@ type addMySQLCommand struct {
 	MaxSlowlogFileSize   units.Base2Bytes
 	TLS                  bool
 	TLSSkipVerify        bool
+	MaxNumberOfTables    int32
 }
 
 func (cmd *addMySQLCommand) Run() (commands.Result, error) {
@@ -134,6 +135,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			MaxSlowlogFileSize:   strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
 			TLS:                  cmd.TLS,
 			TLSSkipVerify:        cmd.TLSSkipVerify,
+			MaxNumberOfTables:    cmd.MaxNumberOfTables,
 		},
 		Context: commands.Ctx,
 	}
@@ -184,4 +186,5 @@ func init() {
 	AddMySQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddMySQL.SkipConnectionCheck)
 	AddMySQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMySQL.TLS)
 	AddMySQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMySQL.TLSSkipVerify)
+	AddMySQLC.Flag("max-number-of-tables", "Max number of tables allowed for a heavy options").Default("1000").Int32Var(&AddMySQL.MaxNumberOfTables)
 }
