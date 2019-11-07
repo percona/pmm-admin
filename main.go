@@ -115,6 +115,7 @@ func main() {
 		inventory.AddAgentQANMongoDBProfilerAgentC.FullCommand():        inventory.AddAgentQANMongoDBProfilerAgent,
 		inventory.AddAgentQANPostgreSQLPgStatementsAgentC.FullCommand(): inventory.AddAgentQANPostgreSQLPgStatementsAgent,
 		inventory.AddAgentRDSExporterC.FullCommand():                    inventory.AddAgentRDSExporter,
+		inventory.AddRemoteRDSNodeC.FullCommand():                       inventory.AddRemoteRDSNode,
 
 		inventory.RemoveAgentC.FullCommand(): inventory.RemoveAgent,
 
