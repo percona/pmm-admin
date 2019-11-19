@@ -240,7 +240,7 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-4809-flag-tbl-stats"
+  branch = "PMM-4809-configurable-tablestat"
   digest = "1:1ed7bb9fe65452e8382f0a868b1da505d862879f71f3564b6ef0d2c4313adb78"
   name = "github.com/percona/pmm"
   packages = [
