@@ -130,12 +130,12 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			QANMysqlSlowlog:    useSlowLog,
 			QANMysqlPerfschema: usePerfschema,
 
-			SkipConnectionCheck:  cmd.SkipConnectionCheck,
-			DisableQueryExamples: cmd.DisableQueryExamples,
-			MaxSlowlogFileSize:   strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
-			TLS:                  cmd.TLS,
-			TLSSkipVerify:        cmd.TLSSkipVerify,
-			MaxNumberOfTables:    cmd.MaxNumberOfTables,
+			SkipConnectionCheck:       cmd.SkipConnectionCheck,
+			DisableQueryExamples:      cmd.DisableQueryExamples,
+			MaxSlowlogFileSize:        strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
+			TLS:                       cmd.TLS,
+			TLSSkipVerify:             cmd.TLSSkipVerify,
+			TablestatsGroupTableLimit: cmd.MaxNumberOfTables,
 		},
 		Context: commands.Ctx,
 	}
