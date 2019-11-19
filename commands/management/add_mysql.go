@@ -64,12 +64,13 @@ type addMySQLCommand struct {
 	UsePerfschema bool
 	UseSlowLog    bool
 
-	SkipConnectionCheck  bool
-	DisableQueryExamples bool
-	MaxSlowlogFileSize   units.Base2Bytes
-	TLS                  bool
-	TLSSkipVerify        bool
-	MaxNumberOfTables    int32
+	SkipConnectionCheck    bool
+	DisableQueryExamples   bool
+	MaxSlowlogFileSize     units.Base2Bytes
+	TLS                    bool
+	TLSSkipVerify          bool
+	DisableTablestats      bool
+	DisableTablestatsLimit uint16
 }
 
 func (cmd *addMySQLCommand) Run() (commands.Result, error) {
@@ -113,6 +114,15 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		}
 	}
 
+	tablestatsGroupTableLimit := int32(cmd.DisableTablestatsLimit)
+	if cmd.DisableTablestats {
+		if tablestatsGroupTableLimit != 0 {
+			return nil, fmt.Errorf("both --disable-tablestats and --disable-tablestats-limit are passed")
+		}
+
+		tablestatsGroupTableLimit = -1
+	}
+
 	params := &mysql.AddMySQLParams{
 		Body: mysql.AddMySQLBody{
 			NodeID:         cmd.NodeID,
@@ -135,7 +145,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			MaxSlowlogFileSize:        strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
 			TLS:                       cmd.TLS,
 			TLSSkipVerify:             cmd.TLSSkipVerify,
-			TablestatsGroupTableLimit: cmd.MaxNumberOfTables,
+			TablestatsGroupTableLimit: tablestatsGroupTableLimit,
 		},
 		Context: commands.Ctx,
 	}
@@ -169,14 +179,17 @@ func init() {
 	AddMySQLC.Flag("username", "MySQL username").Default("root").StringVar(&AddMySQL.Username)
 	AddMySQLC.Flag("password", "MySQL password").StringVar(&AddMySQL.Password)
 
-	querySources := []string{"slowlog", "perfschema", "none"} // TODO add "auto"
+	querySources := []string{"slowlog", "perfschema", "none"} // TODO add "auto", make it default
 	querySourceHelp := fmt.Sprintf("Source of SQL queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
 	AddMySQLC.Flag("query-source", querySourceHelp).Default(querySources[0]).EnumVar(&AddMySQL.QuerySource, querySources...)
 	AddMySQLC.Flag("use-perfschema", "Run QAN perf schema agent").Hidden().BoolVar(&AddMySQL.UsePerfschema)
 	AddMySQLC.Flag("use-slowlog", "Run QAN slow log agent").Hidden().BoolVar(&AddMySQL.UseSlowLog)
 	AddMySQLC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddMySQL.DisableQueryExamples)
-	AddMySQLC.Flag("size-slow-logs", "Rotate slow log file at this size (default: 1GB; negative value disables rotation)").
+	AddMySQLC.Flag("size-slow-logs", "Rotate slow log file at this size (default: server-defined; negative value disables rotation)").
 		BytesVar(&AddMySQL.MaxSlowlogFileSize)
+	AddMySQLC.Flag("disable-tablestats", "Disable collection of table statistics").BoolVar(&AddMySQL.DisableTablestats)
+	AddMySQLC.Flag("disable-tablestats-limit", "Table statistics collection will be disabled if there are more than that number of tables (default: server-defined)").
+		Uint16Var(&AddMySQL.DisableTablestatsLimit)
 
 	AddMySQLC.Flag("environment", "Environment name").StringVar(&AddMySQL.Environment)
 	AddMySQLC.Flag("cluster", "Cluster name").StringVar(&AddMySQL.Cluster)
@@ -186,5 +199,4 @@ func init() {
 	AddMySQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddMySQL.SkipConnectionCheck)
 	AddMySQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMySQL.TLS)
 	AddMySQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMySQL.TLSSkipVerify)
-	AddMySQLC.Flag("max-number-of-tables", "Max number of tables allowed for a heavy options").Default("1000").Int32Var(&AddMySQL.MaxNumberOfTables)
 }
