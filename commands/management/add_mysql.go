@@ -34,10 +34,19 @@ var addMySQLResultT = commands.ParseTemplate(`
 MySQL Service added.
 Service ID  : {{ .Service.ServiceID }}
 Service name: {{ .Service.ServiceName }}
+{{ if .MysqldExporter -}}
+{{ if .MysqldExporter.TablestatsGroupDisabled }}
+Table statistics collection disabled.
+{{ else }}
+Table statistics collection enabled.
+{{ end }}
+{{ end }}
 `)
 
 type addMySQLResult struct {
-	Service *mysql.AddMySQLOKBodyService `json:"service"`
+	Service        *mysql.AddMySQLOKBodyService        `json:"service"`
+	MysqldExporter *mysql.AddMySQLOKBodyMysqldExporter `json:"mysqld_exporter,omitempty"`
+	TableCount     int32                               `json:"table_count,omitempty"`
 }
 
 func (res *addMySQLResult) Result() {}
@@ -155,7 +164,9 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 	}
 
 	return &addMySQLResult{
-		Service: resp.Payload.Service,
+		Service:        resp.Payload.Service,
+		MysqldExporter: resp.Payload.MysqldExporter,
+		TableCount:     resp.Payload.TableCount,
 	}, nil
 }
 
