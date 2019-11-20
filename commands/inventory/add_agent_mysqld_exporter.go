@@ -81,14 +81,15 @@ func (res *addAgentMysqldExporterResult) TablestatStatus() string {
 }
 
 type addAgentMysqldExporterCommand struct {
-	PMMAgentID          string
-	ServiceID           string
-	Username            string
-	Password            string
-	CustomLabels        string
-	SkipConnectionCheck bool
-	TLS                 bool
-	TLSSkipVerify       bool
+	PMMAgentID                string
+	ServiceID                 string
+	Username                  string
+	Password                  string
+	CustomLabels              string
+	SkipConnectionCheck       bool
+	TLS                       bool
+	TLSSkipVerify             bool
+	TablestatsGroupTableLimit int32
 }
 
 func (cmd *addAgentMysqldExporterCommand) Run() (commands.Result, error) {
@@ -98,14 +99,15 @@ func (cmd *addAgentMysqldExporterCommand) Run() (commands.Result, error) {
 	}
 	params := &agents.AddMySQLdExporterParams{
 		Body: agents.AddMySQLdExporterBody{
-			PMMAgentID:          cmd.PMMAgentID,
-			ServiceID:           cmd.ServiceID,
-			Username:            cmd.Username,
-			Password:            cmd.Password,
-			CustomLabels:        customLabels,
-			SkipConnectionCheck: cmd.SkipConnectionCheck,
-			TLS:                 cmd.TLS,
-			TLSSkipVerify:       cmd.TLSSkipVerify,
+			PMMAgentID:                cmd.PMMAgentID,
+			ServiceID:                 cmd.ServiceID,
+			Username:                  cmd.Username,
+			Password:                  cmd.Password,
+			CustomLabels:              customLabels,
+			SkipConnectionCheck:       cmd.SkipConnectionCheck,
+			TLS:                       cmd.TLS,
+			TLSSkipVerify:             cmd.TLSSkipVerify,
+			TablestatsGroupTableLimit: cmd.TablestatsGroupTableLimit,
 		},
 		Context: commands.Ctx,
 	}
@@ -135,4 +137,8 @@ func init() {
 	AddAgentMysqldExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentMysqldExporter.SkipConnectionCheck)
 	AddAgentMysqldExporterC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentMysqldExporter.TLS)
 	AddAgentMysqldExporterC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentMysqldExporter.TLSSkipVerify)
+
+	AddAgentMysqldExporterC.Flag("tablestats-group-table-limit",
+		"Tablestats group collectors will be disabled if there are more than that number of tables (default: 0 - always enabled; negative value - always disabled)").
+		Int32Var(&AddAgentMysqldExporter.TablestatsGroupTableLimit)
 }
