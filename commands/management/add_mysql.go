@@ -34,13 +34,8 @@ var addMySQLResultT = commands.ParseTemplate(`
 MySQL Service added.
 Service ID  : {{ .Service.ServiceID }}
 Service name: {{ .Service.ServiceName }}
-{{ if .MysqldExporter -}}
-{{ if .MysqldExporter.TablestatsGroupDisabled }}
-Table statistics collection disabled.
-{{ else }}
-Table statistics collection enabled.
-{{ end }}
-{{ end }}
+
+{{ .TablestatStatus }}
 `)
 
 type addMySQLResult struct {
@@ -53,6 +48,35 @@ func (res *addMySQLResult) Result() {}
 
 func (res *addMySQLResult) String() string {
 	return commands.RenderTemplate(addMySQLResultT, res)
+}
+
+func (res *addMySQLResult) TablestatStatus() string {
+	if res.MysqldExporter == nil {
+		return ""
+	}
+
+	status := "enabled"
+	if res.MysqldExporter.TablestatsGroupDisabled {
+		status = "disabled"
+	}
+
+	s := "Table statistics collection " + status
+
+	switch {
+	case res.MysqldExporter.TablestatsGroupTableLimit == 0: // no limit
+		s += " (no table count limit set)."
+	case res.MysqldExporter.TablestatsGroupTableLimit < 0: // always disabled
+		s += " (always)."
+	default:
+		count := "unknown"
+		if res.TableCount > 0 {
+			count = strconv.Itoa(int(res.TableCount))
+		}
+
+		s += fmt.Sprintf(" (limit %d, actual table count %s).", res.MysqldExporter.TablestatsGroupTableLimit, count)
+	}
+
+	return s
 }
 
 type addMySQLCommand struct {
