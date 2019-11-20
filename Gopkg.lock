@@ -240,8 +240,8 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-4809-configurable-tablestat"
-  digest = "1:1ed7bb9fe65452e8382f0a868b1da505d862879f71f3564b6ef0d2c4313adb78"
+  branch = "PMM-2.0"
+  digest = "1:46c624119fb4c53b8bbd786e154cb71810bdaa87ad657f48e9205ffd8ce82634"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -266,7 +266,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "8b7858d51a08636b3253ca18b5d8e8415679e80c"
+  revision = "40817e4f8d119582d22105db004c094ccfdabe68"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
