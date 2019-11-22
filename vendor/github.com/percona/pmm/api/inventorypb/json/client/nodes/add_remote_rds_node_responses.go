@@ -125,7 +125,7 @@ type AddRemoteRDSNodeBody struct {
 	// Unique across all Nodes user-defined name.
 	NodeName string `json:"node_name,omitempty"`
 
-	// Node address (DNS name or IP).
+	// DB instance identifier.
 	Address string `json:"address,omitempty"`
 
 	// Node model.
@@ -139,9 +139,6 @@ type AddRemoteRDSNodeBody struct {
 
 	// Custom user-assigned labels.
 	CustomLabels map[string]string `json:"custom_labels,omitempty"`
-
-	// Config file body
-	ConfigBody string `json:"config_body,omitempty"`
 }
 
 // Validate validates this add remote RDS node body
@@ -264,7 +261,7 @@ func (o *AddRemoteRDSNodeOKBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*AddRemoteRDSNodeOKBodyRemote RemoteRDSNode represents generic remote RDS Node. Agents can't run on Remote Nodes.
+/*AddRemoteRDSNodeOKBodyRemote RemoteRDSNode represents remote RDS Node. Agents can't run on Remote Nodes.
 swagger:model AddRemoteRDSNodeOKBodyRemote
 */
 type AddRemoteRDSNodeOKBodyRemote struct {

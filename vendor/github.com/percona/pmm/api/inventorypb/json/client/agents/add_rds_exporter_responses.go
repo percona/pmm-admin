@@ -130,11 +130,11 @@ type AddRDSExporterBody struct {
 	// Service identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
-	// AWS Access Key ID
-	AWSAccessKeyID string `json:"aws_access_key_id,omitempty"`
+	// AWS Access Key.
+	AWSAccessKey string `json:"aws_access_key,omitempty"`
 
-	// AWS Secret Accces Key
-	AWSSecretAccessKey string `json:"aws_secret_access_key,omitempty"`
+	// AWS Secret Key.
+	AWSSecretKey string `json:"aws_secret_key,omitempty"`
 
 	// Custom user-assigned labels.
 	CustomLabels map[string]string `json:"custom_labels,omitempty"`
@@ -263,7 +263,7 @@ func (o *AddRDSExporterOKBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*AddRDSExporterOKBodyRDSExporter RDSExporter runs on Generic or Container Node and exposes RDS Service metrics.
+/*AddRDSExporterOKBodyRDSExporter RDSExporter runs on Generic or Container Node and exposes RemoteRDS Node metrics.
 swagger:model AddRDSExporterOKBodyRDSExporter
 */
 type AddRDSExporterOKBodyRDSExporter struct {
@@ -280,20 +280,11 @@ type AddRDSExporterOKBodyRDSExporter struct {
 	// Service identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
+	// AWS Access Key.
+	AWSAccessKey string `json:"aws_access_key,omitempty"`
+
 	// Custom user-assigned labels.
 	CustomLabels map[string]string `json:"custom_labels,omitempty"`
-
-	// Node ID. We use it to get the node and from the node we can extract the AWS region
-	NodeID string `json:"node_id,omitempty"`
-
-	// AWS Access Key ID
-	AWSAccessKeyID string `json:"aws_access_key_id,omitempty"`
-
-	// AWS Secret Access Key
-	AWSSecretAccessKey string `json:"aws_secret_access_key,omitempty"`
-
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -304,6 +295,9 @@ type AddRDSExporterOKBodyRDSExporter struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
+
+	// Listen port for scraping metrics (the same for several configurations).
+	ListenPort int64 `json:"listen_port,omitempty"`
 }
 
 // Validate validates this add RDS exporter OK body RDS exporter
