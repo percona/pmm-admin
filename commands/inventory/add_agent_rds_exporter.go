@@ -46,7 +46,7 @@ func (res *addAgentRDSExporterResult) String() string {
 
 type addAgentRDSExporterCommand struct {
 	PMMAgentID          string
-	ServiceID           string
+	NodeID              string
 	CustomLabels        string
 	AWSAccessKey        string
 	AWSSecretKey        string
@@ -62,7 +62,7 @@ func (cmd *addAgentRDSExporterCommand) Run() (commands.Result, error) {
 	params := &agents.AddRDSExporterParams{
 		Body: agents.AddRDSExporterBody{
 			PMMAgentID:          cmd.PMMAgentID,
-			ServiceID:           cmd.ServiceID,
+			NodeID:              cmd.NodeID,
 			CustomLabels:        customLabels,
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
 			AWSAccessKey:        cmd.AWSAccessKey,
@@ -88,7 +88,7 @@ var (
 
 func init() {
 	AddAgentRDSExporterC.Arg("pmm-agent-id", "The pmm-agent identifier which runs this instance").StringVar(&AddAgentRDSExporter.PMMAgentID)
-	AddAgentRDSExporterC.Arg("service-id", "Service identifier").StringVar(&AddAgentRDSExporter.ServiceID)
+	AddAgentRDSExporterC.Arg("node-id", "Node identifier").StringVar(&AddAgentRDSExporter.NodeID)
 	AddAgentRDSExporterC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentRDSExporter.CustomLabels)
 	AddAgentRDSExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentRDSExporter.SkipConnectionCheck)
 	AddAgentRDSExporterC.Flag("aws-access-key", "AWS Access Key ID").StringVar(&AddAgentRDSExporter.AWSAccessKey)
