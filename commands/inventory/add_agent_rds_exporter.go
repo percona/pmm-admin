@@ -48,8 +48,8 @@ type addAgentRDSExporterCommand struct {
 	PMMAgentID          string
 	ServiceID           string
 	CustomLabels        string
-	AWSAccessKeyID      string
-	AWSSecretAccessKey  string
+	AWSAccessKey        string
+	AWSSecretKey        string
 	SkipConnectionCheck bool
 }
 
@@ -65,8 +65,8 @@ func (cmd *addAgentRDSExporterCommand) Run() (commands.Result, error) {
 			ServiceID:           cmd.ServiceID,
 			CustomLabels:        customLabels,
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
-			AWSAccessKeyID:      cmd.AWSAccessKeyID,
-			AWSSecretAccessKey:  cmd.AWSSecretAccessKey,
+			AWSAccessKey:        cmd.AWSAccessKey,
+			AWSSecretKey:        cmd.AWSSecretKey,
 		},
 		Context: commands.Ctx,
 	}
@@ -91,6 +91,6 @@ func init() {
 	AddAgentRDSExporterC.Arg("service-id", "Service identifier").StringVar(&AddAgentRDSExporter.ServiceID)
 	AddAgentRDSExporterC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentRDSExporter.CustomLabels)
 	AddAgentRDSExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentRDSExporter.SkipConnectionCheck)
-	AddAgentRDSExporterC.Flag("aws-access-key-id", "AWS Access Key ID").StringVar(&AddAgentRDSExporter.AWSAccessKeyID)
-	AddAgentRDSExporterC.Flag("aws-secret-access-key", "AWS Secret Access").StringVar(&AddAgentRDSExporter.AWSSecretAccessKey)
+	AddAgentRDSExporterC.Flag("aws-access-key", "AWS Access Key ID").StringVar(&AddAgentRDSExporter.AWSAccessKey)
+	AddAgentRDSExporterC.Flag("aws-secret-key", "AWS Secret Access Key").StringVar(&AddAgentRDSExporter.AWSSecretKey)
 }
