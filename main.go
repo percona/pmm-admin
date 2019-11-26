@@ -90,6 +90,7 @@ func main() {
 		inventory.AddNodeGenericC.FullCommand():   inventory.AddNodeGeneric,
 		inventory.AddNodeContainerC.FullCommand(): inventory.AddNodeContainer,
 		inventory.AddNodeRemoteC.FullCommand():    inventory.AddNodeRemote,
+		inventory.AddNodeRemoteRDSC.FullCommand(): inventory.AddNodeRemoteRDS,
 
 		inventory.RemoveNodeC.FullCommand(): inventory.RemoveNode,
 
@@ -115,7 +116,6 @@ func main() {
 		inventory.AddAgentQANMongoDBProfilerAgentC.FullCommand():        inventory.AddAgentQANMongoDBProfilerAgent,
 		inventory.AddAgentQANPostgreSQLPgStatementsAgentC.FullCommand(): inventory.AddAgentQANPostgreSQLPgStatementsAgent,
 		inventory.AddAgentRDSExporterC.FullCommand():                    inventory.AddAgentRDSExporter,
-		inventory.AddRemoteRDSNodeC.FullCommand():                       inventory.AddRemoteRDSNode,
 
 		inventory.RemoveAgentC.FullCommand(): inventory.RemoveAgent,
 

@@ -22,37 +22,39 @@ import (
 	"github.com/percona/pmm-admin/commands"
 )
 
-var addRemoteRDSNodeResultT = commands.ParseTemplate(`
-RDS Node added.
+var addNodeRemoteRDSResultT = commands.ParseTemplate(`
+Remote RDS Node added.
 Node ID  : {{ .Node.NodeID }}
 Node name: {{ .Node.NodeName }}
 
 Address       : {{ .Node.Address }}
+Model         : {{ .Node.NodeModel }}
 Custom labels : {{ .Node.CustomLabels }}
 
 Region    : {{ .Node.Region }}
 Az        : {{ .Node.Az }}
 `)
 
-type addRemoteRDSNodeResult struct {
-	Node *nodes.AddRemoteRDSNodeOKBodyRemote `json:"remote"`
+type addNodeRemoteRDSResult struct {
+	Node *nodes.AddRemoteRDSNodeOKBodyRemoteRDS `json:"remote_rds"`
 }
 
-func (res *addRemoteRDSNodeResult) Result() {}
+func (res *addNodeRemoteRDSResult) Result() {}
 
-func (res *addRemoteRDSNodeResult) String() string {
-	return commands.RenderTemplate(addNodeRemoteResultT, res)
+func (res *addNodeRemoteRDSResult) String() string {
+	return commands.RenderTemplate(addNodeRemoteRDSResultT, res)
 }
 
-type addRemoteRDSNodeCommand struct {
+type addNodeRemoteRDSCommand struct {
 	NodeName     string
 	Address      string
-	CustomLabels string
+	NodeModel    string
 	Region       string
 	Az           string
+	CustomLabels string
 }
 
-func (cmd *addRemoteRDSNodeCommand) Run() (commands.Result, error) {
+func (cmd *addNodeRemoteRDSCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
@@ -61,10 +63,10 @@ func (cmd *addRemoteRDSNodeCommand) Run() (commands.Result, error) {
 		Body: nodes.AddRemoteRDSNodeBody{
 			NodeName:     cmd.NodeName,
 			Address:      cmd.Address,
+			NodeModel:    cmd.NodeModel,
+			Region:       cmd.Region,
+			Az:           cmd.Az,
 			CustomLabels: customLabels,
-
-			Region: cmd.Region,
-			Az:     cmd.Az,
 		},
 		Context: commands.Ctx,
 	}
@@ -73,23 +75,23 @@ func (cmd *addRemoteRDSNodeCommand) Run() (commands.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &addRemoteRDSNodeResult{
-		Node: resp.Payload.Remote,
+	return &addNodeRemoteRDSResult{
+		Node: resp.Payload.RemoteRDS,
 	}, nil
 }
 
 // register command
 var (
-	AddRemoteRDSNode  = new(addRemoteRDSNodeCommand)
-	AddRemoteRDSNodeC = addNodeC.Command("rds-node", "Add RDS node to inventory")
+	AddNodeRemoteRDS  = new(addNodeRemoteRDSCommand)
+	AddNodeRemoteRDSC = addNodeC.Command("remote-rds", "Add Remote RDS node to inventory").Hide(hide)
 )
 
 func init() {
-	AddRemoteRDSNodeC.Arg("name", "Node name").StringVar(&AddRemoteRDSNode.NodeName)
+	AddNodeRemoteRDSC.Arg("name", "Node name").StringVar(&AddNodeRemoteRDS.NodeName)
 
-	AddRemoteRDSNodeC.Flag("address", "Address").StringVar(&AddRemoteRDSNode.Address)
-	AddRemoteRDSNodeC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddRemoteRDSNode.CustomLabels)
-
-	AddRemoteRDSNodeC.Flag("region", "Node region").StringVar(&AddRemoteRDSNode.Region)
-	AddRemoteRDSNodeC.Flag("az", "Node availability zone").StringVar(&AddRemoteRDSNode.Az)
+	AddNodeRemoteRDSC.Flag("address", "Address").StringVar(&AddNodeRemoteRDS.Address)
+	AddNodeRemoteRDSC.Flag("node-model", "Node model").StringVar(&AddNodeRemoteRDS.NodeModel)
+	AddNodeRemoteRDSC.Flag("region", "Node region").StringVar(&AddNodeRemoteRDS.Region)
+	AddNodeRemoteRDSC.Flag("az", "Node availability zone").StringVar(&AddNodeRemoteRDS.Az)
+	AddNodeRemoteRDSC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddNodeRemoteRDS.CustomLabels)
 }
