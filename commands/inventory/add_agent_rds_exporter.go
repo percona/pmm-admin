@@ -35,7 +35,7 @@ Custom labels         : {{ .Agent.CustomLabels }}
 `)
 
 type addAgentRDSExporterResult struct {
-	Agent *agents.AddRDSExporterOKBodyRDSExporter `json:"proxysql_exporter"`
+	Agent *agents.AddRDSExporterOKBodyRDSExporter `json:"rds_exporter"`
 }
 
 func (res *addAgentRDSExporterResult) Result() {}
@@ -47,9 +47,9 @@ func (res *addAgentRDSExporterResult) String() string {
 type addAgentRDSExporterCommand struct {
 	PMMAgentID          string
 	NodeID              string
-	CustomLabels        string
 	AWSAccessKey        string
 	AWSSecretKey        string
+	CustomLabels        string
 	SkipConnectionCheck bool
 }
 
@@ -63,10 +63,10 @@ func (cmd *addAgentRDSExporterCommand) Run() (commands.Result, error) {
 		Body: agents.AddRDSExporterBody{
 			PMMAgentID:          cmd.PMMAgentID,
 			NodeID:              cmd.NodeID,
-			CustomLabels:        customLabels,
-			SkipConnectionCheck: cmd.SkipConnectionCheck,
 			AWSAccessKey:        cmd.AWSAccessKey,
 			AWSSecretKey:        cmd.AWSSecretKey,
+			CustomLabels:        customLabels,
+			SkipConnectionCheck: cmd.SkipConnectionCheck,
 		},
 		Context: commands.Ctx,
 	}
@@ -87,10 +87,10 @@ var (
 )
 
 func init() {
-	AddAgentRDSExporterC.Arg("pmm-agent-id", "The pmm-agent identifier which runs this instance").StringVar(&AddAgentRDSExporter.PMMAgentID)
-	AddAgentRDSExporterC.Arg("node-id", "Node identifier").StringVar(&AddAgentRDSExporter.NodeID)
-	AddAgentRDSExporterC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentRDSExporter.CustomLabels)
-	AddAgentRDSExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentRDSExporter.SkipConnectionCheck)
+	AddAgentRDSExporterC.Arg("pmm-agent-id", "The pmm-agent identifier which runs this instance").Required().StringVar(&AddAgentRDSExporter.PMMAgentID)
+	AddAgentRDSExporterC.Arg("node-id", "Node identifier").Required().StringVar(&AddAgentRDSExporter.NodeID)
 	AddAgentRDSExporterC.Flag("aws-access-key", "AWS Access Key ID").StringVar(&AddAgentRDSExporter.AWSAccessKey)
 	AddAgentRDSExporterC.Flag("aws-secret-key", "AWS Secret Access Key").StringVar(&AddAgentRDSExporter.AWSSecretKey)
+	AddAgentRDSExporterC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentRDSExporter.CustomLabels)
+	AddAgentRDSExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentRDSExporter.SkipConnectionCheck)
 }
