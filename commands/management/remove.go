@@ -45,6 +45,10 @@ type removeMySQLCommand struct {
 }
 
 func (cmd *removeMySQLCommand) Run() (commands.Result, error) {
+	if err := cmd.validateParams(); err != nil {
+		return nil, err
+	}
+
 	params := &service.RemoveServiceParams{
 		Body: service.RemoveServiceBody{
 			ServiceID:   cmd.ServiceID,
@@ -68,6 +72,13 @@ func (cmd *removeMySQLCommand) serviceType() *string {
 	return nil
 }
 
+func (cmd *removeMySQLCommand) validateParams() error {
+	if cmd.ServiceID == "" && cmd.ServiceName == "" {
+		return fmt.Errorf("You need to specify --service-id or --service-name")
+	}
+	return nil
+}
+
 // register command
 var (
 	Remove  = new(removeMySQLCommand)
@@ -77,7 +88,7 @@ var (
 func init() {
 	serviceTypeHelp := fmt.Sprintf("Service type, one of: %s", strings.Join(allServiceTypesKeys, ", "))
 	RemoveC.Arg("service-type", serviceTypeHelp).Required().EnumVar(&Remove.ServiceType, allServiceTypesKeys...)
-	RemoveC.Arg("service-name", "Service name").Required().StringVar(&Remove.ServiceName)
+	RemoveC.Arg("service-name", "Service name").StringVar(&Remove.ServiceName)
 
 	RemoveC.Flag("service-id", "Service ID").StringVar(&Remove.ServiceID)
 }
