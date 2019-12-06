@@ -223,6 +223,9 @@ type GetAgentOKBody struct {
 
 	// qan postgresql pgstatements agent
 	QANPostgresqlPgstatementsAgent *GetAgentOKBodyQANPostgresqlPgstatementsAgent `json:"qan_postgresql_pgstatements_agent,omitempty"`
+
+	// rds exporter
+	RDSExporter *GetAgentOKBodyRDSExporter `json:"rds_exporter,omitempty"`
 }
 
 // Validate validates this get agent OK body
@@ -266,6 +269,10 @@ func (o *GetAgentOKBody) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := o.validateQANPostgresqlPgstatementsAgent(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateRDSExporter(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -455,6 +462,24 @@ func (o *GetAgentOKBody) validateQANPostgresqlPgstatementsAgent(formats strfmt.R
 	return nil
 }
 
+func (o *GetAgentOKBody) validateRDSExporter(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.RDSExporter) { // not required
+		return nil
+	}
+
+	if o.RDSExporter != nil {
+		if err := o.RDSExporter.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("getAgentOk" + "." + "rds_exporter")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (o *GetAgentOKBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
@@ -502,9 +527,6 @@ type GetAgentOKBodyMongodbExporter struct {
 	// Custom user-assigned labels.
 	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
-
 	// AgentStatus represents actual Agent status.
 	//
 	//  - STARTING: Agent is starting.
@@ -514,6 +536,9 @@ type GetAgentOKBodyMongodbExporter struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
 }
 
 // Validate validates this get agent OK body mongodb exporter
@@ -629,11 +654,13 @@ type GetAgentOKBodyMysqldExporter struct {
 	// Skip TLS certificate and hostname validation.
 	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
 
+	// Tablestats group collectors are disabled if there are more than that number of tables.
+	// 0 means tablestats group collectors are always enabled (no limit).
+	// Negative value means tablestats group collectors are always disabled.
+	TablestatsGroupTableLimit int32 `json:"tablestats_group_table_limit,omitempty"`
+
 	// Custom user-assigned labels.
 	CustomLabels map[string]string `json:"custom_labels,omitempty"`
-
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -644,6 +671,12 @@ type GetAgentOKBodyMysqldExporter struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
+
+	// True if tablestats group collectors are currently disabled.
+	TablestatsGroupDisabled bool `json:"tablestats_group_disabled,omitempty"`
 }
 
 // Validate validates this get agent OK body mysqld exporter
@@ -750,9 +783,6 @@ type GetAgentOKBodyNodeExporter struct {
 	// Custom user-assigned labels.
 	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
-
 	// AgentStatus represents actual Agent status.
 	//
 	//  - STARTING: Agent is starting.
@@ -762,6 +792,9 @@ type GetAgentOKBodyNodeExporter struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
 }
 
 // Validate validates this get agent OK body node exporter
@@ -921,9 +954,6 @@ type GetAgentOKBodyPostgresExporter struct {
 	// Custom user-assigned labels.
 	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
-
 	// AgentStatus represents actual Agent status.
 	//
 	//  - STARTING: Agent is starting.
@@ -933,6 +963,9 @@ type GetAgentOKBodyPostgresExporter struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
 }
 
 // Validate validates this get agent OK body postgres exporter
@@ -1051,9 +1084,6 @@ type GetAgentOKBodyProxysqlExporter struct {
 	// Custom user-assigned labels.
 	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
-
 	// AgentStatus represents actual Agent status.
 	//
 	//  - STARTING: Agent is starting.
@@ -1063,6 +1093,9 @@ type GetAgentOKBodyProxysqlExporter struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
 }
 
 // Validate validates this get agent OK body proxysql exporter
@@ -1435,7 +1468,7 @@ type GetAgentOKBodyQANMysqlSlowlogAgent struct {
 	// Skip TLS certificate and hostname validation.
 	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
 
-	// query examples disabled
+	// True if query examples are disabled.
 	QueryExamplesDisabled bool `json:"query_examples_disabled,omitempty"`
 
 	// Slowlog file is rotated at this size if > 0.
@@ -1662,6 +1695,130 @@ func (o *GetAgentOKBodyQANPostgresqlPgstatementsAgent) MarshalBinary() ([]byte, 
 // UnmarshalBinary interface implementation
 func (o *GetAgentOKBodyQANPostgresqlPgstatementsAgent) UnmarshalBinary(b []byte) error {
 	var res GetAgentOKBodyQANPostgresqlPgstatementsAgent
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*GetAgentOKBodyRDSExporter RDSExporter runs on Generic or Container Node and exposes RemoteRDS Node metrics.
+swagger:model GetAgentOKBodyRDSExporter
+*/
+type GetAgentOKBodyRDSExporter struct {
+
+	// Unique randomly generated instance identifier.
+	AgentID string `json:"agent_id,omitempty"`
+
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+
+	// Desired Agent status: enabled (false) or disabled (true).
+	Disabled bool `json:"disabled,omitempty"`
+
+	// Node identifier.
+	NodeID string `json:"node_id,omitempty"`
+
+	// AWS Access Key.
+	AWSAccessKey string `json:"aws_access_key,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// AgentStatus represents actual Agent status.
+	//
+	//  - STARTING: Agent is starting.
+	//  - RUNNING: Agent is running.
+	//  - WAITING: Agent encountered error and will be restarted automatically soon.
+	//  - STOPPING: Agent is stopping.
+	//  - DONE: Agent finished.
+	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
+	Status *string `json:"status,omitempty"`
+
+	// Listen port for scraping metrics (the same for several configurations).
+	ListenPort int64 `json:"listen_port,omitempty"`
+}
+
+// Validate validates this get agent OK body RDS exporter
+func (o *GetAgentOKBodyRDSExporter) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var getAgentOkBodyRdsExporterTypeStatusPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["AGENT_STATUS_INVALID","STARTING","RUNNING","WAITING","STOPPING","DONE"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		getAgentOkBodyRdsExporterTypeStatusPropEnum = append(getAgentOkBodyRdsExporterTypeStatusPropEnum, v)
+	}
+}
+
+const (
+
+	// GetAgentOKBodyRDSExporterStatusAGENTSTATUSINVALID captures enum value "AGENT_STATUS_INVALID"
+	GetAgentOKBodyRDSExporterStatusAGENTSTATUSINVALID string = "AGENT_STATUS_INVALID"
+
+	// GetAgentOKBodyRDSExporterStatusSTARTING captures enum value "STARTING"
+	GetAgentOKBodyRDSExporterStatusSTARTING string = "STARTING"
+
+	// GetAgentOKBodyRDSExporterStatusRUNNING captures enum value "RUNNING"
+	GetAgentOKBodyRDSExporterStatusRUNNING string = "RUNNING"
+
+	// GetAgentOKBodyRDSExporterStatusWAITING captures enum value "WAITING"
+	GetAgentOKBodyRDSExporterStatusWAITING string = "WAITING"
+
+	// GetAgentOKBodyRDSExporterStatusSTOPPING captures enum value "STOPPING"
+	GetAgentOKBodyRDSExporterStatusSTOPPING string = "STOPPING"
+
+	// GetAgentOKBodyRDSExporterStatusDONE captures enum value "DONE"
+	GetAgentOKBodyRDSExporterStatusDONE string = "DONE"
+)
+
+// prop value enum
+func (o *GetAgentOKBodyRDSExporter) validateStatusEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, getAgentOkBodyRdsExporterTypeStatusPropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *GetAgentOKBodyRDSExporter) validateStatus(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Status) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateStatusEnum("getAgentOk"+"."+"rds_exporter"+"."+"status", "body", *o.Status); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *GetAgentOKBodyRDSExporter) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *GetAgentOKBodyRDSExporter) UnmarshalBinary(b []byte) error {
+	var res GetAgentOKBodyRDSExporter
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
