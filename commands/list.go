@@ -18,6 +18,7 @@ package commands
 import (
 	"net"
 	"strconv"
+	"strings"
 
 	"github.com/AlekSi/pointer"
 	"github.com/percona/pmm/api/inventorypb/json/client"
@@ -55,7 +56,7 @@ type listResultService struct {
 
 type listResult struct {
 	Services []listResultService `json:"service"`
-	Agents   []listResultAgent   `json:"agents"`
+	Agents   []listResultAgent   `json:"agent"`
 }
 
 func (res *listResult) Result() {}
@@ -87,34 +88,34 @@ func (cmd *listCommand) Run() (Result, error) {
 		return nil, err
 	}
 
-	var services []listResultService
+	var servicesList []listResultService
 	for _, s := range servicesRes.Payload.Mysql {
-		services = append(services, listResultService{
-			ServiceType: "MYSQL_SERVICE", // inventorypb.ServiceType_MYSQL_SERVICE.String(),
+		servicesList = append(servicesList, listResultService{
+			ServiceType: services.ListServicesBodyServiceTypeMYSQLSERVICE,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
 		})
 	}
 	for _, s := range servicesRes.Payload.Mongodb {
-		services = append(services, listResultService{
-			ServiceType: "MONGODB_SERVICE", // inventorypb.ServiceType_MONGODB_SERVICE.String(),
+		servicesList = append(servicesList, listResultService{
+			ServiceType: services.ListServicesBodyServiceTypeMONGODBSERVICE,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
 		})
 	}
 	for _, s := range servicesRes.Payload.Postgresql {
-		services = append(services, listResultService{
-			ServiceType: "POSTGRESQL_SERVICE", // inventorypb.ServiceType_POSTGRESQL_SERVICE.String(),
+		servicesList = append(servicesList, listResultService{
+			ServiceType: services.ListServicesBodyServiceTypePOSTGRESQLSERVICE,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
 		})
 	}
 	for _, s := range servicesRes.Payload.Proxysql {
-		services = append(services, listResultService{
-			ServiceType: "PROXYSQL_SERVICE", //inventorypb.ServiceType_PROXYSQL_SERVICE.String(),
+		servicesList = append(servicesList, listResultService{
+			ServiceType: services.ListServicesBodyServiceTypePROXYSQLSERVICE,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
@@ -129,7 +130,7 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 
 	getStatus := func(s *string, disabled bool) string {
-		res := pointer.GetString(s)
+		res := strings.ToLower(pointer.GetString(s))
 		if res == "" {
 			res = "unknown"
 		}
@@ -140,7 +141,7 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 
 	pmmAgentIDs := map[string]struct{}{}
-	var agents []listResultAgent
+	var agentsList []listResultAgent
 	for _, a := range agentsRes.Payload.PMMAgent {
 		if a.RunsOnNodeID == cmd.NodeID {
 			pmmAgentIDs[a.AgentID] = struct{}{}
@@ -149,8 +150,8 @@ func (cmd *listCommand) Run() (Result, error) {
 			if a.Connected {
 				status = "connected"
 			}
-			agents = append(agents, listResultAgent{
-				AgentType: "PMM_AGENT", // inventorypb.AgentType_PMM_AGENT.String()
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: agents.ListAgentsBodyAgentTypePMMAGENT,
 				AgentID:   a.AgentID,
 				Status:    status,
 			})
@@ -158,8 +159,8 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 	for _, a := range agentsRes.Payload.NodeExporter {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "NODE_EXPORTER", // inventorypb.AgentType_NODE_EXPORTER.String()
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: agents.ListAgentsBodyAgentTypeNODEEXPORTER,
 				AgentID:   a.AgentID,
 				Status:    getStatus(a.Status, a.Disabled),
 			})
@@ -167,8 +168,8 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 	for _, a := range agentsRes.Payload.MysqldExporter {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "MYSQLD_EXPORTER", // inventorypb.AgentType_MYSQLD_EXPORTER.String()
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: agents.ListAgentsBodyAgentTypeMYSQLDEXPORTER,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
 				Status:    getStatus(a.Status, a.Disabled),
@@ -177,8 +178,8 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 	for _, a := range agentsRes.Payload.MongodbExporter {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "MONGODB_EXPORTER", // inventorypb.AgentType_MONGODB_EXPORTER.String()
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: agents.ListAgentsBodyAgentTypeMONGODBEXPORTER,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
 				Status:    getStatus(a.Status, a.Disabled),
@@ -187,8 +188,8 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 	for _, a := range agentsRes.Payload.PostgresExporter {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "POSTGRES_EXPORTER", // inventorypb.AgentType_POSTGRES_EXPORTER.String()
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: agents.ListAgentsBodyAgentTypePOSTGRESEXPORTER,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
 				Status:    getStatus(a.Status, a.Disabled),
@@ -197,8 +198,8 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 	for _, a := range agentsRes.Payload.ProxysqlExporter {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "PROXYSQL_EXPORTER", // inventorypb.AgentType_PROXYSQL_EXPORTER.String()
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: agents.ListAgentsBodyAgentTypePROXYSQLEXPORTER,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
 				Status:    getStatus(a.Status, a.Disabled),
@@ -207,8 +208,8 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 	for _, a := range agentsRes.Payload.RDSExporter {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "RDS_EXPORTER", // inventorypb.AgentType_RDS_EXPORTER.String()
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: agents.ListAgentsBodyAgentTypeRDSEXPORTER,
 				AgentID:   a.AgentID,
 				Status:    getStatus(a.Status, a.Disabled),
 			})
@@ -216,8 +217,8 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 	for _, a := range agentsRes.Payload.QANMysqlPerfschemaAgent {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "QAN_MYSQL_PERFSCHEMA_AGENT", // inventorypb.AgentType_QAN_MYSQL_PERFSCHEMA_AGENT.String()
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: agents.ListAgentsBodyAgentTypeQANMYSQLPERFSCHEMAAGENT,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
 				Status:    getStatus(a.Status, a.Disabled),
@@ -226,8 +227,8 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 	for _, a := range agentsRes.Payload.QANMysqlSlowlogAgent {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "QAN_MYSQL_SLOWLOG_AGENT", // inventorypb.AgentType_QAN_MYSQL_SLOWLOG_AGENT.String()
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: agents.ListAgentsBodyAgentTypeQANMYSQLSLOWLOGAGENT,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
 				Status:    getStatus(a.Status, a.Disabled),
@@ -236,8 +237,8 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 	for _, a := range agentsRes.Payload.QANMongodbProfilerAgent {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "QAN_MONGODB_PROFILER_AGENT", // inventorypb.AgentType_QAN_MONGODB_PROFILER_AGENT.String()
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: agents.ListAgentsBodyAgentTypeQANMONGODBPROFILERAGENT,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
 				Status:    getStatus(a.Status, a.Disabled),
@@ -246,8 +247,8 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 	for _, a := range agentsRes.Payload.QANPostgresqlPgstatementsAgent {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "QAN_POSTGRESQL_PGSTATEMENTS_AGENT", // inventorypb.AgentType_QAN_POSTGRESQL_PGSTATEMENTS_AGENT.String()
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: agents.ListAgentsBodyAgentTypeQANPOSTGRESQLPGSTATEMENTSAGENT,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
 				Status:    getStatus(a.Status, a.Disabled),
@@ -256,8 +257,8 @@ func (cmd *listCommand) Run() (Result, error) {
 	}
 
 	return &listResult{
-		Services: services,
-		Agents:   agents,
+		Services: servicesList,
+		Agents:   agentsList,
 	}, nil
 }
 
