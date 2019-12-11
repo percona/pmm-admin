@@ -21,5 +21,8 @@ import (
 
 // register command
 var (
-	AddC = kingpin.Command("add", "Add Service to monitoring")
+	AddC        = kingpin.Command("add", "Add Service to monitoring")
+	Host        = AddC.Flag("host", "Hostname").String()
+	Port        = AddC.Flag("port", "Port number").Int()
+	ServiceName = AddC.Flag("service-name", "Service name").String()
 )
