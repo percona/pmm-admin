@@ -56,17 +56,32 @@ type addServiceMySQLCommand struct {
 	CustomLabels   string
 }
 
+func (cmd *addServiceMySQLCommand) GetAddress() string {
+	return cmd.Address
+}
+
+func (cmd *addServiceMySQLCommand) GetServiceName() string {
+	return cmd.ServiceName
+}
+
+func (cmd *addServiceMySQLCommand) GetPort() int64 {
+	return cmd.Port
+}
+
 func (cmd *addServiceMySQLCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
 	}
+
+	serviceName, address, port := processGlobalAddFlags(cmd)
+
 	params := &services.AddMySQLServiceParams{
 		Body: services.AddMySQLServiceBody{
-			ServiceName:    cmd.ServiceName,
+			ServiceName:    serviceName,
 			NodeID:         cmd.NodeID,
-			Address:        cmd.Address,
-			Port:           cmd.Port,
+			Address:        address,
+			Port:           port,
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,

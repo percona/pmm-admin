@@ -29,4 +29,38 @@ var (
 	inventoryListC   = inventoryC.Command("list", "List inventory commands").Hide(hide)
 	inventoryAddC    = inventoryC.Command("add", "Add to inventory commands").Hide(hide)
 	inventoryRemoveC = inventoryC.Command("remove", "Remove from inventory commands").Hide(hide)
+	// Add command gobal flags
+	AddAddressFlag     = inventoryAddC.Flag("host", "Hostname").String()
+	AddPortFlag        = inventoryAddC.Flag("port", "Port number").Int64()
+	AddServiceNameFlag = inventoryAddC.Flag("service-name", "Service name").String()
 )
+
+type getter interface {
+	GetAddress() string
+	GetServiceName() string
+	GetPort() int64
+}
+
+// Types implementing the getter interface:
+// - addServiceMySQLCommand
+// - addServiceProxySQLCommand
+// - addServiceMongoDBCommand
+// - ddServicePostgreSQLCommand
+func processGlobalAddFlags(cmd getter) (string, string, int64) {
+	serviceName := cmd.GetServiceName()
+	if *AddServiceNameFlag != "" {
+		serviceName = *AddServiceNameFlag
+	}
+
+	address := cmd.GetAddress()
+	if *AddAddressFlag != "" {
+		address = *AddAddressFlag
+	}
+
+	port := cmd.GetPort()
+	if *AddPortFlag != 0 {
+		port = *AddPortFlag
+	}
+
+	return serviceName, address, port
+}

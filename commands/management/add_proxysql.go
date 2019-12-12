@@ -17,9 +17,7 @@ package management
 
 import (
 	"fmt"
-	"net"
 	"os"
-	"strconv"
 
 	"github.com/percona/pmm/api/managementpb/json/client"
 	proxysql "github.com/percona/pmm/api/managementpb/json/client/proxy_sql"
@@ -61,6 +59,14 @@ type addProxySQLCommand struct {
 	TLSSkipVerify       bool
 }
 
+func (cmd *addProxySQLCommand) GetAddressPort() string {
+	return cmd.AddressPort
+}
+
+func (cmd *addProxySQLCommand) GetServiceName() string {
+	return cmd.ServiceName
+}
+
 func (cmd *addProxySQLCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
@@ -80,11 +86,7 @@ func (cmd *addProxySQLCommand) Run() (commands.Result, error) {
 		}
 	}
 
-	host, portS, err := net.SplitHostPort(cmd.AddressPort)
-	if err != nil {
-		return nil, err
-	}
-	port, err := strconv.Atoi(portS)
+	serviceName, host, port, err := processGlobalAddFlags(cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +94,7 @@ func (cmd *addProxySQLCommand) Run() (commands.Result, error) {
 	params := &proxysql.AddProxySQLParams{
 		Body: proxysql.AddProxySQLBody{
 			NodeID:         cmd.NodeID,
-			ServiceName:    cmd.ServiceName,
+			ServiceName:    serviceName,
 			Address:        host,
 			Port:           int64(port),
 			PMMAgentID:     cmd.PMMAgentID,

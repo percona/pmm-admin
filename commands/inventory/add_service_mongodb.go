@@ -56,17 +56,32 @@ type addServiceMongoDBCommand struct {
 	CustomLabels   string
 }
 
+func (cmd *addServiceMongoDBCommand) GetAddress() string {
+	return cmd.Address
+}
+
+func (cmd *addServiceMongoDBCommand) GetServiceName() string {
+	return cmd.ServiceName
+}
+
+func (cmd *addServiceMongoDBCommand) GetPort() int64 {
+	return cmd.Port
+}
+
 func (cmd *addServiceMongoDBCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
 	}
+
+	serviceName, address, port := processGlobalAddFlags(cmd)
+
 	params := &services.AddMongoDBServiceParams{
 		Body: services.AddMongoDBServiceBody{
-			ServiceName:    cmd.ServiceName,
+			ServiceName:    serviceName,
 			NodeID:         cmd.NodeID,
-			Address:        cmd.Address,
-			Port:           cmd.Port,
+			Address:        address,
+			Port:           port,
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,

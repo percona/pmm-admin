@@ -17,9 +17,7 @@ package management
 
 import (
 	"fmt"
-	"net"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/percona/pmm/api/managementpb/json/client"
@@ -64,6 +62,14 @@ type addPostgreSQLCommand struct {
 	TLSSkipVerify       bool
 }
 
+func (cmd *addPostgreSQLCommand) GetAddressPort() string {
+	return cmd.AddressPort
+}
+
+func (cmd *addPostgreSQLCommand) GetServiceName() string {
+	return cmd.ServiceName
+}
+
 func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
@@ -83,11 +89,7 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 		}
 	}
 
-	host, portS, err := net.SplitHostPort(cmd.AddressPort)
-	if err != nil {
-		return nil, err
-	}
-	port, err := strconv.Atoi(portS)
+	serviceName, host, port, err := processGlobalAddFlags(cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +105,7 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 	params := &postgresql.AddPostgreSQLParams{
 		Body: postgresql.AddPostgreSQLBody{
 			NodeID:         cmd.NodeID,
-			ServiceName:    cmd.ServiceName,
+			ServiceName:    serviceName,
 			Address:        host,
 			Port:           int64(port),
 			PMMAgentID:     cmd.PMMAgentID,

@@ -17,7 +17,6 @@ package management
 
 import (
 	"fmt"
-	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -108,6 +107,14 @@ type addMySQLCommand struct {
 	DisableTablestatsLimit uint16
 }
 
+func (cmd *addMySQLCommand) GetAddressPort() string {
+	return cmd.AddressPort
+}
+
+func (cmd *addMySQLCommand) GetServiceName() string {
+	return cmd.ServiceName
+}
+
 func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
@@ -127,11 +134,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		}
 	}
 
-	host, portS, err := net.SplitHostPort(cmd.AddressPort)
-	if err != nil {
-		return nil, err
-	}
-	port, err := strconv.Atoi(portS)
+	serviceName, host, port, err := processGlobalAddFlags(cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +151,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 	params := &mysql.AddMySQLParams{
 		Body: mysql.AddMySQLBody{
 			NodeID:         cmd.NodeID,
-			ServiceName:    cmd.ServiceName,
+			ServiceName:    serviceName,
 			Address:        host,
 			Port:           int64(port),
 			PMMAgentID:     cmd.PMMAgentID,
