@@ -63,34 +63,34 @@ func (cmd *listServicesCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	var services []listResultService
+	var servicesList []listResultService
 	for _, s := range result.Payload.Mysql {
-		services = append(services, listResultService{
-			ServiceType: "MySQL",
+		servicesList = append(servicesList, listResultService{
+			ServiceType: services.ListServicesBodyServiceTypeMYSQLSERVICE,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
 		})
 	}
 	for _, s := range result.Payload.Mongodb {
-		services = append(services, listResultService{
-			ServiceType: "MongoDB",
+		servicesList = append(servicesList, listResultService{
+			ServiceType: services.ListServicesBodyServiceTypeMONGODBSERVICE,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
 		})
 	}
 	for _, s := range result.Payload.Postgresql {
-		services = append(services, listResultService{
-			ServiceType: "PostgreSQL",
+		servicesList = append(servicesList, listResultService{
+			ServiceType: services.ListServicesBodyServiceTypePOSTGRESQLSERVICE,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
 		})
 	}
 	for _, s := range result.Payload.Proxysql {
-		services = append(services, listResultService{
-			ServiceType: "ProxySQL",
+		servicesList = append(servicesList, listResultService{
+			ServiceType: services.ListServicesBodyServiceTypePROXYSQLSERVICE,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
@@ -98,7 +98,7 @@ func (cmd *listServicesCommand) Run() (commands.Result, error) {
 	}
 
 	return &listServicesResult{
-		Services: services,
+		Services: servicesList,
 	}, nil
 }
 

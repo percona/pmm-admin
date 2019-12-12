@@ -60,34 +60,34 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	var nodes []listResultNode
+	var nodesList []listResultNode
 	for _, n := range result.Payload.Generic {
-		nodes = append(nodes, listResultNode{
-			NodeType: "Generic",
+		nodesList = append(nodesList, listResultNode{
+			NodeType: nodes.ListNodesBodyNodeTypeGENERICNODE,
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
 		})
 	}
 	for _, n := range result.Payload.Container {
-		nodes = append(nodes, listResultNode{
-			NodeType: "Container",
+		nodesList = append(nodesList, listResultNode{
+			NodeType: nodes.ListNodesBodyNodeTypeCONTAINERNODE,
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
 		})
 	}
 	for _, n := range result.Payload.Remote {
-		nodes = append(nodes, listResultNode{
-			NodeType: "Remote",
+		nodesList = append(nodesList, listResultNode{
+			NodeType: nodes.ListNodesBodyNodeTypeREMOTENODE,
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
 		})
 	}
 	for _, n := range result.Payload.RemoteRDS {
-		nodes = append(nodes, listResultNode{
-			NodeType: "RemoteRDS",
+		nodesList = append(nodesList, listResultNode{
+			NodeType: nodes.ListNodesBodyNodeTypeREMOTERDSNODE,
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
@@ -95,7 +95,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 
 	return &listNodesResult{
-		Nodes: nodes,
+		Nodes: nodesList,
 	}, nil
 }
 
