@@ -16,7 +16,6 @@
 package management
 
 import (
-	"fmt"
 	"net"
 	"strconv"
 
@@ -44,16 +43,12 @@ type getter interface {
 // - addProxySQLCommand
 // Returns, service name, address, port, error
 func processGlobalAddFlags(cmd getter) (string, string, int, error) {
-
 	serviceName := cmd.GetServiceName()
 	if *AddServiceNameFlag != "" {
 		serviceName = *AddServiceNameFlag
 	}
 
 	addressPort := cmd.GetAddressPort()
-	if *AddAddressFlag != "" && *AddPortFlag != 0 {
-		addressPort = fmt.Sprintf("%s:%d", *AddAddressFlag, *AddPortFlag)
-	}
 
 	host, portS, err := net.SplitHostPort(addressPort)
 	if err != nil {
@@ -63,6 +58,14 @@ func processGlobalAddFlags(cmd getter) (string, string, int, error) {
 	port, err := strconv.Atoi(portS)
 	if err != nil {
 		return "", "", 0, err
+	}
+
+	if *AddAddressFlag != "" {
+		host = *AddAddressFlag
+	}
+
+	if *AddPortFlag != 0 {
+		port = int(*AddPortFlag)
 	}
 
 	return serviceName, host, port, nil

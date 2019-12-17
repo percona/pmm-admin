@@ -16,36 +16,98 @@
 package management
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/AlekSi/pointer"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGlobalFlags(t *testing.T) {
-	wantHost := "localhost"
-	wantPort := 27017
-	cmd := &addMongoDBCommand{
-		AddressPort: fmt.Sprintf("%s:%d", wantHost, wantPort),
-		ServiceName: "mongodb-service",
+func TestManagementGlobalFlags(t *testing.T) {
+	tests := []struct {
+		testName       string
+		addressPortArg string
+		serviceNameArg string
+		addressFlag    string
+		portFlag       int64
+		serviceFlag    string
+		//
+		wantHost    string
+		wantPort    int
+		wantService string
+	}{
+		{
+			testName:       "Only positional arguments",
+			addressPortArg: "localhost:27017",
+			serviceNameArg: "service-name",
+
+			wantHost:    "localhost",
+			wantPort:    27017,
+			wantService: "service-name",
+		},
+		{
+			testName:       "Override only host",
+			addressPortArg: "localhost:27017",
+			serviceNameArg: "service-name",
+
+			addressFlag: "visitant-host",
+
+			wantHost:    "visitant-host",
+			wantPort:    27017,
+			wantService: "service-name",
+		},
+		{
+			testName:       "Override only port",
+			addressPortArg: "localhost:27017",
+			serviceNameArg: "service-name",
+
+			portFlag: 27018,
+
+			wantHost:    "localhost",
+			wantPort:    27018,
+			wantService: "service-name",
+		},
+		{
+			testName:       "Override only service name",
+			addressPortArg: "localhost:27017",
+			serviceNameArg: "service-name",
+
+			serviceFlag: "no-service",
+
+			wantHost:    "localhost",
+			wantPort:    27017,
+			wantService: "no-service",
+		},
+		{
+			testName:       "Override everything",
+			addressPortArg: "localhost:27017",
+			serviceNameArg: "service-name",
+
+			addressFlag: "new-address",
+			portFlag:    27019,
+			serviceFlag: "out-of-service",
+
+			wantHost:    "new-address",
+			wantPort:    27019,
+			wantService: "out-of-service",
+		},
 	}
 
-	serviceName, address, port, err := processGlobalAddFlags(cmd)
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			cmd := &addMongoDBCommand{
+				AddressPort: test.addressPortArg,
+				ServiceName: test.serviceNameArg,
+			}
+			AddAddressFlag = pointer.ToString(test.addressFlag)
+			AddPortFlag = pointer.ToInt64(test.portFlag)
+			AddServiceNameFlag = pointer.ToString(test.serviceFlag)
 
-	assert.NoError(t, err)
-	assert.Equal(t, serviceName, cmd.ServiceName)
-	assert.Equal(t, address, wantHost)
-	assert.Equal(t, port, wantPort)
+			serviceName, address, port, err := processGlobalAddFlags(cmd)
 
-	// Flags have precedence over positional arguments
-	AddAddressFlag = pointer.ToString("remotehost")
-	AddPortFlag = pointer.ToInt64(27018)
-	AddServiceNameFlag = pointer.ToString("new-service")
-	serviceName, address, port, err = processGlobalAddFlags(cmd)
-
-	assert.NoError(t, err)
-	assert.Equal(t, serviceName, *AddServiceNameFlag)
-	assert.Equal(t, address, *AddAddressFlag)
-	assert.Equal(t, int64(port), *AddPortFlag)
+			assert.NoError(t, err)
+			assert.Equal(t, serviceName, test.wantService)
+			assert.Equal(t, address, test.wantHost)
+			assert.Equal(t, port, test.wantPort)
+		})
+	}
 }

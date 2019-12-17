@@ -29,10 +29,6 @@ var (
 	inventoryListC   = inventoryC.Command("list", "List inventory commands").Hide(hide)
 	inventoryAddC    = inventoryC.Command("add", "Add to inventory commands").Hide(hide)
 	inventoryRemoveC = inventoryC.Command("remove", "Remove from inventory commands").Hide(hide)
-	// Add command gobal flags
-	AddAddressFlag     = inventoryAddC.Flag("host", "Hostname").String()
-	AddPortFlag        = inventoryAddC.Flag("port", "Port number").Int64()
-	AddServiceNameFlag = inventoryAddC.Flag("service-name", "Service name").String()
 )
 
 type getter interface {
