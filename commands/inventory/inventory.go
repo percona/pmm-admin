@@ -41,7 +41,7 @@ type getter interface {
 // - addServiceMySQLCommand
 // - addServiceProxySQLCommand
 // - addServiceMongoDBCommand
-// - ddServicePostgreSQLCommand
+// - addServicePostgreSQLCommand
 func processGlobalAddFlags(cmd getter) (string, string, int64) {
 	serviceName := cmd.GetServiceName()
 	if *addServiceNameFlag != "" {
