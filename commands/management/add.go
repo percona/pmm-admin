@@ -25,10 +25,11 @@ import (
 // register command
 var (
 	AddC = kingpin.Command("add", "Add Service to monitoring")
-	// Add command gobal flags
-	AddAddressFlag     = AddC.Flag("host", "Hostname").String()
-	AddPortFlag        = AddC.Flag("port", "Port number").Int64()
-	AddServiceNameFlag = AddC.Flag("service-name", "Service name").String()
+
+	// Add command global flags
+	addAddressFlag     = AddC.Flag("host", "Hostname").String()
+	addPortFlag        = AddC.Flag("port", "Port number").Int64()
+	addServiceNameFlag = AddC.Flag("service-name", "Service name").String()
 )
 
 type getter interface {
@@ -44,8 +45,8 @@ type getter interface {
 // Returns, service name, address, port, error
 func processGlobalAddFlags(cmd getter) (string, string, int, error) {
 	serviceName := cmd.GetServiceName()
-	if *AddServiceNameFlag != "" {
-		serviceName = *AddServiceNameFlag
+	if *addServiceNameFlag != "" {
+		serviceName = *addServiceNameFlag
 	}
 
 	addressPort := cmd.GetAddressPort()
@@ -60,12 +61,12 @@ func processGlobalAddFlags(cmd getter) (string, string, int, error) {
 		return "", "", 0, err
 	}
 
-	if *AddAddressFlag != "" {
-		host = *AddAddressFlag
+	if *addAddressFlag != "" {
+		host = *addAddressFlag
 	}
 
-	if *AddPortFlag != 0 {
-		port = int(*AddPortFlag)
+	if *addPortFlag != 0 {
+		port = int(*addPortFlag)
 	}
 
 	return serviceName, host, port, nil

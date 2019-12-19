@@ -44,18 +44,18 @@ type getter interface {
 // - ddServicePostgreSQLCommand
 func processGlobalAddFlags(cmd getter) (string, string, int64) {
 	serviceName := cmd.GetServiceName()
-	if *AddServiceNameFlag != "" {
-		serviceName = *AddServiceNameFlag
+	if *addServiceNameFlag != "" {
+		serviceName = *addServiceNameFlag
 	}
 
 	address := cmd.GetAddress()
-	if *AddAddressFlag != "" {
-		address = *AddAddressFlag
+	if *addAddressFlag != "" {
+		address = *addAddressFlag
 	}
 
 	port := cmd.GetPort()
-	if *AddPortFlag != 0 {
-		port = *AddPortFlag
+	if *addPortFlag != 0 {
+		port = *addPortFlag
 	}
 
 	return serviceName, address, port

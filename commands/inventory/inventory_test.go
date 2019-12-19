@@ -109,9 +109,9 @@ func TestInventoryGlobalFlags(t *testing.T) {
 				Port:        test.portArg,
 				ServiceName: test.serviceNameArg,
 			}
-			AddAddressFlag = pointer.ToString(test.addressFlag)
-			AddPortFlag = pointer.ToInt64(test.portFlag)
-			AddServiceNameFlag = pointer.ToString(test.serviceFlag)
+			addAddressFlag = pointer.ToString(test.addressFlag)
+			addPortFlag = pointer.ToInt64(test.portFlag)
+			addServiceNameFlag = pointer.ToString(test.serviceFlag)
 
 			serviceName, address, port := processGlobalAddFlags(cmd)
 
