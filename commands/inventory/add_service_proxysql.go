@@ -56,32 +56,17 @@ type addServiceProxySQLCommand struct {
 	CustomLabels   string
 }
 
-func (cmd *addServiceProxySQLCommand) GetAddress() string {
-	return cmd.Address
-}
-
-func (cmd *addServiceProxySQLCommand) GetServiceName() string {
-	return cmd.ServiceName
-}
-
-func (cmd *addServiceProxySQLCommand) GetPort() int64 {
-	return cmd.Port
-}
-
 func (cmd *addServiceProxySQLCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
 	}
-
-	serviceName, address, port := processGlobalAddFlags(cmd)
-
 	params := &services.AddProxySQLServiceParams{
 		Body: services.AddProxySQLServiceBody{
-			ServiceName:    serviceName,
+			ServiceName:    cmd.ServiceName,
 			NodeID:         cmd.NodeID,
-			Address:        address,
-			Port:           port,
+			Address:        cmd.Address,
+			Port:           cmd.Port,
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,

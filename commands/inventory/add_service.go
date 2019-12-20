@@ -18,9 +18,4 @@ package inventory
 // register command
 var (
 	addServiceC = inventoryAddC.Command("service", "Add service to inventory").Hide(hide)
-
-	// Add command global flags
-	addAddressFlag     = addServiceC.Flag("host", "Hostname").String()
-	addPortFlag        = addServiceC.Flag("port", "Port number").Int64()
-	addServiceNameFlag = addServiceC.Flag("service-name", "Service name").String()
 )

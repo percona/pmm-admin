@@ -56,32 +56,17 @@ type addServicePostgreSQLCommand struct {
 	CustomLabels   string
 }
 
-func (cmd *addServicePostgreSQLCommand) GetAddress() string {
-	return cmd.Address
-}
-
-func (cmd *addServicePostgreSQLCommand) GetServiceName() string {
-	return cmd.ServiceName
-}
-
-func (cmd *addServicePostgreSQLCommand) GetPort() int64 {
-	return cmd.Port
-}
-
 func (cmd *addServicePostgreSQLCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
 	}
-
-	serviceName, address, port := processGlobalAddFlags(cmd)
-
 	params := &services.AddPostgreSQLServiceParams{
 		Body: services.AddPostgreSQLServiceBody{
-			ServiceName:    serviceName,
+			ServiceName:    cmd.ServiceName,
 			NodeID:         cmd.NodeID,
-			Address:        address,
-			Port:           port,
+			Address:        cmd.Address,
+			Port:           cmd.Port,
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
