@@ -18,7 +18,6 @@ package management
 import (
 	"testing"
 
-	"github.com/AlekSi/pointer"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,11 +27,11 @@ func TestManagementGlobalFlags(t *testing.T) {
 		addressPortArg string
 		serviceNameArg string
 		addressFlag    string
-		portFlag       int64
+		portFlag       uint16
 		serviceFlag    string
 		//
 		wantHost    string
-		wantPort    int
+		wantPort    uint16
 		wantService string
 	}{
 		{
@@ -93,21 +92,22 @@ func TestManagementGlobalFlags(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		test := test
 		t.Run(test.testName, func(t *testing.T) {
 			cmd := &addMongoDBCommand{
-				AddressPort: test.addressPortArg,
+				Address:     test.addressPortArg,
 				ServiceName: test.serviceNameArg,
 			}
-			addAddressFlag = pointer.ToString(test.addressFlag)
-			addPortFlag = pointer.ToInt64(test.portFlag)
-			addServiceNameFlag = pointer.ToString(test.serviceFlag)
+			addHostFlag = &test.addressFlag
+			addPortFlag = &test.portFlag
+			addServiceNameFlag = &test.serviceFlag
 
 			serviceName, address, port, err := processGlobalAddFlags(cmd)
 
 			assert.NoError(t, err)
 			assert.Equal(t, serviceName, test.wantService)
 			assert.Equal(t, address, test.wantHost)
-			assert.Equal(t, port, test.wantPort)
+			assert.Equal(t, int(port), int(test.wantPort))
 		})
 	}
 }

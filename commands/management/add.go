@@ -27,14 +27,14 @@ var (
 	AddC = kingpin.Command("add", "Add Service to monitoring")
 
 	// Add command global flags
-	addAddressFlag     = AddC.Flag("host", "Hostname").String()
-	addPortFlag        = AddC.Flag("port", "Port number").Int64()
-	addServiceNameFlag = AddC.Flag("service-name", "Service name").String()
+	addServiceNameFlag = AddC.Flag("service-name", "Service name (overrides positional argument)").PlaceHolder("NAME").String()
+	addHostFlag        = AddC.Flag("host", "Service hostname or IP address (overrides positional argument)").String()
+	addPortFlag        = AddC.Flag("port", "Service port number (overrides positional argument)").Uint16()
 )
 
 type getter interface {
-	GetAddressPort() string
 	GetServiceName() string
+	GetAddress() string
 }
 
 // Types implementing the getter interface:
@@ -42,16 +42,14 @@ type getter interface {
 // - addMySQLCommand
 // - addPostgreSQLCommand
 // - addProxySQLCommand
-// Returns, service name, address, port, error
-func processGlobalAddFlags(cmd getter) (string, string, int, error) {
+// Returns service name, host, port, error.
+func processGlobalAddFlags(cmd getter) (string, string, uint16, error) {
 	serviceName := cmd.GetServiceName()
 	if *addServiceNameFlag != "" {
 		serviceName = *addServiceNameFlag
 	}
 
-	addressPort := cmd.GetAddressPort()
-
-	host, portS, err := net.SplitHostPort(addressPort)
+	host, portS, err := net.SplitHostPort(cmd.GetAddress())
 	if err != nil {
 		return "", "", 0, err
 	}
@@ -61,13 +59,13 @@ func processGlobalAddFlags(cmd getter) (string, string, int, error) {
 		return "", "", 0, err
 	}
 
-	if *addAddressFlag != "" {
-		host = *addAddressFlag
+	if *addHostFlag != "" {
+		host = *addHostFlag
 	}
 
 	if *addPortFlag != 0 {
 		port = int(*addPortFlag)
 	}
 
-	return serviceName, host, port, nil
+	return serviceName, host, uint16(port), nil
 }

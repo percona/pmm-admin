@@ -85,7 +85,7 @@ func (res *addMySQLResult) TablestatStatus() string {
 }
 
 type addMySQLCommand struct {
-	AddressPort    string
+	Address        string
 	NodeID         string
 	PMMAgentID     string
 	ServiceName    string
@@ -107,12 +107,12 @@ type addMySQLCommand struct {
 	DisableTablestatsLimit uint16
 }
 
-func (cmd *addMySQLCommand) GetAddressPort() string {
-	return cmd.AddressPort
-}
-
 func (cmd *addMySQLCommand) GetServiceName() string {
 	return cmd.ServiceName
+}
+
+func (cmd *addMySQLCommand) GetAddress() string {
+	return cmd.Address
 }
 
 func (cmd *addMySQLCommand) Run() (commands.Result, error) {
@@ -198,7 +198,7 @@ func init() {
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddMySQLC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddMySQL.ServiceName)
 
-	AddMySQLC.Arg("address", "MySQL address and port (default: 127.0.0.1:3306)").Default("127.0.0.1:3306").StringVar(&AddMySQL.AddressPort)
+	AddMySQLC.Arg("address", "MySQL address and port (default: 127.0.0.1:3306)").Default("127.0.0.1:3306").StringVar(&AddMySQL.Address)
 
 	AddMySQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddMySQL.NodeID)
 	AddMySQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddMySQL.PMMAgentID)

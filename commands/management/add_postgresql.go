@@ -44,7 +44,7 @@ func (res *addPostgreSQLResult) String() string {
 }
 
 type addPostgreSQLCommand struct {
-	AddressPort    string
+	Address        string
 	NodeID         string
 	PMMAgentID     string
 	ServiceName    string
@@ -62,12 +62,12 @@ type addPostgreSQLCommand struct {
 	TLSSkipVerify       bool
 }
 
-func (cmd *addPostgreSQLCommand) GetAddressPort() string {
-	return cmd.AddressPort
-}
-
 func (cmd *addPostgreSQLCommand) GetServiceName() string {
 	return cmd.ServiceName
+}
+
+func (cmd *addPostgreSQLCommand) GetAddress() string {
+	return cmd.Address
 }
 
 func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
@@ -146,7 +146,7 @@ func init() {
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddPostgreSQLC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddPostgreSQL.ServiceName)
 
-	AddPostgreSQLC.Arg("address", "PostgreSQL address and port (default: 127.0.0.1:5432)").Default("127.0.0.1:5432").StringVar(&AddPostgreSQL.AddressPort)
+	AddPostgreSQLC.Arg("address", "PostgreSQL address and port (default: 127.0.0.1:5432)").Default("127.0.0.1:5432").StringVar(&AddPostgreSQL.Address)
 
 	AddPostgreSQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddPostgreSQL.NodeID)
 	AddPostgreSQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddPostgreSQL.PMMAgentID)

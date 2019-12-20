@@ -49,7 +49,7 @@ func (res *addMongoDBResult) String() string {
 }
 
 type addMongoDBCommand struct {
-	AddressPort    string
+	Address        string
 	NodeID         string
 	PMMAgentID     string
 	ServiceName    string
@@ -67,12 +67,12 @@ type addMongoDBCommand struct {
 	TLSSkipVerify       bool
 }
 
-func (cmd *addMongoDBCommand) GetAddressPort() string {
-	return cmd.AddressPort
-}
-
 func (cmd *addMongoDBCommand) GetServiceName() string {
 	return cmd.ServiceName
+}
+
+func (cmd *addMongoDBCommand) GetAddress() string {
+	return cmd.Address
 }
 
 func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
@@ -143,7 +143,7 @@ func init() {
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddMongoDBC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddMongoDB.ServiceName)
 
-	AddMongoDBC.Arg("address", "MongoDB address and port (default: 127.0.0.1:27017)").Default("127.0.0.1:27017").StringVar(&AddMongoDB.AddressPort)
+	AddMongoDBC.Arg("address", "MongoDB address and port (default: 127.0.0.1:27017)").Default("127.0.0.1:27017").StringVar(&AddMongoDB.Address)
 
 	AddMongoDBC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddMongoDB.NodeID)
 	AddMongoDBC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddMongoDB.PMMAgentID)

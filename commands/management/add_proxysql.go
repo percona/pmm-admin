@@ -43,7 +43,7 @@ func (res *addProxySQLResult) String() string {
 }
 
 type addProxySQLCommand struct {
-	AddressPort    string
+	Address        string
 	NodeID         string
 	PMMAgentID     string
 	ServiceName    string
@@ -59,12 +59,12 @@ type addProxySQLCommand struct {
 	TLSSkipVerify       bool
 }
 
-func (cmd *addProxySQLCommand) GetAddressPort() string {
-	return cmd.AddressPort
-}
-
 func (cmd *addProxySQLCommand) GetServiceName() string {
 	return cmd.ServiceName
+}
+
+func (cmd *addProxySQLCommand) GetAddress() string {
+	return cmd.Address
 }
 
 func (cmd *addProxySQLCommand) Run() (commands.Result, error) {
@@ -133,7 +133,7 @@ func init() {
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddProxySQLC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddProxySQL.ServiceName)
 
-	AddProxySQLC.Arg("address", "ProxySQL address and port (default: 127.0.0.1:3306)").Default("127.0.0.1:6032").StringVar(&AddProxySQL.AddressPort)
+	AddProxySQLC.Arg("address", "ProxySQL address and port (default: 127.0.0.1:3306)").Default("127.0.0.1:6032").StringVar(&AddProxySQL.Address)
 
 	AddProxySQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddProxySQL.NodeID)
 	AddProxySQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddProxySQL.PMMAgentID)
