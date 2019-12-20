@@ -23,71 +23,78 @@ import (
 
 func TestManagementGlobalFlags(t *testing.T) {
 	tests := []struct {
-		testName       string
-		addressPortArg string
-		serviceNameArg string
-		addressFlag    string
-		portFlag       uint16
-		serviceFlag    string
-		//
-		wantHost    string
-		wantPort    uint16
-		wantService string
+		testName string
+
+		nameArg    string
+		addressArg string
+
+		serviceNameFlag string
+		hostFlag        string
+		portFlag        uint16
+
+		wantServiceName string
+		wantHost        string
+		wantPort        uint16
 	}{
 		{
-			testName:       "Only positional arguments",
-			addressPortArg: "localhost:27017",
-			serviceNameArg: "service-name",
+			testName: "Only positional arguments",
 
-			wantHost:    "localhost",
-			wantPort:    27017,
-			wantService: "service-name",
+			nameArg:    "service-name",
+			addressArg: "localhost:27017",
+
+			wantServiceName: "service-name",
+			wantHost:        "localhost",
+			wantPort:        27017,
 		},
 		{
-			testName:       "Override only host",
-			addressPortArg: "localhost:27017",
-			serviceNameArg: "service-name",
+			testName: "Override only host",
 
-			addressFlag: "visitant-host",
+			nameArg:    "service-name",
+			addressArg: "localhost:27017",
 
-			wantHost:    "visitant-host",
-			wantPort:    27017,
-			wantService: "service-name",
+			hostFlag: "visitant-host",
+
+			wantServiceName: "service-name",
+			wantHost:        "visitant-host",
+			wantPort:        27017,
 		},
 		{
-			testName:       "Override only port",
-			addressPortArg: "localhost:27017",
-			serviceNameArg: "service-name",
+			testName: "Override only port",
+
+			nameArg:    "service-name",
+			addressArg: "localhost:27017",
 
 			portFlag: 27018,
 
-			wantHost:    "localhost",
-			wantPort:    27018,
-			wantService: "service-name",
+			wantServiceName: "service-name",
+			wantHost:        "localhost",
+			wantPort:        27018,
 		},
 		{
-			testName:       "Override only service name",
-			addressPortArg: "localhost:27017",
-			serviceNameArg: "service-name",
+			testName: "Override only service name",
 
-			serviceFlag: "no-service",
+			nameArg:    "service-name",
+			addressArg: "localhost:27017",
 
-			wantHost:    "localhost",
-			wantPort:    27017,
-			wantService: "no-service",
+			serviceNameFlag: "no-service",
+
+			wantServiceName: "no-service",
+			wantHost:        "localhost",
+			wantPort:        27017,
 		},
 		{
-			testName:       "Override everything",
-			addressPortArg: "localhost:27017",
-			serviceNameArg: "service-name",
+			testName: "Override everything",
 
-			addressFlag: "new-address",
-			portFlag:    27019,
-			serviceFlag: "out-of-service",
+			nameArg:    "service-name",
+			addressArg: "localhost:27017",
 
-			wantHost:    "new-address",
-			wantPort:    27019,
-			wantService: "out-of-service",
+			serviceNameFlag: "out-of-service",
+			hostFlag:        "new-address",
+			portFlag:        27019,
+
+			wantServiceName: "out-of-service",
+			wantHost:        "new-address",
+			wantPort:        27019,
 		},
 	}
 
@@ -95,17 +102,17 @@ func TestManagementGlobalFlags(t *testing.T) {
 		test := test
 		t.Run(test.testName, func(t *testing.T) {
 			cmd := &addMongoDBCommand{
-				Address:     test.addressPortArg,
-				ServiceName: test.serviceNameArg,
+				ServiceName: test.nameArg,
+				Address:     test.addressArg,
 			}
-			addHostFlag = &test.addressFlag
+			addServiceNameFlag = &test.serviceNameFlag
+			addHostFlag = &test.hostFlag
 			addPortFlag = &test.portFlag
-			addServiceNameFlag = &test.serviceFlag
 
 			serviceName, address, port, err := processGlobalAddFlags(cmd)
 
 			assert.NoError(t, err)
-			assert.Equal(t, serviceName, test.wantService)
+			assert.Equal(t, serviceName, test.wantServiceName)
 			assert.Equal(t, address, test.wantHost)
 			assert.Equal(t, int(port), int(test.wantPort))
 		})
