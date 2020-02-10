@@ -199,6 +199,7 @@ func SetupClients(ctx context.Context, serverURL string) {
 	})
 	transport.Consumers = map[string]runtime.Consumer{
 		runtime.JSONMime:    runtime.JSONConsumer(),
+		"application/zip":   runtime.ByteStreamConsumer(),
 		runtime.HTMLMime:    errorConsumer,
 		runtime.TextMime:    errorConsumer,
 		runtime.DefaultMime: errorConsumer,

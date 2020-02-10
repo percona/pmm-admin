@@ -19,13 +19,11 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
 	"path"
@@ -34,6 +32,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/percona/pmm/api/serverpb/json/client"
+	"github.com/percona/pmm/api/serverpb/json/client/server"
 	"github.com/percona/pmm/version"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -67,37 +67,19 @@ type summaryCommand struct {
 	Pproof     bool
 }
 
-func getServerLogs(serverURL *url.URL, serverInsecureTLS bool) (*bytes.Reader, error) {
-	transport := new(http.Transport)
-	if serverInsecureTLS {
-		transport.TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: true, //nolint:gosec
-		}
-	}
-	client := &http.Client{
-		Transport: transport,
-	}
-	u := serverURL.ResolveReference(&url.URL{
-		Path: "logs.zip",
-	})
-	resp, err := client.Get(u.String())
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	defer resp.Body.Close() //nolint:errcheck
+func getServerLogs() (*bytes.Reader, error) {
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("status code %d", resp.StatusCode)
-	}
-	b, err := ioutil.ReadAll(resp.Body)
+	buffer := bytes.NewBuffer(nil)
+	_, err := client.Default.Server.Logs(&server.LogsParams{Context: context.TODO()}, buffer)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	return bytes.NewReader(b), nil
+
+	return bytes.NewReader(buffer.Bytes()), nil
 }
 
-func addServerData(zipW *zip.Writer, serverURL *url.URL, serverInsecureTLS bool) error {
-	bytesR, err := getServerLogs(serverURL, serverInsecureTLS)
+func addServerData(zipW *zip.Writer) error {
+	bytesR, err := getServerLogs()
 	if err != nil {
 		return err
 	}
@@ -282,7 +264,7 @@ func (cmd *summaryCommand) makeArchive() (err error) {
 	}
 
 	if !cmd.SkipServer {
-		if e := addServerData(zipW, GlobalFlags.ServerURL, GlobalFlags.ServerInsecureTLS); e != nil {
+		if e := addServerData(zipW); e != nil {
 			logrus.Warnf("Failed to add server data: %s", e)
 			logrus.Debugf("%+v", e)
 		}
