@@ -50,11 +50,6 @@ type summaryResult struct {
 	Filename string `json:"filename"`
 }
 
-type pproofResult struct {
-	filename string
-	err      error
-}
-
 func (res *summaryResult) Result() {}
 
 func (res *summaryResult) String() string {
@@ -68,7 +63,6 @@ type summaryCommand struct {
 }
 
 func getServerLogs() (*bytes.Reader, error) {
-
 	buffer := bytes.NewBuffer(nil)
 	_, err := client.Default.Server.Logs(&server.LogsParams{Context: context.TODO()}, buffer)
 	if err != nil {
@@ -123,7 +117,7 @@ func addFileToZip(zipW *zip.Writer, fpath, name string) {
 
 	b, err := ioutil.ReadFile(name) //nolint:gosec
 	if err != nil {
-		logrus.Debugf("%s", err)
+		logrus.Warnf("%s", err)
 		b = []byte(err.Error())
 	}
 	m := time.Now()
@@ -131,17 +125,7 @@ func addFileToZip(zipW *zip.Writer, fpath, name string) {
 		m = fi.ModTime()
 	}
 
-	w, err := zipW.CreateHeader(&zip.FileHeader{
-		Name:     path.Join(fpath, filepath.Base(name)),
-		Method:   zip.Deflate,
-		Modified: m,
-	})
-	if err == nil {
-		_, err = w.Write(b)
-	}
-	if err != nil {
-		logrus.Debugf("%s", err)
-	}
+	writeFileToZipWithTime(zipW, path.Join(fpath, filepath.Base(name)), m, b)
 }
 
 func addClientCommand(zipW *zip.Writer, name string, cmd Command) {
@@ -154,17 +138,7 @@ func addClientCommand(zipW *zip.Writer, name string, cmd Command) {
 		b = append(b, err.Error()...)
 	}
 
-	w, err := zipW.CreateHeader(&zip.FileHeader{
-		Name:     path.Join("client", name),
-		Method:   zip.Deflate,
-		Modified: time.Now(),
-	})
-	if err == nil {
-		_, err = w.Write(b)
-	}
-	if err != nil {
-		logrus.Debugf("%s", err)
-	}
+	writeFileToZip(zipW, path.Join("client", name), b)
 }
 
 func addClientData(zipW *zip.Writer) error {
@@ -179,29 +153,7 @@ func addClientData(zipW *zip.Writer) error {
 		b = []byte(err.Error())
 	}
 	b = append(b, '\n')
-	w, err := zipW.CreateHeader(&zip.FileHeader{
-		Name:     "client/status.json",
-		Method:   zip.Deflate,
-		Modified: time.Now(),
-	})
-	if err == nil {
-		_, err = w.Write(b)
-	}
-	if err != nil {
-		logrus.Debugf("%s", err)
-	}
-
-	w, err = zipW.CreateHeader(&zip.FileHeader{
-		Name:     "client/pmm-admin-version.txt",
-		Method:   zip.Deflate,
-		Modified: time.Now(),
-	})
-	if err == nil {
-		_, err = w.Write([]byte(version.FullInfo()))
-	}
-	if err != nil {
-		logrus.Debugf("%s", err)
-	}
+	writeFileToZip(zipW, "client/status.json", b)
 
 	// FIXME get it via pmm-agent's API - it is _not_ a good idea to use exec there
 	// golangli-lint should continue complain about it until it is fixed
@@ -210,23 +162,33 @@ func addClientData(zipW *zip.Writer) error {
 		logrus.Debugf("%s", err)
 		b = []byte(err.Error())
 	}
-	w, err = zipW.CreateHeader(&zip.FileHeader{
-		Name:     "client/pmm-agent-version.txt",
-		Method:   zip.Deflate,
-		Modified: time.Now(),
-	})
-	if err == nil {
-		_, err = w.Write(b)
-	}
-	if err != nil {
-		logrus.Debugf("%s", err)
-	}
+	writeFileToZip(zipW, "client/pmm-agent-version.txt", b)
+	writeFileToZip(zipW, "client/pmm-admin-version.txt", []byte(version.FullInfo()))
 
 	addFileToZip(zipW, "client", status.ConfigFilepath)
 
 	addClientCommand(zipW, "list.txt", &listCommand{NodeID: status.RunsOnNodeID})
 
 	return nil
+}
+
+func writeFileToZip(zipW *zip.Writer, fileName string, data []byte) {
+	modifiedTime := time.Now()
+	writeFileToZipWithTime(zipW, fileName, modifiedTime, data)
+}
+
+func writeFileToZipWithTime(zipW *zip.Writer, fileName string, modifiedTime time.Time, data []byte) {
+	w, err := zipW.CreateHeader(&zip.FileHeader{
+		Name:     fileName,
+		Method:   zip.Deflate,
+		Modified: modifiedTime,
+	})
+	if err == nil {
+		_, err = w.Write(data)
+	}
+	if err != nil {
+		logrus.Errorf("%s", err)
+	}
 }
 
 func (cmd *summaryCommand) makeArchive() (err error) {
@@ -257,7 +219,7 @@ func (cmd *summaryCommand) makeArchive() (err error) {
 	}
 
 	if cmd.Pproof {
-		files := getPprofData()
+		files := cmd.getPprofData()
 		for _, file := range files {
 			addFileToZip(zipW, "pproof", file)
 		}
@@ -273,65 +235,35 @@ func (cmd *summaryCommand) makeArchive() (err error) {
 	return //nolint:nakedret
 }
 
-func checkPproofEnabled(url string) (bool, error) {
-	resp, err := http.Get(url) //nolint:G017
-	if err != nil {
-		return false, errors.Wrap(err, "cannot check if proflier is enabled in server & client")
-	}
-	defer resp.Body.Close() //nolint:errcheck
-
-	if resp.StatusCode != http.StatusOK {
-		return false, nil
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return false, errors.Wrap(err, "cannot check if proflier is enabled in server & client (error reading body")
-	}
-
-	if bytes.Contains(bytes.ToLower(body), []byte("types of profiles available")) {
-		return true, nil
-	}
-
-	return false, nil
+type profilerPath struct {
+	suffix  string
+	webPath string
 }
 
-func getPprofData() []string {
-	apps := []struct {
-		app           string
-		baseURL       string
-		profilerPaths map[string]string
-	}{
+func (cmd *summaryCommand) getPprofData() []string {
+	profilerPaths := []profilerPath{
 		{
-			app:     "pmm-agent",
-			baseURL: "http://127.0.0.1:7777/debug/pprof/",
-			profilerPaths: map[string]string{
-				"pmm-agent-profile.pb.gz": "/profile?seconds=60", // (profile.pb.gz)
-				"pmm-agent-heap.pb.gz":    "/heap?gc=1",          //(heap.pb.gz)
-				"pmm-agent-trace.out":     "/trace?seconds=10",   // (trace.out)
-			},
+			suffix:  "profile.pb.gz",
+			webPath: "/profile?seconds=60",
 		},
 		{
-			app:     "pmm-managed",
-			baseURL: "http://127.0.0.1:7773/debug/pprof/",
-			profilerPaths: map[string]string{
-				"pmm-managed-profile.pb.gz": "/profile?seconds=60", // (profile.pb.gz)
-				"pmm-managed-heap.pb.gz":    "/heap?gc=1",          //(heap.pb.gz)
-				"pmm-managed-trace.out":     "/trace?seconds=10",   // (trace.out)
-			},
+			suffix:  "heap.pb.gz",
+			webPath: "/heap?gc=1",
 		},
 		{
-			app:     "qan-api2",
-			baseURL: "http://127.0.0.1:9933/debug/pprof/",
-			profilerPaths: map[string]string{
-				"qan-api2-profile.pb.gz": "/profile?seconds=60", // (profile.pb.gz)
-				"qan-api2-heap.pb.gz":    "/heap?gc=1",          //(heap.pb.gz)
-				"qan-api2-trace.out":     "/trace?seconds=10",   // (trace.out)
-			},
+			suffix:  "trace.out",
+			webPath: "/trace?seconds=10",
 		},
 	}
+	apps := map[string]string{
+		"pmm-agent": "http://127.0.0.1:7777/debug/pprof",
+	}
+	if !cmd.SkipServer {
+		apps["pmm-managed"] = "http://127.0.0.1:7773/debug/pprof"
+		apps["qan-api2"] = "http://127.0.0.1:9933/debug/pprof"
+	}
 
-	out := make(chan pproofResult)
+	out := make(chan string)
 	files := make([]string, 0)
 	wg := &sync.WaitGroup{}
 	wgr := &sync.WaitGroup{}
@@ -339,36 +271,25 @@ func getPprofData() []string {
 	wgr.Add(1)
 
 	go func() {
-		for result := range out {
-			if result.err != nil {
-				logrus.Errorf("cannot get profiles info: %s", result.err)
-				continue
-			}
-			files = append(files, result.filename)
+		for fileName := range out {
+			files = append(files, fileName)
 		}
 
 		wgr.Done()
 	}()
 
-	for _, appInfo := range apps {
-		enabled, err := checkPproofEnabled(appInfo.baseURL)
-		if err != nil {
-			logrus.Errorf("cannot get %s profiler status: %s", appInfo.app, err)
-			continue
-		}
-		if !enabled {
-			logrus.Errorf("%s profiler is not enabled", appInfo.app)
-			continue
-		}
+	for appName, baseUrl := range apps {
+		wg.Add(1)
+		go func(appName, baseUrl string) {
+			defer wg.Done()
 
-		for filenameSuffix, ppath := range appInfo.profilerPaths {
-			fs := filenameSuffix
-			url := appInfo.baseURL + ppath
+			for _, file := range profilerPaths {
+				fs := fmt.Sprintf("%s-%s", appName, file.suffix)
+				url := baseUrl + file.webPath
 
-			wg.Add(1)
-
-			go downloadProfilerData(url, fs, out, wg)
-		}
+				downloadProfilerData(url, fs, out)
+			}
+		}(appName, baseUrl)
 	}
 
 	wg.Wait()
@@ -378,35 +299,37 @@ func getPprofData() []string {
 	return files
 }
 
-func downloadProfilerData(url string, fs string, out chan pproofResult, wg *sync.WaitGroup) {
-	defer wg.Done()
+func downloadProfilerData(url string, fs string, out chan string) {
+	logrus.Debugf("Started downloading profiler data from %s", url)
 	resp, err := http.Get(url) //nolint
 	if err != nil {
-		out <- pproofResult{filename: "", err: err}
+		logrus.Errorf("cannot get profiles info: %s", err)
 		return
 	}
 	if resp.StatusCode != http.StatusOK {
-		out <- pproofResult{filename: "", err: fmt.Errorf("cannot get profiler data(%s). Status code: %d", url, resp.StatusCode)}
+		err := fmt.Errorf("cannot get profiler data(%s). Status code: %d", url, resp.StatusCode)
+		logrus.Errorf("cannot get profiles info: %s", err)
 		return
 	}
 
 	tmpfile, err := ioutil.TempFile("", "*_"+fs)
 	if err != nil {
-		out <- pproofResult{filename: "", err: errors.Wrap(err, "cannot create temp file")}
+		logrus.Errorf("cannot get profiles info: %s", "cannot create temp file")
 		return
 	}
 
 	if _, err := io.Copy(tmpfile, resp.Body); err != nil {
-		out <- pproofResult{filename: "", err: errors.Wrap(err, "cannot write pprof file")}
+		logrus.Errorf("cannot get profiles info: %s", "cannot write pprof file")
 		return
 	}
 
 	if err := tmpfile.Close(); err != nil {
-		out <- pproofResult{filename: "", err: errors.Wrap(err, "cannot close pprof file")}
+		logrus.Errorf("cannot get profiles info: %s", "cannot close pprof file")
 		return
 	}
 
-	out <- pproofResult{filename: tmpfile.Name(), err: nil}
+	logrus.Debugf("Finished downloading profiler data from %s", url)
+	out <- tmpfile.Name()
 }
 
 func (cmd *summaryCommand) Run() (Result, error) {
