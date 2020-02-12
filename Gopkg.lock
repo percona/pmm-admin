@@ -429,6 +429,7 @@
     "github.com/percona/pmm/api/managementpb/json/client/proxy_sql",
     "github.com/percona/pmm/api/managementpb/json/client/service",
     "github.com/percona/pmm/api/serverpb/json/client",
+    "github.com/percona/pmm/api/serverpb/json/client/server",
     "github.com/percona/pmm/utils/nodeinfo",
     "github.com/percona/pmm/utils/tlsconfig",
     "github.com/percona/pmm/version",
