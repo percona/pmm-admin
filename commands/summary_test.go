@@ -32,15 +32,33 @@ func TestSummary(t *testing.T) {
 
 	f, err := ioutil.TempFile("", "pmm-admin-test-summary")
 	require.NoError(t, err)
-	assert.NoError(t, f.Close())
-
 	filename := f.Name()
 	t.Log(filename)
-	cmd := &summaryCommand{
-		Filename: filename,
-	}
-	res, err := cmd.Run()
-	require.NoError(t, err)
-	assert.NotNil(t, res)
-	assert.NoError(t, os.Remove(filename))
+	defer os.Remove(filename)
+	assert.NoError(t, f.Close())
+
+	t.Run("Summary default", func(t *testing.T) {
+		cmd := &summaryCommand{
+			Filename: filename,
+		}
+		res, err := cmd.Run()
+		require.NoError(t, err)
+		expected := &summaryResult{
+			Filename: filename,
+		}
+		assert.Equal(t, expected, res)
+	})
+
+	t.Run("Summary skip server", func(t *testing.T) {
+		cmd := &summaryCommand{
+			Filename:   filename,
+			SkipServer: true,
+		}
+		res, err := cmd.Run()
+		require.NoError(t, err)
+		expected := &summaryResult{
+			Filename: filename,
+		}
+		assert.Equal(t, expected, res)
+	})
 }

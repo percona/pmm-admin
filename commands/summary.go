@@ -56,7 +56,8 @@ func (res *summaryResult) String() string {
 }
 
 type summaryCommand struct {
-	Filename string
+	Filename   string
+	SkipServer bool
 }
 
 func getServerLogs(serverURL *url.URL, serverInsecureTLS bool) (*bytes.Reader, error) {
@@ -263,9 +264,11 @@ func (cmd *summaryCommand) makeArchive() (err error) {
 		logrus.Debugf("%+v", e)
 	}
 
-	if e := addServerData(zipW, GlobalFlags.ServerURL, GlobalFlags.ServerInsecureTLS); e != nil {
-		logrus.Warnf("Failed to add server data: %s", e)
-		logrus.Debugf("%+v", e)
+	if !cmd.SkipServer {
+		if e := addServerData(zipW, GlobalFlags.ServerURL, GlobalFlags.ServerInsecureTLS); e != nil {
+			logrus.Warnf("Failed to add server data: %s", e)
+			logrus.Debugf("%+v", e)
+		}
 	}
 
 	return //nolint:nakedret
@@ -292,4 +295,5 @@ func init() {
 	filename := fmt.Sprintf("summary_%s_%s.zip",
 		strings.Replace(hostname, ".", "_", -1), time.Now().Format("2006_01_02_15_04_05"))
 	SummaryC.Flag("filename", "Summary archive filename").Default(filename).StringVar(&Summary.Filename)
+	SummaryC.Flag("skip-server", "Skip fetching logs.zip from PMM Server").BoolVar(&Summary.SkipServer)
 }
