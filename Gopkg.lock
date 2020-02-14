@@ -240,7 +240,7 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-5816-logs-zip-endpoint-in-swagger"
+  branch = "PMM-2.0"
   digest = "1:630abc4ddfb585b750a7709b8048ac4000ad59ba81b976f72f50871a49f4175d"
   name = "github.com/percona/pmm"
   packages = [
@@ -266,7 +266,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "5fbc98dfe82869ed5afa37fb7603be0650c88bb6"
+  revision = "35ec9c64bb206c7ed01125963dd07402ba63dbdf"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
