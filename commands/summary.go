@@ -59,12 +59,12 @@ func (res *summaryResult) String() string {
 type summaryCommand struct {
 	Filename   string
 	SkipServer bool
-	Pproof     bool
+	Pprof      bool
 }
 
 func getServerLogs() (*bytes.Reader, error) {
-	buffer := bytes.NewBuffer(nil)
-	_, err := client.Default.Server.Logs(&server.LogsParams{Context: context.TODO()}, buffer)
+	var buffer bytes.Buffer
+	_, err := client.Default.Server.Logs(&server.LogsParams{Context: context.TODO()}, &buffer)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -117,7 +117,7 @@ func addFileToZip(zipW *zip.Writer, fpath, name string) {
 
 	b, err := ioutil.ReadFile(name) //nolint:gosec
 	if err != nil {
-		logrus.Warnf("%s", err)
+		logrus.Debugf("%s", err)
 		b = []byte(err.Error())
 	}
 	m := time.Now()
@@ -162,6 +162,7 @@ func addClientData(zipW *zip.Writer) error {
 		logrus.Debugf("%s", err)
 		b = []byte(err.Error())
 	}
+
 	writeFileToZip(zipW, "client/pmm-agent-version.txt", b)
 	writeFileToZip(zipW, "client/pmm-admin-version.txt", []byte(version.FullInfo()))
 
@@ -218,10 +219,10 @@ func (cmd *summaryCommand) makeArchive() (err error) {
 		logrus.Debugf("%+v", e)
 	}
 
-	if cmd.Pproof {
+	if cmd.Pprof {
 		files := cmd.getPprofData()
 		for _, file := range files {
-			addFileToZip(zipW, "pproof", file)
+			writeFileToZip(zipW, path.Join("pprof", file.name), file.body)
 		}
 	}
 
@@ -240,7 +241,12 @@ type profilerPath struct {
 	webPath string
 }
 
-func (cmd *summaryCommand) getPprofData() []string {
+type pprofFile struct {
+	name string
+	body []byte
+}
+
+func (cmd *summaryCommand) getPprofData() []pprofFile {
 	profilerPaths := []profilerPath{
 		{
 			suffix:  "profile.pb.gz",
@@ -258,15 +264,16 @@ func (cmd *summaryCommand) getPprofData() []string {
 	apps := map[string]string{
 		"pmm-agent": "http://127.0.0.1:7777/debug/pprof",
 	}
+
 	if !cmd.SkipServer {
 		apps["pmm-managed"] = "http://127.0.0.1:7773/debug/pprof"
 		apps["qan-api2"] = "http://127.0.0.1:9933/debug/pprof"
 	}
 
-	out := make(chan string)
-	files := make([]string, 0)
-	wg := &sync.WaitGroup{}
-	wgr := &sync.WaitGroup{}
+	out := make(chan pprofFile)
+	var files []pprofFile
+	var wg sync.WaitGroup
+	var wgr sync.WaitGroup
 
 	wgr.Add(1)
 
@@ -278,58 +285,57 @@ func (cmd *summaryCommand) getPprofData() []string {
 		wgr.Done()
 	}()
 
-	for appName, baseUrl := range apps {
+	for appName, baseURL := range apps {
 		wg.Add(1)
-		go func(appName, baseUrl string) {
+
+		go func(appName, baseURL string) {
 			defer wg.Done()
 
 			for _, file := range profilerPaths {
 				fs := fmt.Sprintf("%s-%s", appName, file.suffix)
-				url := baseUrl + file.webPath
+				url := baseURL + file.webPath
 
 				downloadProfilerData(url, fs, out)
 			}
-		}(appName, baseUrl)
+		}(appName, baseURL)
 	}
 
 	wg.Wait()
 	close(out)
-
 	wgr.Wait()
+
 	return files
 }
 
-func downloadProfilerData(url string, fs string, out chan string) {
+func downloadProfilerData(url string, fs string, out chan pprofFile) {
 	logrus.Debugf("Started downloading profiler data from %s", url)
+
 	resp, err := http.Get(url) //nolint
 	if err != nil {
 		logrus.Errorf("cannot get profiles info: %s", err)
 		return
 	}
+
 	if resp.StatusCode != http.StatusOK {
 		err := fmt.Errorf("cannot get profiler data(%s). Status code: %d", url, resp.StatusCode)
 		logrus.Errorf("cannot get profiles info: %s", err)
+
 		return
 	}
+	defer resp.Body.Close()
 
-	tmpfile, err := ioutil.TempFile("", "*_"+fs)
+	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		logrus.Errorf("cannot get profiles info: %s", "cannot create temp file")
-		return
-	}
+		logrus.Errorf("cannot read response body for %s: %s", fs, err)
 
-	if _, err := io.Copy(tmpfile, resp.Body); err != nil {
-		logrus.Errorf("cannot get profiles info: %s", "cannot write pprof file")
-		return
-	}
-
-	if err := tmpfile.Close(); err != nil {
-		logrus.Errorf("cannot get profiles info: %s", "cannot close pprof file")
 		return
 	}
 
 	logrus.Debugf("Finished downloading profiler data from %s", url)
-	out <- tmpfile.Name()
+	out <- pprofFile{
+		name: fs,
+		body: b,
+	}
 }
 
 func (cmd *summaryCommand) Run() (Result, error) {
@@ -354,5 +360,5 @@ func init() {
 		strings.Replace(hostname, ".", "_", -1), time.Now().Format("2006_01_02_15_04_05"))
 	SummaryC.Flag("filename", "Summary archive filename").Default(filename).StringVar(&Summary.Filename)
 	SummaryC.Flag("skip-server", "Skip fetching logs.zip from PMM Server").BoolVar(&Summary.SkipServer)
-	SummaryC.Flag("pprof", "Include proflier information in the logs").BoolVar(&Summary.Pproof)
+	SummaryC.Flag("pprof", "Include profiler information in the logs").BoolVar(&Summary.Pprof)
 }

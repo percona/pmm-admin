@@ -37,7 +37,7 @@ func TestSummary(t *testing.T) {
 	filename := f.Name()
 	t.Log(filename)
 
-	//defer os.Remove(filename) //nolint
+	defer os.Remove(filename) //nolint
 	assert.NoError(t, f.Close())
 
 	t.Run("Summary default", func(t *testing.T) {
@@ -65,7 +65,7 @@ func TestSummary(t *testing.T) {
 		assert.Equal(t, expected, res)
 	})
 
-	t.Run("Summary pproof", func(t *testing.T) {
+	t.Run("Summary pprof", func(t *testing.T) {
 		if os.Getenv("DEVCONTAINER") == "" {
 			t.Skip("can be tested only inside devcontainer")
 		}
@@ -73,7 +73,7 @@ func TestSummary(t *testing.T) {
 		cmd := &summaryCommand{
 			Filename:   filename,
 			SkipServer: true,
-			Pproof:     true,
+			Pprof:      true,
 		}
 		res, err := cmd.Run()
 		require.NoError(t, err)
@@ -81,20 +81,20 @@ func TestSummary(t *testing.T) {
 			Filename: filename,
 		}
 
-		// Check there is a pproof dir with data inside the zip file
+		// Check there is a pprof dir with data inside the zip file
 		reader, err := zip.OpenReader(filename)
 		assert.NoError(t, err)
 		assert.Equal(t, expected, res)
 
-		hasClientDir := false
+		hasPprofDir := false
 
 		for _, file := range reader.File {
-			if filepath.Dir(file.Name) == "pproof" {
-				hasClientDir = true
+			if filepath.Dir(file.Name) == "pprof" {
+				hasPprofDir = true
 				break
 			}
 		}
 
-		assert.True(t, hasClientDir)
+		assert.True(t, hasPprofDir)
 	})
 }
