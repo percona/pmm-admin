@@ -16,6 +16,7 @@
 package inventory
 
 import (
+	"github.com/percona/pmm/api/inventorypb"
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/nodes"
 
@@ -63,7 +64,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	var nodesList []listResultNode
 	for _, n := range result.Payload.Generic {
 		nodesList = append(nodesList, listResultNode{
-			NodeType: nodes.ListNodesBodyNodeTypeGENERICNODE,
+			NodeType: inventorypb.NodeTypeName("GENERIC_NODE"),
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
@@ -71,7 +72,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 	for _, n := range result.Payload.Container {
 		nodesList = append(nodesList, listResultNode{
-			NodeType: nodes.ListNodesBodyNodeTypeCONTAINERNODE,
+			NodeType: inventorypb.NodeTypeName("CONTAINER_NODE"),
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
@@ -79,7 +80,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 	for _, n := range result.Payload.Remote {
 		nodesList = append(nodesList, listResultNode{
-			NodeType: nodes.ListNodesBodyNodeTypeREMOTENODE,
+			NodeType: inventorypb.NodeTypeName("REMOTE_NODE"),
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
@@ -87,7 +88,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 	for _, n := range result.Payload.RemoteRDS {
 		nodesList = append(nodesList, listResultNode{
-			NodeType: nodes.ListNodesBodyNodeTypeREMOTERDSNODE,
+			NodeType: inventorypb.NodeTypeName("REMOTE_RDS_NODE"),
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,

@@ -19,6 +19,7 @@ import (
 	"net"
 	"strconv"
 
+	"github.com/percona/pmm/api/inventorypb"
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
 
@@ -66,7 +67,7 @@ func (cmd *listServicesCommand) Run() (commands.Result, error) {
 	var servicesList []listResultService
 	for _, s := range result.Payload.Mysql {
 		servicesList = append(servicesList, listResultService{
-			ServiceType: services.ListServicesBodyServiceTypeMYSQLSERVICE,
+			ServiceType: inventorypb.ServiceTypeName("MYSQL_SERVICE"),
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
@@ -74,7 +75,7 @@ func (cmd *listServicesCommand) Run() (commands.Result, error) {
 	}
 	for _, s := range result.Payload.Mongodb {
 		servicesList = append(servicesList, listResultService{
-			ServiceType: services.ListServicesBodyServiceTypeMONGODBSERVICE,
+			ServiceType: inventorypb.ServiceTypeName("MONGODB_SERVICE"),
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
@@ -82,7 +83,7 @@ func (cmd *listServicesCommand) Run() (commands.Result, error) {
 	}
 	for _, s := range result.Payload.Postgresql {
 		servicesList = append(servicesList, listResultService{
-			ServiceType: services.ListServicesBodyServiceTypePOSTGRESQLSERVICE,
+			ServiceType: inventorypb.ServiceTypeName("POSTGRESQL_SERVICE"),
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
@@ -90,7 +91,7 @@ func (cmd *listServicesCommand) Run() (commands.Result, error) {
 	}
 	for _, s := range result.Payload.Proxysql {
 		servicesList = append(servicesList, listResultService{
-			ServiceType: services.ListServicesBodyServiceTypePROXYSQLSERVICE,
+			ServiceType: inventorypb.ServiceTypeName("PROXYSQL_SERVICE"),
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
