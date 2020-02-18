@@ -96,7 +96,7 @@ func ParseTemplate(text string) *template.Template {
 func RenderTemplate(t *template.Template, data interface{}) string {
 	var buf bytes.Buffer
 	if err := t.Execute(&buf, data); err != nil {
-		logrus.Panicf("Failed to render response.\n%s.\nPlease report this bug.", err)
+		logrus.Panicf("Failed to render response.\n%s.\nTemplate data: %#v.\nPlease report this bug.", err, data)
 	}
 
 	return strings.TrimSpace(buf.String()) + "\n"
@@ -268,7 +268,7 @@ Flags:
 {{.Context.Flags|FlagsToTwoColumns|FormatTwoColumns}}
 {{end}}\
 {{if .Context.Args}}\
-Args:
+Positional arguments:
 {{.Context.Args|ArgsToTwoColumns|FormatTwoColumns}}
 {{end}}\
 {{if .Context.SelectedCommand}}\
