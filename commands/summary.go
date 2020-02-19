@@ -295,7 +295,12 @@ func (cmd *summaryCommand) getPprofData() []pprofFile {
 				fs := fmt.Sprintf("%s-%s", appName, file.suffix)
 				url := baseURL + file.webPath
 
-				downloadProfilerData(url, fs, out)
+				file, err := downloadProfilerData(url, fs)
+				if err != nil {
+					logrus.Errorf("Cannot get profiles info from %s: %v", url, err)
+					continue
+				}
+				out <- *file
 			}
 		}(appName, baseURL)
 	}
@@ -307,35 +312,29 @@ func (cmd *summaryCommand) getPprofData() []pprofFile {
 	return files
 }
 
-func downloadProfilerData(url string, fs string, out chan pprofFile) {
+func downloadProfilerData(url string, fs string) (*pprofFile, error) {
 	logrus.Debugf("Started downloading profiler data from %s", url)
 
 	resp, err := http.Get(url) //nolint
 	if err != nil {
-		logrus.Errorf("cannot get profiles info: %s", err)
-		return
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		err := fmt.Errorf("cannot get profiler data(%s). Status code: %d", url, resp.StatusCode)
-		logrus.Errorf("cannot get profiles info: %s", err)
-
-		return
+		return nil, err
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("status code: %d", resp.StatusCode)
+	}
+
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		logrus.Errorf("cannot read response body for %s: %s", fs, err)
-
-		return
+		return nil, errors.Wrap(err, "cannot read response body")
 	}
 
 	logrus.Debugf("Finished downloading profiler data from %s", url)
-	out <- pprofFile{
+	return &pprofFile{
 		name: fs,
 		body: b,
-	}
+	}, nil
 }
 
 func (cmd *summaryCommand) Run() (Result, error) {
