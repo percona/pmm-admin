@@ -285,6 +285,7 @@ func (cmd *summaryCommand) getPprofData() []pprofFile {
 		wgr.Done()
 	}()
 
+	//We download data from different apps in parallel, but don't download profiles from the same app in parallel.
 	for appName, baseURL := range apps {
 		wg.Add(1)
 
