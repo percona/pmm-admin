@@ -23,6 +23,15 @@ import (
 	"github.com/percona/pmm-admin/commands"
 )
 
+const (
+	// This list should match nodeTypeNames in vendor/github.com/percona/pmm/api/inventorypb/nodes.go
+	// Do NOT import constants from the pmm pkg to avoid importing big gRPC dependencies
+	NodeTypeGenericNode   = "GENERIC_NODE"
+	NodeTypeContainerNode = "CONTAINER_NODE"
+	NodeTypeRemoteNode    = "REMOTE_NODE"
+	NodeTypeRemoteRDSNode = "REMOTE_RDS_NODE"
+)
+
 var listNodesResultT = commands.ParseTemplate(`
 Nodes list.
 
@@ -64,7 +73,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	var nodesList []listResultNode
 	for _, n := range result.Payload.Generic {
 		nodesList = append(nodesList, listResultNode{
-			NodeType: inventorypb.NodeTypeName("GENERIC_NODE"),
+			NodeType: inventorypb.NodeTypeName(NodeTypeGenericNode),
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
@@ -72,7 +81,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 	for _, n := range result.Payload.Container {
 		nodesList = append(nodesList, listResultNode{
-			NodeType: inventorypb.NodeTypeName("CONTAINER_NODE"),
+			NodeType: inventorypb.NodeTypeName(NodeTypeContainerNode),
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
@@ -80,7 +89,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 	for _, n := range result.Payload.Remote {
 		nodesList = append(nodesList, listResultNode{
-			NodeType: inventorypb.NodeTypeName("REMOTE_NODE"),
+			NodeType: inventorypb.NodeTypeName(NodeTypeRemoteNode),
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
@@ -88,7 +97,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 	for _, n := range result.Payload.RemoteRDS {
 		nodesList = append(nodesList, listResultNode{
-			NodeType: inventorypb.NodeTypeName("REMOTE_RDS_NODE"),
+			NodeType: inventorypb.NodeTypeName(NodeTypeRemoteRDSNode),
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,

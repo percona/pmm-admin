@@ -26,6 +26,15 @@ import (
 	"github.com/percona/pmm-admin/commands"
 )
 
+const (
+	// This list should match serviceTypeNames in vendor/github.com/percona/pmm/api/inventorypb/services.go
+	// Do NOT import constants from the pmm pkg to avoid importing big gRPC dependencies
+	ServiceTypeMySQL      = "MYSQL_SERVICE"
+	ServiceTypeMongoDB    = "MONGODB_SERVICE"
+	ServiceTypePostgreSQL = "POSTGRESQL_SERVICE"
+	ServiceTypeProxySQL   = "PROXYSQL_SERVICE"
+)
+
 var listServicesResultT = commands.ParseTemplate(`
 Services list.
 
@@ -67,7 +76,7 @@ func (cmd *listServicesCommand) Run() (commands.Result, error) {
 	var servicesList []listResultService
 	for _, s := range result.Payload.Mysql {
 		servicesList = append(servicesList, listResultService{
-			ServiceType: inventorypb.ServiceTypeName("MYSQL_SERVICE"),
+			ServiceType: inventorypb.ServiceTypeName(ServiceTypeMySQL),
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
@@ -75,7 +84,7 @@ func (cmd *listServicesCommand) Run() (commands.Result, error) {
 	}
 	for _, s := range result.Payload.Mongodb {
 		servicesList = append(servicesList, listResultService{
-			ServiceType: inventorypb.ServiceTypeName("MONGODB_SERVICE"),
+			ServiceType: inventorypb.ServiceTypeName(ServiceTypeMongoDB),
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
@@ -83,7 +92,7 @@ func (cmd *listServicesCommand) Run() (commands.Result, error) {
 	}
 	for _, s := range result.Payload.Postgresql {
 		servicesList = append(servicesList, listResultService{
-			ServiceType: inventorypb.ServiceTypeName("POSTGRESQL_SERVICE"),
+			ServiceType: inventorypb.ServiceTypeName(ServiceTypePostgreSQL),
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
@@ -91,7 +100,7 @@ func (cmd *listServicesCommand) Run() (commands.Result, error) {
 	}
 	for _, s := range result.Payload.Proxysql {
 		servicesList = append(servicesList, listResultService{
-			ServiceType: inventorypb.ServiceTypeName("PROXYSQL_SERVICE"),
+			ServiceType: inventorypb.ServiceTypeName(ServiceTypeProxySQL),
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
