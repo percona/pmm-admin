@@ -28,6 +28,7 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/percona/pmm/api/serverpb/json/client"
@@ -198,6 +199,11 @@ func getURL(ctx context.Context, url string) ([]byte, error) {
 	return b, nil
 }
 
+type pprofData struct {
+	name string
+	data []byte
+}
+
 // addPprofData adds pprof data to zip file.
 func addPprofData(ctx context.Context, zipW *zip.Writer, skipServer bool) {
 	profiles := []struct {
@@ -225,16 +231,36 @@ func addPprofData(ctx context.Context, zipW *zip.Writer, skipServer bool) {
 	}
 
 	for _, p := range profiles {
-		for dir, urlPrefix := range sources {
-			url := urlPrefix + p.urlPath
-			logrus.Infof("Getting %s ...", url)
-			b, err := getURL(ctx, url)
-			if err != nil {
-				logrus.Debugf("%s", err)
-				continue
-			}
+		// fetch the same profile from different sources in parallel
 
-			addData(zipW, dir+"/"+p.name, time.Now(), bytes.NewReader(b))
+		var wg sync.WaitGroup
+		ch := make(chan pprofData, len(sources))
+
+		for dir, urlPrefix := range sources {
+			wg.Add(1)
+
+			go func(url, name string) {
+				defer wg.Done()
+
+				logrus.Infof("Getting %s ...", url)
+				data, err := getURL(ctx, url)
+				if err != nil {
+					logrus.Debugf("%s", err)
+					return
+				}
+
+				ch <- pprofData{
+					name: name,
+					data: data,
+				}
+			}(urlPrefix+p.urlPath, dir+"/"+p.name)
+		}
+
+		wg.Wait()
+		close(ch)
+
+		for res := range ch {
+			addData(zipW, res.name, time.Now(), bytes.NewReader(res.data))
 		}
 	}
 }
