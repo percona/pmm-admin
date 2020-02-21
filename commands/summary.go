@@ -270,8 +270,6 @@ func (cmd *summaryCommand) getPprofData(ctx context.Context) []pprofFile {
 		apps["qan-api2"] = "http://127.0.0.1:9933/debug/pprof"
 	}
 
-	// TODO use ctx
-
 	out := make(chan pprofFile)
 	var files []pprofFile
 	var wg sync.WaitGroup
@@ -298,12 +296,18 @@ func (cmd *summaryCommand) getPprofData(ctx context.Context) []pprofFile {
 				fs := fmt.Sprintf("%s-%s", appName, file.suffix)
 				url := baseURL + file.webPath
 
-				file, err := downloadProfilerData(url, fs)
+				logrus.Debugf("Started downloading profiler data from %s ...", url)
+				b, err := getURL(ctx, url)
 				if err != nil {
-					logrus.Errorf("Cannot get profiles info from %s: %v", url, err)
+					logrus.Debugf("Can't download profiler data from %s: %s.", url, err)
 					continue
 				}
-				out <- *file
+
+				logrus.Debugf("Finished downloading profiler data from %s.", url)
+				out <- pprofFile{
+					name: fs,
+					body: b,
+				}
 			}
 		}(appName, baseURL)
 	}
@@ -315,29 +319,26 @@ func (cmd *summaryCommand) getPprofData(ctx context.Context) []pprofFile {
 	return files
 }
 
-func downloadProfilerData(url string, fs string) (*pprofFile, error) {
-	logrus.Debugf("Started downloading profiler data from %s", url)
-
-	resp, err := http.Get(url) //nolint
+func getURL(ctx context.Context, url string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
-	defer resp.Body.Close()
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("status code: %d", resp.StatusCode)
+		return nil, errors.Errorf("status code: %d", resp.StatusCode)
 	}
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot read response body")
 	}
-
-	logrus.Debugf("Finished downloading profiler data from %s", url)
-	return &pprofFile{
-		name: fs,
-		body: b,
-	}, nil
+	return b, nil
 }
 
 func (cmd *summaryCommand) Run() (Result, error) {

@@ -37,7 +37,7 @@ func TestSummary(t *testing.T) {
 	filename := f.Name()
 	t.Log(filename)
 
-	defer os.Remove(filename) //nolint
+	defer os.Remove(filename) //nolint:errcheck
 	assert.NoError(t, f.Close())
 
 	t.Run("Summary default", func(t *testing.T) {
