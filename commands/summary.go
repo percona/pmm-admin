@@ -341,8 +341,13 @@ func getURL(ctx context.Context, url string) ([]byte, error) {
 	return b, nil
 }
 
+// TODO remove
 func (cmd *summaryCommand) Run() (Result, error) {
-	if err := cmd.makeArchive(context.TODO()); err != nil {
+	return cmd.RunWithContext(context.TODO())
+}
+
+func (cmd *summaryCommand) RunWithContext(ctx context.Context) (Result, error) {
+	if err := cmd.makeArchive(ctx); err != nil {
 		return nil, err
 	}
 

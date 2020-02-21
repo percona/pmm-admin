@@ -67,6 +67,12 @@ type Command interface {
 	Run() (Result, error)
 }
 
+// TODO remove Command above, rename CommandWithContext to Command
+type CommandWithContext interface {
+	// TODO rename to Run
+	RunWithContext(ctx context.Context) (Result, error)
+}
+
 type ErrorResponse interface {
 	error
 	Code() int
