@@ -27,9 +27,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/percona/pmm/api/serverpb/json/client"
@@ -62,72 +60,43 @@ type summaryCommand struct {
 	Pprof      bool
 }
 
-func getServerLogs(ctx context.Context) (*bytes.Reader, error) {
-	var buffer bytes.Buffer
-	_, err := client.Default.Server.Logs(&server.LogsParams{Context: ctx}, &buffer)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return bytes.NewReader(buffer.Bytes()), nil
-}
-
-func addServerData(ctx context.Context, zipW *zip.Writer) error {
-	bytesR, err := getServerLogs(ctx)
-	if err != nil {
-		return err
-	}
-
-	zipR, err := zip.NewReader(bytesR, bytesR.Size())
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	for _, rf := range zipR.File {
-		w, err := zipW.CreateHeader(&zip.FileHeader{
-			Name:     path.Join("server", rf.Name),
-			Method:   zip.Deflate,
-			Modified: rf.Modified,
-		})
-		if err != nil {
-			logrus.Debugf("%s", err)
-			continue
-		}
-
-		r, err := rf.Open()
-		if err != nil {
-			logrus.Debugf("%s", err)
-			continue
-		}
+// addData adds data from io.Reader to zip file with given name and time.
+func addData(zipW *zip.Writer, name string, modTime time.Time, r io.Reader) {
+	w, err := zipW.CreateHeader(&zip.FileHeader{
+		Name:     name,
+		Method:   zip.Deflate,
+		Modified: modTime,
+	})
+	if err == nil {
 		_, err = io.Copy(w, r)
-		_ = r.Close()
-		if err != nil {
-			logrus.Debugf("%s", err)
-			continue
-		}
 	}
-
-	return nil
-}
-
-func addFileToZip(zipW *zip.Writer, fpath, name string) {
-	if name == "" {
-		return
-	}
-
-	b, err := ioutil.ReadFile(name) //nolint:gosec
 	if err != nil {
-		logrus.Debugf("%s", err)
-		b = []byte(err.Error())
+		logrus.Errorf("%s", err)
 	}
-	m := time.Now()
-	if fi, _ := os.Stat(name); fi != nil {
-		m = fi.ModTime()
-	}
-
-	writeFileToZipWithTime(zipW, path.Join(fpath, filepath.Base(name)), m, b)
 }
 
+// addFile adds data from fileName to zip file with given name.
+func addFile(zipW *zip.Writer, name string, fileName string) {
+	// do not read the whole file at once - it can be very big
+
+	var r io.ReadCloser
+	r, err := os.Open(fileName) //nolint:gosec
+	if err != nil {
+		// use error instead of file data
+		logrus.Debugf("%s", err)
+		r = ioutil.NopCloser(bytes.NewReader([]byte(err.Error() + "\n")))
+	}
+	defer r.Close() //nolint:errcheck
+
+	modTime := time.Now()
+	if fi, _ := os.Stat(fileName); fi != nil {
+		modTime = fi.ModTime()
+	}
+
+	addData(zipW, name, modTime, r)
+}
+
+// addClientCommand adds cmd.Run() results to zip file with given name.
 func addClientCommand(zipW *zip.Writer, name string, cmd Command) {
 	var b []byte
 	res, err := cmd.Run()
@@ -138,14 +107,18 @@ func addClientCommand(zipW *zip.Writer, name string, cmd Command) {
 		b = append(b, err.Error()...)
 	}
 
-	writeFileToZip(zipW, path.Join("client", name), b)
+	addData(zipW, name, time.Now(), bytes.NewReader(b))
 }
 
-func addClientData(ctx context.Context, zipW *zip.Writer) error {
+// addClientData adds all PMM Client data to zip file.
+func addClientData(ctx context.Context, zipW *zip.Writer) {
 	status, err := agentlocal.GetRawStatus(ctx, agentlocal.RequestNetworkInfo)
 	if err != nil {
-		return err
+		logrus.Errorf("%s", err)
+		return
 	}
+
+	now := time.Now()
 
 	b, err := json.MarshalIndent(status, "", "  ")
 	if err != nil {
@@ -153,7 +126,7 @@ func addClientData(ctx context.Context, zipW *zip.Writer) error {
 		b = []byte(err.Error())
 	}
 	b = append(b, '\n')
-	writeFileToZip(zipW, "client/status.json", b)
+	addData(zipW, "client/status.json", now, bytes.NewReader(b))
 
 	// FIXME get it via pmm-agent's API - it is _not_ a good idea to use exec there
 	// golangli-lint should continue complain about it until it is fixed
@@ -162,33 +135,107 @@ func addClientData(ctx context.Context, zipW *zip.Writer) error {
 		logrus.Debugf("%s", err)
 		b = []byte(err.Error())
 	}
+	addData(zipW, "client/pmm-agent-version.txt", now, bytes.NewReader(b))
 
-	writeFileToZip(zipW, "client/pmm-agent-version.txt", b)
-	writeFileToZip(zipW, "client/pmm-admin-version.txt", []byte(version.FullInfo()))
+	addData(zipW, "client/pmm-admin-version.txt", now, bytes.NewReader([]byte(version.FullInfo())))
 
-	addFileToZip(zipW, "client", status.ConfigFilepath)
-
-	addClientCommand(zipW, "list.txt", &listCommand{NodeID: status.RunsOnNodeID})
-
-	return nil
-}
-
-func writeFileToZip(zipW *zip.Writer, fileName string, data []byte) {
-	modifiedTime := time.Now()
-	writeFileToZipWithTime(zipW, fileName, modifiedTime, data)
-}
-
-func writeFileToZipWithTime(zipW *zip.Writer, fileName string, modifiedTime time.Time, data []byte) {
-	w, err := zipW.CreateHeader(&zip.FileHeader{
-		Name:     fileName,
-		Method:   zip.Deflate,
-		Modified: modifiedTime,
-	})
-	if err == nil {
-		_, err = w.Write(data)
+	if status.ConfigFilepath != "" {
+		addFile(zipW, "client/pmm-agent-config.yaml", status.ConfigFilepath)
 	}
+
+	addClientCommand(zipW, "client/list.txt", &listCommand{NodeID: status.RunsOnNodeID})
+}
+
+// addServerData adds logs.zip from PMM Server to zip file.
+func addServerData(ctx context.Context, zipW *zip.Writer) {
+	var buf bytes.Buffer
+	_, err := client.Default.Server.Logs(&server.LogsParams{Context: ctx}, &buf)
 	if err != nil {
 		logrus.Errorf("%s", err)
+		return
+	}
+
+	bufR := bytes.NewReader(buf.Bytes())
+	zipR, err := zip.NewReader(bufR, bufR.Size())
+	if err != nil {
+		logrus.Errorf("%s", err)
+		return
+	}
+
+	for _, rf := range zipR.File {
+		rc, err := rf.Open()
+		if err != nil {
+			logrus.Errorf("%s", err)
+			continue
+		}
+
+		addData(zipW, path.Join("server", rf.Name), rf.Modified, rc)
+
+		rc.Close() //nolint:errcheck
+	}
+}
+
+// getURL returns `GET url` response body.
+func getURL(ctx context.Context, url string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	defer resp.Body.Close() //nolint:errcheck
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("status code: %d", resp.StatusCode)
+	}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot read response body")
+	}
+	return b, nil
+}
+
+// addPprofData adds pprof data to zip file.
+func addPprofData(ctx context.Context, zipW *zip.Writer, skipServer bool) {
+	profiles := []struct {
+		name    string
+		urlPath string
+	}{
+		{
+			"profile.pb.gz",
+			"/profile?seconds=60",
+		}, {
+			"heap.pb.gz",
+			"/heap?gc=1",
+		}, {
+			"trace.out",
+			"/trace?seconds=10",
+		},
+	}
+
+	sources := map[string]string{
+		"client/pprof/pmm-agent": "http://127.0.0.1:7777/debug/pprof",
+	}
+	if !skipServer {
+		sources["server/pprof/pmm-managed"] = "http://127.0.0.1:7773/debug/pprof"
+		sources["server/pprof/qan-api2"] = "http://127.0.0.1:9933/debug/pprof"
+	}
+
+	for _, p := range profiles {
+		for dir, urlPrefix := range sources {
+			url := urlPrefix + p.urlPath
+			logrus.Infof("Getting %s ...", url)
+			b, err := getURL(ctx, url)
+			if err != nil {
+				logrus.Debugf("%s", err)
+				continue
+			}
+
+			addData(zipW, dir+"/"+p.name, time.Now(), bytes.NewReader(b))
+		}
 	}
 }
 
@@ -214,131 +261,17 @@ func (cmd *summaryCommand) makeArchive(ctx context.Context) (err error) {
 		}
 	}()
 
-	if e := addClientData(ctx, zipW); e != nil {
-		logrus.Warnf("Failed to add client data: %s", e)
-		logrus.Debugf("%+v", e)
-	}
+	addClientData(ctx, zipW)
 
 	if cmd.Pprof {
-		files := cmd.getPprofData(ctx)
-		for _, file := range files {
-			writeFileToZip(zipW, path.Join("pprof", file.name), file.body)
-		}
+		addPprofData(ctx, zipW, cmd.SkipServer)
 	}
 
 	if !cmd.SkipServer {
-		if e := addServerData(ctx, zipW); e != nil {
-			logrus.Warnf("Failed to add server data: %s", e)
-			logrus.Debugf("%+v", e)
-		}
+		addServerData(ctx, zipW)
 	}
 
 	return //nolint:nakedret
-}
-
-type profilerPath struct {
-	suffix  string
-	webPath string
-}
-
-type pprofFile struct {
-	name string
-	body []byte
-}
-
-func (cmd *summaryCommand) getPprofData(ctx context.Context) []pprofFile {
-	profilerPaths := []profilerPath{
-		{
-			suffix:  "profile.pb.gz",
-			webPath: "/profile?seconds=60",
-		},
-		{
-			suffix:  "heap.pb.gz",
-			webPath: "/heap?gc=1",
-		},
-		{
-			suffix:  "trace.out",
-			webPath: "/trace?seconds=10",
-		},
-	}
-	apps := map[string]string{
-		"pmm-agent": "http://127.0.0.1:7777/debug/pprof",
-	}
-
-	if !cmd.SkipServer {
-		apps["pmm-managed"] = "http://127.0.0.1:7773/debug/pprof"
-		apps["qan-api2"] = "http://127.0.0.1:9933/debug/pprof"
-	}
-
-	out := make(chan pprofFile)
-	var files []pprofFile
-	var wg sync.WaitGroup
-	var wgr sync.WaitGroup
-
-	wgr.Add(1)
-
-	go func() {
-		for fileName := range out {
-			files = append(files, fileName)
-		}
-
-		wgr.Done()
-	}()
-
-	//We download data from different apps in parallel, but don't download profiles from the same app in parallel.
-	for appName, baseURL := range apps {
-		wg.Add(1)
-
-		go func(appName, baseURL string) {
-			defer wg.Done()
-
-			for _, file := range profilerPaths {
-				fs := fmt.Sprintf("%s-%s", appName, file.suffix)
-				url := baseURL + file.webPath
-
-				logrus.Debugf("Started downloading profiler data from %s ...", url)
-				b, err := getURL(ctx, url)
-				if err != nil {
-					logrus.Debugf("Can't download profiler data from %s: %s.", url, err)
-					continue
-				}
-
-				logrus.Debugf("Finished downloading profiler data from %s.", url)
-				out <- pprofFile{
-					name: fs,
-					body: b,
-				}
-			}
-		}(appName, baseURL)
-	}
-
-	wg.Wait()
-	close(out)
-	wgr.Wait()
-
-	return files
-}
-
-func getURL(ctx context.Context, url string) ([]byte, error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	defer resp.Body.Close() //nolint:errcheck
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("status code: %d", resp.StatusCode)
-	}
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "cannot read response body")
-	}
-	return b, nil
 }
 
 // TODO remove

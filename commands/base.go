@@ -62,7 +62,8 @@ type Result interface {
 // Command should not:
 //  * return both result and error;
 //  * exit with logrus.Fatal, os.Exit, etc;
-//  * use logrus.Print, logrus.Info and higher levels.
+//  * use logrus.Print, logrus.Info and higher levels except:
+//    * summary command (for progress output).
 type Command interface {
 	Run() (Result, error)
 }
