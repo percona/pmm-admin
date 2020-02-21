@@ -62,9 +62,9 @@ type summaryCommand struct {
 	Pprof      bool
 }
 
-func getServerLogs() (*bytes.Reader, error) {
+func getServerLogs(ctx context.Context) (*bytes.Reader, error) {
 	var buffer bytes.Buffer
-	_, err := client.Default.Server.Logs(&server.LogsParams{Context: context.TODO()}, &buffer)
+	_, err := client.Default.Server.Logs(&server.LogsParams{Context: ctx}, &buffer)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -72,8 +72,8 @@ func getServerLogs() (*bytes.Reader, error) {
 	return bytes.NewReader(buffer.Bytes()), nil
 }
 
-func addServerData(zipW *zip.Writer) error {
-	bytesR, err := getServerLogs()
+func addServerData(ctx context.Context, zipW *zip.Writer) error {
+	bytesR, err := getServerLogs(ctx)
 	if err != nil {
 		return err
 	}
@@ -141,8 +141,8 @@ func addClientCommand(zipW *zip.Writer, name string, cmd Command) {
 	writeFileToZip(zipW, path.Join("client", name), b)
 }
 
-func addClientData(zipW *zip.Writer) error {
-	status, err := agentlocal.GetRawStatus(context.TODO(), agentlocal.RequestNetworkInfo)
+func addClientData(ctx context.Context, zipW *zip.Writer) error {
+	status, err := agentlocal.GetRawStatus(ctx, agentlocal.RequestNetworkInfo)
 	if err != nil {
 		return err
 	}
@@ -192,7 +192,7 @@ func writeFileToZipWithTime(zipW *zip.Writer, fileName string, modifiedTime time
 	}
 }
 
-func (cmd *summaryCommand) makeArchive() (err error) {
+func (cmd *summaryCommand) makeArchive(ctx context.Context) (err error) {
 	var f *os.File
 
 	if f, err = os.Create(cmd.Filename); err != nil {
@@ -214,20 +214,20 @@ func (cmd *summaryCommand) makeArchive() (err error) {
 		}
 	}()
 
-	if e := addClientData(zipW); e != nil {
+	if e := addClientData(ctx, zipW); e != nil {
 		logrus.Warnf("Failed to add client data: %s", e)
 		logrus.Debugf("%+v", e)
 	}
 
 	if cmd.Pprof {
-		files := cmd.getPprofData()
+		files := cmd.getPprofData(ctx)
 		for _, file := range files {
 			writeFileToZip(zipW, path.Join("pprof", file.name), file.body)
 		}
 	}
 
 	if !cmd.SkipServer {
-		if e := addServerData(zipW); e != nil {
+		if e := addServerData(ctx, zipW); e != nil {
 			logrus.Warnf("Failed to add server data: %s", e)
 			logrus.Debugf("%+v", e)
 		}
@@ -246,7 +246,7 @@ type pprofFile struct {
 	body []byte
 }
 
-func (cmd *summaryCommand) getPprofData() []pprofFile {
+func (cmd *summaryCommand) getPprofData(ctx context.Context) []pprofFile {
 	profilerPaths := []profilerPath{
 		{
 			suffix:  "profile.pb.gz",
@@ -269,6 +269,8 @@ func (cmd *summaryCommand) getPprofData() []pprofFile {
 		apps["pmm-managed"] = "http://127.0.0.1:7773/debug/pprof"
 		apps["qan-api2"] = "http://127.0.0.1:9933/debug/pprof"
 	}
+
+	// TODO use ctx
 
 	out := make(chan pprofFile)
 	var files []pprofFile
@@ -339,7 +341,7 @@ func downloadProfilerData(url string, fs string) (*pprofFile, error) {
 }
 
 func (cmd *summaryCommand) Run() (Result, error) {
-	if err := cmd.makeArchive(); err != nil {
+	if err := cmd.makeArchive(context.TODO()); err != nil {
 		return nil, err
 	}
 
