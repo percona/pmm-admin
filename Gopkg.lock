@@ -201,49 +201,6 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:b2b193b1c8227eea746da4a8467d16a8b79d460ae6d27a16d930581d30bb6990"
-  name = "github.com/gogo/protobuf"
-  packages = [
-    "proto",
-    "protoc-gen-gogo/descriptor",
-  ]
-  pruneopts = "NUT"
-  revision = "5628607bb4c51c3157aacc3a50f0ab707582b805"
-  version = "v1.3.1"
-
-[[projects]]
-  digest = "1:8ebe051a4e858b5b020a62e2b1454c746c81000bdd73005fdd4416b2cd151433"
-  name = "github.com/golang/protobuf"
-  packages = [
-    "descriptor",
-    "jsonpb",
-    "proto",
-    "protoc-gen-go/descriptor",
-    "ptypes",
-    "ptypes/any",
-    "ptypes/duration",
-    "ptypes/struct",
-    "ptypes/timestamp",
-    "ptypes/wrappers",
-  ]
-  pruneopts = "NUT"
-  revision = "d23c5127dc24889085f8ccea5c9d560a57a879d8"
-  version = "v1.3.3"
-
-[[projects]]
-  digest = "1:a0aaaf3b716956ad0ee091533c277fe3a8eb2f6bd5f1647803d73f0040bdbf12"
-  name = "github.com/grpc-ecosystem/grpc-gateway"
-  packages = [
-    "internal",
-    "protoc-gen-swagger/options",
-    "runtime",
-    "utilities",
-  ]
-  pruneopts = "NUT"
-  revision = "e16fcd495a18ea01dbc6f5b6ac2956a94e1981a2"
-  version = "v1.12.2"
-
-[[projects]]
   digest = "1:04eb2b1e456031d95dbc76c9a42fa8a2da0d61ae5111d6aa277cbefba53c7e8f"
   name = "github.com/kisielk/gotool"
   packages = [
@@ -283,25 +240,17 @@
   version = "v1.1.2"
 
 [[projects]]
-  digest = "1:93b5830f1e6138532e9450d6a639d68132e613a0878d789c610322764220171a"
-  name = "github.com/mwitkow/go-proto-validators"
-  packages = ["."]
-  pruneopts = "NUT"
-  revision = "f73ec5a7ce82b3f9fb47f01d4629aa4617247af5"
-  version = "v0.3.0"
-
-[[projects]]
   branch = "PMM-5003-add-constants-for-types"
-  digest = "1:0204de7aa1546e9928b89e54324a846da9230e9f0c5245cb68043763f2005bf0"
+  digest = "1:fc595787358010bb18f42be1dead707b936c2b5f4967da568611add66951d70e"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
     "api/agentlocalpb/json/client/agent_local",
-    "api/inventorypb",
     "api/inventorypb/json/client",
     "api/inventorypb/json/client/agents",
     "api/inventorypb/json/client/nodes",
     "api/inventorypb/json/client/services",
+    "api/inventorypb/types",
     "api/managementpb/json/client",
     "api/managementpb/json/client/actions",
     "api/managementpb/json/client/mongo_db",
@@ -318,7 +267,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "48c4281ffae7cba44c3914190579caa344e783be"
+  revision = "685e3ae6e491eb8ed0ea9fd07f82312a7396d18d"
 
 [[projects]]
   digest = "1:4047c378584616813d610c9f993bf90dd0d07aed8d94bd3bc299cd35ececdcba"
@@ -392,16 +341,9 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c3480c91cbcd593cc4c7e2656ad0d394c03744f987fd1b5b5e39460dbf7a3979"
+  digest = "1:d1f7edf951b9cc444358a31de2f4e4c1c5c539ea9c6aca13f5bf92eb1124fc4b"
   name = "golang.org/x/net"
-  packages = [
-    "http/httpguts",
-    "http2",
-    "http2/hpack",
-    "idna",
-    "internal/timeseries",
-    "trace",
-  ]
+  packages = ["idna"]
   pruneopts = "NUT"
   revision = "16171245cfb220d5317888b716d69c1fb4e7992b"
 
@@ -471,64 +413,6 @@
   revision = "9bdfabe68543c54f90421aeb9a60ef8061b5b544"
 
 [[projects]]
-  branch = "master"
-  digest = "1:5d7ffce5ba6941a5358f343e96f9129ff7b9a2864b211091bde6d7c236c3f874"
-  name = "google.golang.org/genproto"
-  packages = [
-    "googleapis/api/annotations",
-    "googleapis/api/httpbody",
-    "googleapis/rpc/status",
-    "protobuf/field_mask",
-  ]
-  pruneopts = "NUT"
-  revision = "66ed5ce911ce4978d229e861f15b63d8bf359acb"
-
-[[projects]]
-  digest = "1:ad113f760f5a2a924fd1ea324539df77f3e0166bbaf7f886985fbb447737323b"
-  name = "google.golang.org/grpc"
-  packages = [
-    ".",
-    "attributes",
-    "backoff",
-    "balancer",
-    "balancer/base",
-    "balancer/roundrobin",
-    "binarylog/grpc_binarylog_v1",
-    "codes",
-    "connectivity",
-    "credentials",
-    "credentials/internal",
-    "encoding",
-    "encoding/proto",
-    "grpclog",
-    "internal",
-    "internal/backoff",
-    "internal/balancerload",
-    "internal/binarylog",
-    "internal/buffer",
-    "internal/channelz",
-    "internal/envconfig",
-    "internal/grpcrand",
-    "internal/grpcsync",
-    "internal/resolver/dns",
-    "internal/resolver/passthrough",
-    "internal/syscall",
-    "internal/transport",
-    "keepalive",
-    "metadata",
-    "naming",
-    "peer",
-    "resolver",
-    "serviceconfig",
-    "stats",
-    "status",
-    "tap",
-  ]
-  pruneopts = "NUT"
-  revision = "f495f5b15ae7ccda3b38c53a1bfcde4c1a58a2bc"
-  version = "v1.27.1"
-
-[[projects]]
   branch = "v2.2.6-percona"
   digest = "1:65f2385f4890821d672a45ea6800fd59e2f7cf94cd385d56baf2390f031e4633"
   name = "gopkg.in/alecthomas/kingpin.v2"
@@ -555,11 +439,11 @@
     "github.com/go-openapi/runtime/client",
     "github.com/percona/pmm/api/agentlocalpb/json/client",
     "github.com/percona/pmm/api/agentlocalpb/json/client/agent_local",
-    "github.com/percona/pmm/api/inventorypb",
     "github.com/percona/pmm/api/inventorypb/json/client",
     "github.com/percona/pmm/api/inventorypb/json/client/agents",
     "github.com/percona/pmm/api/inventorypb/json/client/nodes",
     "github.com/percona/pmm/api/inventorypb/json/client/services",
+    "github.com/percona/pmm/api/inventorypb/types",
     "github.com/percona/pmm/api/managementpb/json/client",
     "github.com/percona/pmm/api/managementpb/json/client/mongo_db",
     "github.com/percona/pmm/api/managementpb/json/client/my_sql",

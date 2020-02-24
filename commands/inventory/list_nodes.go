@@ -16,20 +16,11 @@
 package inventory
 
 import (
-	"github.com/percona/pmm/api/inventorypb"
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/nodes"
+	"github.com/percona/pmm/api/inventorypb/types"
 
 	"github.com/percona/pmm-admin/commands"
-)
-
-const (
-	// This list should match nodeTypeNames in vendor/github.com/percona/pmm/api/inventorypb/nodes.go
-	// Do NOT import constants from the pmm pkg to avoid importing big gRPC dependencies
-	NodeTypeGenericNode   = "GENERIC_NODE"
-	NodeTypeContainerNode = "CONTAINER_NODE"
-	NodeTypeRemoteNode    = "REMOTE_NODE"
-	NodeTypeRemoteRDSNode = "REMOTE_RDS_NODE"
 )
 
 var listNodesResultT = commands.ParseTemplate(`
@@ -71,9 +62,11 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 
 	var nodesList []listResultNode
+	// Contanst values passed to NodeTypeName should match the values in agentTypeNames from
+	// api/inventorypb/types/node_types.go. We use hardcoded constants to avoid big dependencies
 	for _, n := range result.Payload.Generic {
 		nodesList = append(nodesList, listResultNode{
-			NodeType: inventorypb.NodeTypeName(NodeTypeGenericNode),
+			NodeType: types.NodeTypeGenericNode,
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
@@ -81,7 +74,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 	for _, n := range result.Payload.Container {
 		nodesList = append(nodesList, listResultNode{
-			NodeType: inventorypb.NodeTypeName(NodeTypeContainerNode),
+			NodeType: types.NodeTypeContainerNode,
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
@@ -89,7 +82,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 	for _, n := range result.Payload.Remote {
 		nodesList = append(nodesList, listResultNode{
-			NodeType: inventorypb.NodeTypeName(NodeTypeRemoteNode),
+			NodeType: types.NodeTypeRemoteNode,
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
@@ -97,7 +90,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 	for _, n := range result.Payload.RemoteRDS {
 		nodesList = append(nodesList, listResultNode{
-			NodeType: inventorypb.NodeTypeName(NodeTypeRemoteRDSNode),
+			NodeType: types.NodeTypeRemoteRDSNode,
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
