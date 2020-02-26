@@ -16,10 +16,10 @@
 package commands
 
 import (
-	"github.com/percona/pmm/api/inventorypb/types"
 	"strings"
 	"testing"
 
+	"github.com/percona/pmm/api/inventorypb/types"
 	"github.com/stretchr/testify/assert"
 )
 

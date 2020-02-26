@@ -21,7 +21,7 @@ import (
 
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
-	types "github.com/percona/pmm/api/inventorypb/types"
+	"github.com/percona/pmm/api/inventorypb/types"
 
 	"github.com/percona/pmm-admin/commands"
 )

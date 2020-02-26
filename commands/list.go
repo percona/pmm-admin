@@ -20,12 +20,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/percona/pmm/api/inventorypb/types"
-
 	"github.com/AlekSi/pointer"
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
+	"github.com/percona/pmm/api/inventorypb/types"
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/agentlocal"
