@@ -23,13 +23,6 @@ import (
 	"github.com/percona/pmm-admin/commands"
 )
 
-var nodeTypeNames = map[string]string{
-	types.NodeTypeGenericNode:   "Generic",
-	types.NodeTypeContainerNode: "Container",
-	types.NodeTypeRemoteNode:    "Remote",
-	types.NodeTypeRemoteRDSNode: "RemoteRDS",
-}
-
 var listNodesResultT = commands.ParseTemplate(`
 Nodes list.
 
