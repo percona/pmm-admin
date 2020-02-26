@@ -11,7 +11,7 @@ required = [
 
 [[constraint]]
   name = "github.com/percona/pmm"
-  branch = "PMM-5003-add-constants-for-types"
+  branch = "PMM-5003-fix-service-type-values"
 
 # https://jira.percona.com/browse/PMM-4081
 # https://jira.percona.com/browse/PMM-4042

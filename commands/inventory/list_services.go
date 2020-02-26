@@ -31,7 +31,7 @@ Services list.
 
 {{ printf "%-13s" "Service type" }} {{ printf "%-20s" "Service name" }} {{ printf "%-17s" "Address and Port" }} {{ "Service ID" }}
 {{ range .Services }}
-{{- printf "%-13s" .ServiceType }} {{ printf "%-20s" .ServiceName }} {{ printf "%-17s" .AddressPort }} {{ .ServiceID }}
+{{- printf "%-13s" .HumanReadableServiceType }} {{ printf "%-20s" .ServiceName }} {{ printf "%-17s" .AddressPort }} {{ .ServiceID }}
 {{ end }}
 `)
 
@@ -40,6 +40,10 @@ type listResultService struct {
 	ServiceID   string `json:"service_id"`
 	ServiceName string `json:"service_name"`
 	AddressPort string `json:"address_port"`
+}
+
+func (s listResultService) HumanReadableServiceType() string {
+	return types.ServiceTypeName(s.ServiceType)
 }
 
 type listServicesResult struct {

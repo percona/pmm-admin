@@ -34,11 +34,11 @@ import (
 var listResultT = ParseTemplate(`
 Service type  Service name         Address and port  Service ID
 {{ range .Services }}
-{{- printf "%-13s" .ServiceType }} {{ printf "%-20s" .ServiceName }} {{ printf "%-17s" .AddressPort }} {{ .ServiceID }}
+{{- printf "%-13s" .HumanReadableServiceType }} {{ printf "%-20s" .ServiceName }} {{ printf "%-17s" .AddressPort }} {{ .ServiceID }}
 {{ end }}
 Agent type                  Status     Agent ID                                        Service ID
 {{ range .Agents }}
-{{- printf "%-27s" .AgentType }} {{ printf "%-10s" .Status }} {{ .AgentID }}  {{ .ServiceID }}
+{{- printf "%-27s" .HumanReadableAgentType }} {{ printf "%-10s" .Status }} {{ .AgentID }}  {{ .ServiceID }}
 {{ end }}
 `)
 
@@ -49,11 +49,19 @@ type listResultAgent struct {
 	Status    string `json:"status"`
 }
 
+func (a listResultAgent) HumanReadableAgentType() string {
+	return types.AgentTypeName(a.AgentType)
+}
+
 type listResultService struct {
 	ServiceType string `json:"service_type"`
 	ServiceID   string `json:"service_id"`
 	ServiceName string `json:"service_name"`
 	AddressPort string `json:"address_port"`
+}
+
+func (s listResultService) HumanReadableServiceType() string {
+	return types.ServiceTypeName(s.ServiceType)
 }
 
 type listResult struct {

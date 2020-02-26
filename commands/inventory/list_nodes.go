@@ -23,6 +23,13 @@ import (
 	"github.com/percona/pmm-admin/commands"
 )
 
+var nodeTypeNames = map[string]string{
+	types.NodeTypeGenericNode:   "Generic",
+	types.NodeTypeContainerNode: "Container",
+	types.NodeTypeRemoteNode:    "Remote",
+	types.NodeTypeRemoteRDSNode: "RemoteRDS",
+}
+
 var listNodesResultT = commands.ParseTemplate(`
 Nodes list.
 
@@ -37,6 +44,10 @@ type listResultNode struct {
 	NodeName string `json:"node_name"`
 	Address  string `json:"address"`
 	NodeID   string `json:"node_id"`
+}
+
+func (n listResultNode) HumanReadableNodeType() string {
+	return types.NodeTypeName(n.NodeType)
 }
 
 type listNodesResult struct {
@@ -62,7 +73,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 
 	var nodesList []listResultNode
-	// Contanst values passed to NodeTypeName should match the values in agentTypeNames from
+	// Contanst values passed to HumanReadableNodeType should match the values in agentTypeNames from
 	// api/inventorypb/types/node_types.go. We use hardcoded constants to avoid big dependencies
 	for _, n := range result.Payload.Generic {
 		nodesList = append(nodesList, listResultNode{

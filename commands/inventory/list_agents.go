@@ -31,7 +31,7 @@ Agents list.
 
 {{ printf "%-27s" "Agent type" }} {{ printf "%-15s" "Status" }} {{ printf "%-47s" "Agent ID" }} {{ printf "%-47s" "PMM-Agent ID" }} {{ printf "%-47s" "Service ID" }}
 {{ range .Agents }}
-{{- printf "%-27s" .AgentType }} {{ printf "%-15s" .Status }} {{ .AgentID }}  {{ .PMMAgentID }}  {{ .ServiceID }}
+{{- printf "%-27s" .HumanReadableAgentType }} {{ printf "%-15s" .Status }} {{ .AgentID }}  {{ .PMMAgentID }}  {{ .ServiceID }}
 {{ end }}
 `)
 
@@ -41,6 +41,10 @@ type listResultAgent struct {
 	PMMAgentID string `json:"pmm_agent_id"`
 	ServiceID  string `json:"service_id"`
 	Status     string `json:"status"`
+}
+
+func (a listResultAgent) HumanReadableAgentType() string {
+	return types.AgentTypeName(a.AgentType)
 }
 
 type listAgentsResult struct {
