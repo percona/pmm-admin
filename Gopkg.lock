@@ -45,12 +45,12 @@
   revision = "f65c72e2690dc4b403c8bd637baf4611cd4c069b"
 
 [[projects]]
-  digest = "1:c625fa56b03726603d572cf18fc73499751d2715dfa3f8b2dfad48ddecd408d7"
+  digest = "1:5a23cd3a5496a0b2da7e3b348d14e77b11a210738c398200d7d6f04ea8cf3bd8"
   name = "github.com/asaskevich/govalidator"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "475eaeb164960a651e97470412a7d3b0c5036105"
-  version = "v10"
+  revision = "ccb8e960c48f04d6935e72476ae4a51028f9e22f"
+  version = "v9"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -61,23 +61,23 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:1d12d916c2281ca8c667087a99e45586d716397ddf6bc8140c2ba9966b62bfd5"
+  digest = "1:b207f23640c59caf8516c3aa739bd5e92212e1c36ef513016782ab5d6b6918e2"
   name = "github.com/go-openapi/analysis"
   packages = [
     ".",
     "internal",
   ]
   pruneopts = "NUT"
-  revision = "01a3bdad024cd0b80f267b070347538b6edb1c77"
-  version = "v0.19.7"
+  revision = "1024f3482ddc2c381cc918eb9eca596d51a70272"
+  version = "v0.19.6"
 
 [[projects]]
-  digest = "1:e6de5e1d94268a61cd4672452b1d39c576c0e796ff677ada73d94f259253c038"
+  digest = "1:561157070be37514e296bbf1144e5e3130573483e253443bf378917475f55836"
   name = "github.com/go-openapi/errors"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "9b273e805998abc751853b4e1574d66e5df888b4"
-  version = "v0.19.3"
+  revision = "0b2a0a1f89aa2eec2d13e03cd80ab0fdaf01f8ce"
+  version = "v0.19.2"
 
 [[projects]]
   digest = "1:3758c86e787dfe5792a23430f34636106a16da914446724399c9c12f121a225d"
@@ -104,7 +104,7 @@
   version = "v0.19.4"
 
 [[projects]]
-  digest = "1:b84759b936cd41335ea7beb8999e7f6fa911d5759db5359adef5702ef9b865ee"
+  digest = "1:e7c105f945721a5514a2521c800a12c54e80b744e379896a15641fa9c0a8c4ec"
   name = "github.com/go-openapi/runtime"
   packages = [
     ".",
@@ -117,40 +117,40 @@
     "security",
   ]
   pruneopts = "NUT"
-  revision = "d5a301537e5208a4b0c720f36ba75c0fa802c7df"
-  version = "v0.19.11"
+  revision = "fe6d8ccde74ed2051547fa7590a3932b88a53875"
+  version = "v0.19.8"
 
 [[projects]]
-  digest = "1:da2ad0356c603997317f60dfa8c571df6c60411b4359846b8b9ed735b62e913f"
+  digest = "1:97b95774863237dc7589e326d064713cc0372c9ecadbe2e4e7e560a949cbb45d"
   name = "github.com/go-openapi/spec"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "dce82e4362c708e636da7feb0831bd29efb5cd97"
-  version = "v0.19.6"
-
-[[projects]]
-  digest = "1:0c6d85eccd1cdefa1826b4f7ad874b5ee626dc1ac2746742d9d2fd0faf8704e1"
-  name = "github.com/go-openapi/strfmt"
-  packages = ["."]
-  pruneopts = "NUT"
-  revision = "1940fb2f8aba2045ae5493bd64b76ad4af8b5856"
+  revision = "8557d72e4f077c2dbe1e48df09e596b6fb9b7991"
   version = "v0.19.4"
 
 [[projects]]
-  digest = "1:2233a452b32ea89d54ed31bb1357a23b35e5fcc55f25880bcdccc1aa0872c891"
+  digest = "1:4e6aee7d8d3257e61a836d643a047972269b345bb78ce7cce01aa4289ac842d4"
+  name = "github.com/go-openapi/strfmt"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "6faa644e1cdafc07f7b38eb06c1af5f92128f289"
+  version = "v0.19.3"
+
+[[projects]]
+  digest = "1:b318f36b1725220c1580b27504b8ee9d33a2a8e2db58f28c176edf6f0d1b7fb2"
   name = "github.com/go-openapi/swag"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "6a1eb9830f1c6b090dcd01cee6c3983604a2306f"
-  version = "v0.19.7"
+  revision = "c3d0f7896d589f3babb99eea24bbc7de98108e72"
+  version = "v0.19.5"
 
 [[projects]]
-  digest = "1:9fbbc1c4406ca7512b30c1e5a0c23d155e3cb34da63c207577fa49841377f8c7"
+  digest = "1:96e99183061f1a45f588278952d43f5387cdfe3e5139df98ee4cd46fdfbe908f"
   name = "github.com/go-openapi/validate"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "0ce7161a56d25c4021e6a4b5c18418ed46909b35"
-  version = "v0.19.6"
+  revision = "08232b6614a50c4f62d1efa77e966421d327d3d3"
+  version = "v0.19.5"
 
 [[projects]]
   digest = "1:91358b3a314c1ddfd4d6445ca9c1fb846842c31c153e626730594b3c95f73f4a"
@@ -240,8 +240,8 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-5003-add-constants-for-types"
-  digest = "1:fc595787358010bb18f42be1dead707b936c2b5f4967da568611add66951d70e"
+  branch = "PMM-2.0"
+  digest = "1:630abc4ddfb585b750a7709b8048ac4000ad59ba81b976f72f50871a49f4175d"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -250,7 +250,6 @@
     "api/inventorypb/json/client/agents",
     "api/inventorypb/json/client/nodes",
     "api/inventorypb/json/client/services",
-    "api/inventorypb/types",
     "api/managementpb/json/client",
     "api/managementpb/json/client/actions",
     "api/managementpb/json/client/mongo_db",
@@ -267,15 +266,15 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "685e3ae6e491eb8ed0ea9fd07f82312a7396d18d"
+  revision = "35ec9c64bb206c7ed01125963dd07402ba63dbdf"
 
 [[projects]]
-  digest = "1:4047c378584616813d610c9f993bf90dd0d07aed8d94bd3bc299cd35ececdcba"
+  digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
   name = "github.com/pkg/errors"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "614d223910a179a466c1767a985424175c39b465"
-  version = "v0.9.1"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
@@ -313,31 +312,19 @@
   version = "v1.4.0"
 
 [[projects]]
-  digest = "1:3f2695e75ed6dfa1187df6baf40a81d8dd47589e6fbfc4ccb748bceb3af8836c"
+  digest = "1:8458b1a19a304c09d8f109a9463a419f703e3d1a81615afcaf3593dcce6749b9"
   name = "go.mongodb.org/mongo-driver"
   packages = [
     "bson",
     "bson/bsoncodec",
-    "bson/bsonoptions",
     "bson/bsonrw",
     "bson/bsontype",
     "bson/primitive",
     "x/bsonx/bsoncore",
   ]
   pruneopts = "NUT"
-  revision = "f002b1fa256d7987c03274bab1f4263dbdff0f64"
-  version = "v1.3.0"
-
-[[projects]]
-  digest = "1:467bb8fb8fa786448b8d486cd0bb7c1a5577dcd7310441aa02a20110cd9f727d"
-  name = "golang.org/x/mod"
-  packages = [
-    "module",
-    "semver",
-  ]
-  pruneopts = "NUT"
-  revision = "ed3ec21bb8e252814c380df79a80f366440ddb2d"
-  version = "v0.2.0"
+  revision = "797e0a635920c291b1808180bf7249eaac5eafed"
+  version = "v1.1.3"
 
 [[projects]]
   branch = "master"
@@ -345,15 +332,15 @@
   name = "golang.org/x/net"
   packages = ["idna"]
   pruneopts = "NUT"
-  revision = "16171245cfb220d5317888b716d69c1fb4e7992b"
+  revision = "2180aed2234323691e9fd264fb1d32d20ff04b27"
 
 [[projects]]
   branch = "master"
-  digest = "1:72ff5ef1472764bf50f383f0d96a49195268f31712a308684cef1a44a0f86e41"
+  digest = "1:761c2f8e6f99d4ad4a5eb07c41f5d238c28629071a9f5d8288197b6c94eb1a8f"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "NUT"
-  revision = "9197077df8675547dfa5e04c6dfcd024257a2030"
+  revision = "59a1497f0cead4659791683f1514d15ae8cf3934"
 
 [[projects]]
   digest = "1:66a2f252a58b4fbbad0e4e180e1d85a83c222b6bce09c3dcdef3dc87c72eda7c"
@@ -383,7 +370,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4a4fcb5ca789eaec8428443a259c092d53f30591f539eb473823c19e7e837372"
+  digest = "1:c6844361728aad543b24489ce34dd854487d3fb19b7d6b7eca111e318e82b00c"
   name = "golang.org/x/tools"
   packages = [
     "cmd/goimports",
@@ -396,21 +383,12 @@
     "internal/fastwalk",
     "internal/gopathwalk",
     "internal/imports",
-    "internal/packagesinternal",
+    "internal/module",
+    "internal/semver",
+    "internal/span",
   ]
   pruneopts = "NUT"
-  revision = "b320d3a0f5a29dea7f95f1ca5c4cbef0ac24a304"
-
-[[projects]]
-  branch = "master"
-  digest = "1:325a1b73817aa79fc85f10376ed41ea607f7dd7f6c6bfa46df6a28ef2857941f"
-  name = "golang.org/x/xerrors"
-  packages = [
-    ".",
-    "internal",
-  ]
-  pruneopts = "NUT"
-  revision = "9bdfabe68543c54f90421aeb9a60ef8061b5b544"
+  revision = "e33b02e766163a704f840c6decda2d0c5b15cb8f"
 
 [[projects]]
   branch = "v2.2.6-percona"
@@ -422,12 +400,12 @@
   source = "https://github.com/Percona-Lab/kingpin.git"
 
 [[projects]]
-  digest = "1:d9b9ac6943a512737f76bf3d61b08d97121c66686bc02ffc231313563230b468"
+  digest = "1:5ad10df0893403ae9fdbd17c6f14814394a635339dd79595600bae52432befcf"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "53403b58ad1b561927d19068c655246f2db79d48"
-  version = "v2.2.8"
+  revision = "f90ceb4f409096b60e2e9076b38b304b8246e5fa"
+  version = "v2.2.5"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -443,7 +421,6 @@
     "github.com/percona/pmm/api/inventorypb/json/client/agents",
     "github.com/percona/pmm/api/inventorypb/json/client/nodes",
     "github.com/percona/pmm/api/inventorypb/json/client/services",
-    "github.com/percona/pmm/api/inventorypb/types",
     "github.com/percona/pmm/api/managementpb/json/client",
     "github.com/percona/pmm/api/managementpb/json/client/mongo_db",
     "github.com/percona/pmm/api/managementpb/json/client/my_sql",
@@ -452,6 +429,7 @@
     "github.com/percona/pmm/api/managementpb/json/client/proxy_sql",
     "github.com/percona/pmm/api/managementpb/json/client/service",
     "github.com/percona/pmm/api/serverpb/json/client",
+    "github.com/percona/pmm/api/serverpb/json/client/server",
     "github.com/percona/pmm/utils/nodeinfo",
     "github.com/percona/pmm/utils/tlsconfig",
     "github.com/percona/pmm/version",
