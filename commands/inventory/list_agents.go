@@ -81,8 +81,8 @@ func (cmd *listAgentsCommand) Run() (commands.Result, error) {
 	}
 
 	var agentsList []listResultAgent
-	// Contanst values passed to AgentTypeName should match the values in agentTypeNames from
-	// api/inventorypb/types/agent_types.go. We use hardcoded constants to avoid big dependencies
+	// Contanst values set to AgentType should be from api/inventorypb/types/agent_types.go.
+	// We use hardcoded constants to avoid big dependencies.
 	for _, a := range agentsRes.Payload.PMMAgent {
 		status := "disconnected"
 		if a.Connected {
