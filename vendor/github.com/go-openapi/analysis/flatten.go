@@ -41,10 +41,11 @@ type FlattenOpts struct {
 	BasePath string
 
 	// Flattening options
-	Expand       bool // If Expand is true, we skip flattening the spec and expand it instead
-	Minimal      bool
-	Verbose      bool
-	RemoveUnused bool
+	Expand          bool // If Expand is true, we skip flattening the spec and expand it instead
+	Minimal         bool
+	Verbose         bool
+	RemoveUnused    bool
+	ContinueOnError bool // Continues when facing some issues
 
 	/* Extra keys */
 	_ struct{} // require keys
@@ -149,7 +150,9 @@ func Flatten(opts FlattenOpts) error {
 
 	// recursively expand responses, parameters, path items and items in simple schemas.
 	// This simplifies the spec and leaves $ref only into schema objects.
-	if err := swspec.ExpandSpec(opts.Swagger(), opts.ExpandOpts(!opts.Expand)); err != nil {
+	expandOpts := opts.ExpandOpts(!opts.Expand)
+	expandOpts.ContinueOnError = opts.ContinueOnError
+	if err := swspec.ExpandSpec(opts.Swagger(), expandOpts); err != nil {
 		return err
 	}
 
@@ -847,7 +850,7 @@ func importExternalReferences(opts *FlattenOpts) (bool, error) {
 				enums:      enumAnalysis{},
 			}
 			partialAnalyzer.reset()
-			partialAnalyzer.analyzeSchema("", *sch, "/")
+			partialAnalyzer.analyzeSchema("", sch, "/")
 
 			// now rewrite those refs with rebase
 			for key, ref := range partialAnalyzer.references.allRefs {
