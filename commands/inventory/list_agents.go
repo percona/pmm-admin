@@ -73,7 +73,7 @@ func (res *listAgentsResult) String() string {
 
 type listAgentsCommand struct {
 	filters   agents.ListAgentsBody
-	AgentType string
+	agentType string
 }
 
 func getAgentStatus(s *string, disabled bool) string {
@@ -88,7 +88,7 @@ func getAgentStatus(s *string, disabled bool) string {
 }
 
 func (cmd *listAgentsCommand) Run() (commands.Result, error) {
-	agentType, err := formatTypeValue(acceptableAgentTypes, cmd.AgentType)
+	agentType, err := formatTypeValue(acceptableAgentTypes, cmd.agentType)
 	if err != nil {
 		return nil, err
 	}
@@ -222,5 +222,5 @@ func init() {
 	ListAgentsC.Flag("pmm-agent-id", "Filter by pmm-agent identifier").StringVar(&ListAgents.filters.PMMAgentID)
 	ListAgentsC.Flag("service-id", "Filter by Service identifier").StringVar(&ListAgents.filters.ServiceID)
 	ListAgentsC.Flag("node-id", "Filter by Node identifier").StringVar(&ListAgents.filters.NodeID)
-	ListAgentsC.Flag("agent-type", "Filter by Agent type").StringVar(&ListAgents.AgentType)
+	ListAgentsC.Flag("agent-type", "Filter by Agent type").StringVar(&ListAgents.agentType)
 }

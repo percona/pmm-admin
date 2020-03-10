@@ -34,6 +34,8 @@ var (
 	inventoryRemoveC = inventoryC.Command("remove", "Remove from inventory commands").Hide(hide)
 )
 
+// formatTypeValue checks acceptable type value and variations contains input and returns type value.
+// Values comparision is case-insensitive.
 func formatTypeValue(acceptableTypeValues map[string][]string, input string) (*string, error) {
 	if input == "" {
 		return nil, nil
