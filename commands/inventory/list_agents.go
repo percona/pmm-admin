@@ -115,6 +115,8 @@ func (cmd *listAgentsCommand) Run() (commands.Result, error) {
 			AgentID:    a.AgentID,
 			PMMAgentID: a.PMMAgentID,
 			ServiceID:  a.ServiceID,
+			Status:     getAgentStatus(a.Status),
+			Disabled:   a.Disabled,
 		})
 	}
 	for _, a := range agentsRes.Payload.MongodbExporter {
