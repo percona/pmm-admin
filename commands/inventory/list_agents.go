@@ -54,9 +54,6 @@ type listAgentsResult struct {
 
 func (a listResultAgent) NiceAgentStatus() string {
 	res := a.Status
-	if res == "" {
-		res = "unknown"
-	}
 	res = strings.Title(strings.ToLower(res))
 	if a.Disabled {
 		res += " (disabled)"
@@ -77,9 +74,9 @@ type listAgentsCommand struct {
 func getAgentStatus(status *string) string {
 	res := pointer.GetString(status)
 	if res == "" {
-		res = "unknown"
+		res = "UNKNOWN"
 	}
-	return strings.ToUpper(res)
+	return res
 }
 
 func (cmd *listAgentsCommand) Run() (commands.Result, error) {
