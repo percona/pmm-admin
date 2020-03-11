@@ -99,6 +99,12 @@ func ParseTemplate(text string) *template.Template {
 	return template.Must(t.Parse(strings.TrimSpace(text)))
 }
 
+// ParseTemplateWithFuncs parses a text template and include the provided list of function helpers
+func ParseTemplateFuncs(text string, funcs template.FuncMap) *template.Template {
+	t := template.New("").Option("missingkey=error")
+	return template.Must(t.Funcs(funcs).Parse(strings.TrimSpace(text)))
+}
+
 // RenderTemplate renders given template with given data and returns result as string.
 func RenderTemplate(t *template.Template, data interface{}) string {
 	var buf bytes.Buffer

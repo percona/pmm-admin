@@ -17,13 +17,21 @@ package commands
 
 import (
 	"net/url"
+	"strings"
+	"text/template"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/agentlocal"
+	"github.com/percona/pmm/api/inventorypb/types"
 )
 
-var statusResultT = ParseTemplate(`
+var fns = template.FuncMap{
+	"niceAgentStatus":        niceAgentStatus,
+	"humanReadableAgentType": humanReadableAgentType,
+}
+
+var statusResultT = ParseTemplateFuncs(`
 Agent ID: {{ .PMMAgentStatus.AgentID }}
 Node ID : {{ .PMMAgentStatus.NodeID }}
 
@@ -37,9 +45,9 @@ PMM-agent:
 	Latency   : {{ .PMMAgentStatus.ServerLatency }}
 {{ end }}
 Agents:
-{{ range .PMMAgentStatus.Agents }}	{{ .AgentID }} {{ .AgentType }} {{ .Status }}
+{{ range .PMMAgentStatus.Agents }}	{{ .AgentID }} {{ .AgentType | humanReadableAgentType }} {{ .Status | niceAgentStatus }}
 {{ end }}
-`)
+`, fns)
 
 type statusResult struct {
 	PMMAgentStatus *agentlocal.Status `json:"pmm_agent_status"`
@@ -49,6 +57,16 @@ func (res *statusResult) Result() {}
 
 func (res *statusResult) String() string {
 	return RenderTemplate(statusResultT, res)
+}
+
+// Helper function used in template. Not used for JSON output
+func niceAgentStatus(status string) string {
+	return strings.Title(strings.ToLower(status))
+}
+
+// Helper function used in template. Not used for JSON output
+func humanReadableAgentType(agentType string) string {
+	return types.AgentTypeName(agentType)
 }
 
 func newStatusResult(status *agentlocal.Status) *statusResult {
