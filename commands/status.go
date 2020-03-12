@@ -22,8 +22,9 @@ import (
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm/api/inventorypb/types"
+
+	"github.com/percona/pmm-admin/agentlocal"
 )
 
 var fns = template.FuncMap{
