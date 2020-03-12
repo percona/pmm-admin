@@ -20,10 +20,10 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/percona/pmm/api/inventorypb/types"
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/agentlocal"
-	"github.com/percona/pmm/api/inventorypb/types"
 )
 
 var fns = template.FuncMap{
