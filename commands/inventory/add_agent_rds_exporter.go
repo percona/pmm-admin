@@ -26,13 +26,13 @@ var addAgentRDSExporterResultT = commands.ParseTemplate(`
 RDS Exporter added.
 Agent ID                  : {{ .Agent.AgentID }}
 PMM-Agent ID              : {{ .Agent.PMMAgentID }}
-Service ID                : {{ .Agent.ServiceID }}
+Node ID                   : {{ .Agent.NodeID }}
 Listen port               : {{ .Agent.ListenPort }}
 
 Status                    : {{ .Agent.Status }}
 Disabled                  : {{ .Agent.Disabled }}
-Disabled Basic Metrics    : {{ .Agent.DisableBasicMetrics }}
-Disabled Enhanced Metrics : {{ .Agent.DisableEnhancedMetrics }}
+Disabled Basic Metrics    : {{ .Agent.BasicMetricsDisabled }}
+Disabled Enhanced Metrics : {{ .Agent.EnhancedMetricsDisabled }}
 Custom labels             : {{ .Agent.CustomLabels }}
 `)
 
