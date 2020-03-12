@@ -240,8 +240,8 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-2.0"
-  digest = "1:8eafea353cf0db97ed9cfb9646b0cdc7087704cf4edd6e9a66b4eb6e48221fe0"
+  branch = "PMM-4145-rds-disable-metric-collection"
+  digest = "1:c9650cd408a9615675bb4769f03098cb5e374df367c346e4d701a1b13715768e"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -267,7 +267,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "2fd5efeda1131797b5064de56e2046337f0ea248"
+  revision = "f33101ee8eaf4b7588b428fd82aeeddd13e2273f"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
