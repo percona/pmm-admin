@@ -31,8 +31,8 @@ Listen port               : {{ .Agent.ListenPort }}
 
 Status                    : {{ .Agent.Status }}
 Disabled                  : {{ .Agent.Disabled }}
-Disabled Basic Metrics    : {{ .Agent.BasicMetricsDisabled }}
-Disabled Enhanced Metrics : {{ .Agent.EnhancedMetricsDisabled }}
+Basic metrics disabled    : {{ .Agent.BasicMetricsDisabled }}
+Enhanced metrics disabled : {{ .Agent.EnhancedMetricsDisabled }}
 Custom labels             : {{ .Agent.CustomLabels }}
 `)
 
@@ -99,6 +99,6 @@ func init() {
 	AddAgentRDSExporterC.Flag("aws-secret-key", "AWS Secret Access Key").StringVar(&AddAgentRDSExporter.AWSSecretKey)
 	AddAgentRDSExporterC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentRDSExporter.CustomLabels)
 	AddAgentRDSExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentRDSExporter.SkipConnectionCheck)
-	AddAgentRDSExporterC.Flag("disable-basic-metrics", "Disable Basic Metrics").BoolVar(&AddAgentRDSExporter.DisableBasicMetrics)
-	AddAgentRDSExporterC.Flag("disable-enhanced-metrics", "Disable Enhanced Metrics").BoolVar(&AddAgentRDSExporter.DisableEnhancedMetrics)
+	AddAgentRDSExporterC.Flag("disable-basic-metrics", "Disable basic metrics").BoolVar(&AddAgentRDSExporter.DisableBasicMetrics)
+	AddAgentRDSExporterC.Flag("disable-enhanced-metrics", "Disable enhanced metrics").BoolVar(&AddAgentRDSExporter.DisableEnhancedMetrics)
 }
