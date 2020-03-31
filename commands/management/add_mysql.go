@@ -150,6 +150,9 @@ func (cmd *addMySQLCommand) processGlobalAddFlags() (serviceName string, socket 
 		if *addPortFlag != 0 {
 			portI = int(*addPortFlag)
 		}
+		if err := commands.ValidatePort(portI); err != nil {
+			return "", "", "", 0, err
+		}
 	}
 
 	return serviceName, socket, host, uint16(portI), nil

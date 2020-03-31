@@ -98,15 +98,16 @@ func (cmd *addServiceMySQLCommand) validateParams() error {
 		if cmd.Address != "" || cmd.Port != 0 {
 			return fmt.Errorf("both socket and address are passed")
 		}
-	} else {
-		if cmd.Address == "" {
-			return fmt.Errorf("both socket and address are not passed")
-		}
-		if cmd.Port == 0 {
-			return fmt.Errorf("port are expected to be passed with address")
-		}
+		return nil
 	}
-	return nil
+
+	if cmd.Address == "" {
+		return fmt.Errorf("both socket and address are not passed")
+	}
+	if cmd.Port == 0 {
+		return fmt.Errorf("port are expected to be passed with address")
+	}
+	return commands.ValidatePort(int(cmd.Port))
 }
 
 // register command
