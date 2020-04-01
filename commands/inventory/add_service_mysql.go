@@ -121,7 +121,7 @@ func init() {
 	AddServiceMySQLC.Arg("name", "Service name").StringVar(&AddServiceMySQL.ServiceName)
 	AddServiceMySQLC.Arg("node-id", "Node ID").StringVar(&AddServiceMySQL.NodeID)
 	AddServiceMySQLC.Arg("address", "Address").Default("").StringVar(&AddServiceMySQL.Address)
-	AddServiceMySQLC.Arg("port", "Port").Default("").Int64Var(&AddServiceMySQL.Port)
+	AddServiceMySQLC.Arg("port", "Port").Default("0").Int64Var(&AddServiceMySQL.Port)
 	AddServiceMySQLC.Flag("socket", "Path to MySQL socket").StringVar(&AddServiceMySQL.Socket)
 
 	AddServiceMySQLC.Flag("environment", "Environment name").StringVar(&AddServiceMySQL.Environment)
