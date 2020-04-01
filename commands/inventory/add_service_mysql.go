@@ -74,6 +74,7 @@ func (cmd *addServiceMySQLCommand) Run() (commands.Result, error) {
 		Body: services.AddMySQLServiceBody{
 			ServiceName:    cmd.ServiceName,
 			NodeID:         cmd.NodeID,
+			Socket:         cmd.Socket,
 			Address:        cmd.Address,
 			Port:           cmd.Port,
 			Environment:    cmd.Environment,
