@@ -23,12 +23,15 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+// annotationResult is a result of annotation command.
 type annotationResult struct {
 	Message string `json:"message"`
 }
 
+// Result is a command run result.
 func (res *annotationResult) Result() {}
 
+// String stringifies command result.
 func (res *annotationResult) String() string {
 	return res.Message
 }
@@ -38,10 +41,7 @@ type annotationCommand struct {
 	Tags string
 }
 
-type annotationResultService struct {
-	Message string `json:"message"`
-}
-
+// Run runs annotation command.
 func (cmd *annotationCommand) Run() (Result, error) {
 	annotationRes, err := client.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
 		Body: annotation.AddAnnotationBody{
@@ -60,10 +60,10 @@ func (cmd *annotationCommand) Run() (Result, error) {
 // register command
 var (
 	Annotation  = new(annotationCommand)
-	AnnotationC = kingpin.Command("annotation", "Add annotation")
+	AnnotationC = kingpin.Command("annotation", "Add an annotation to Grafana charts")
 )
 
 func init() {
-	AnnotationC.Arg("text", "Annotation Description").StringVar(&Annotation.Text)
-	AnnotationC.Flag("tags", "Tags filter global annotations. Multiple tags separated by a comma").StringVar(&Annotation.Tags)
+	AnnotationC.Arg("text", "Text of annotation").StringVar(&Annotation.Text)
+	AnnotationC.Flag("tags", "Tags to filter annotations. Multiple tags are separated by a comma.").StringVar(&Annotation.Tags)
 }

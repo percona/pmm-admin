@@ -241,7 +241,7 @@
 
 [[projects]]
   branch = "PMM-5559-annotation"
-  digest = "1:d713936e26f4dbc9fffa0a4e1d898a039167d6163c0abc71027e572bc6671096"
+  digest = "1:6693983ecea6ead6d3ed5d97bff74d5e544f9f6918dacb462a9dd6d21544ced8"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -268,7 +268,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "46455550b8c41985008ff5af6a009062c0fb7d9c"
+  revision = "a8883d6e64c569f755beca0a2fcd834cfc6f719a"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
@@ -425,6 +425,7 @@
     "github.com/percona/pmm/api/inventorypb/json/client/services",
     "github.com/percona/pmm/api/inventorypb/types",
     "github.com/percona/pmm/api/managementpb/json/client",
+    "github.com/percona/pmm/api/managementpb/json/client/annotation",
     "github.com/percona/pmm/api/managementpb/json/client/mongo_db",
     "github.com/percona/pmm/api/managementpb/json/client/my_sql",
     "github.com/percona/pmm/api/managementpb/json/client/node",
