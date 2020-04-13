@@ -43,7 +43,7 @@ type annotationCommand struct {
 
 // Run runs annotation command.
 func (cmd *annotationCommand) Run() (Result, error) {
-	annotationRes, err := client.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
+	_, err := client.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
 		Body: annotation.AddAnnotationBody{
 			Text: cmd.Text,
 			Tags: strings.Split(cmd.Tags, ","),
@@ -54,7 +54,7 @@ func (cmd *annotationCommand) Run() (Result, error) {
 		return nil, err
 	}
 
-	return &annotationResult{Message: annotationRes.Payload.Message}, nil
+	return &annotationResult{Message: "Annotation added."}, nil
 }
 
 // register command
