@@ -97,10 +97,10 @@ func (cmd *addServiceMySQLCommand) Run() (commands.Result, error) {
 func (cmd *addServiceMySQLCommand) validateParams() error {
 	if cmd.Socket != "" {
 		if cmd.Address != "" {
-			return fmt.Errorf("both socket and address cannot be specified")
+			return fmt.Errorf("socket and address cannot be specified together")
 		}
 		if cmd.Port != 0 {
-			return fmt.Errorf("both socket and port cannot be specified")
+			return fmt.Errorf("socket and port cannot be specified together")
 		}
 		return nil
 	}
