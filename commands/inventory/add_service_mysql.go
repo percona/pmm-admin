@@ -27,12 +27,12 @@ MySQL Service added.
 Service ID     : {{ .Service.ServiceID }}
 Service name   : {{ .Service.ServiceName }}
 Node ID        : {{ .Service.NodeID }}
-{{ if .Service.Socket }}\
+{{ if .Service.Socket -}}
 Socket         : {{ .Service.Socket }}
-{{else}}\
+{{- else -}}
 Address        : {{ .Service.Address }}
 Port           : {{ .Service.Port }}
-{{end}}\
+{{- end }}
 Environment    : {{ .Service.Environment }}
 Cluster name   : {{ .Service.Cluster }}
 Replication set: {{ .Service.ReplicationSet }}
