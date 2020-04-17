@@ -18,22 +18,25 @@ package commands
 import (
 	"strings"
 
+	"github.com/Percona-Lab/pmm-submodules/sources/pmm-admin/src/github.com/percona/pmm-admin/commands"
 	"github.com/percona/pmm/api/managementpb/json/client"
 	"github.com/percona/pmm/api/managementpb/json/client/annotation"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+var annotationResultT = commands.ParseTemplate(`
+Annotation added.
+`)
+
 // annotationResult is a result of annotation command.
-type annotationResult struct {
-	Message string `json:"message"`
-}
+type annotationResult struct{}
 
 // Result is a command run result.
 func (res *annotationResult) Result() {}
 
 // String stringifies command result.
 func (res *annotationResult) String() string {
-	return res.Message
+	return commands.RenderTemplate(annotationResultT, res)
 }
 
 type annotationCommand struct {
@@ -54,7 +57,7 @@ func (cmd *annotationCommand) Run() (Result, error) {
 		return nil, err
 	}
 
-	return &annotationResult{Message: "Annotation added."}, nil
+	return new(annotationResult), nil
 }
 
 // register command
