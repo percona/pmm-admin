@@ -45,10 +45,15 @@ type annotationCommand struct {
 
 // Run runs annotation command.
 func (cmd *annotationCommand) Run() (Result, error) {
+	tags := strings.Split(cmd.Tags, ",")
+	for i := range tags {
+		tags[i] = strings.TrimSpace(tags[i])
+	}
+
 	_, err := client.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
 		Body: annotation.AddAnnotationBody{
 			Text: cmd.Text,
-			Tags: strings.Split(cmd.Tags, ","),
+			Tags: tags,
 		},
 		Context: Ctx,
 	})
