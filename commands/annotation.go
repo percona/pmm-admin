@@ -62,7 +62,7 @@ func (cmd *annotationCommand) Run() (Result, error) {
 // register command
 var (
 	Annotation  = new(annotationCommand)
-	AnnotationC = kingpin.Command("annotation", "Add an annotation to Grafana charts")
+	AnnotationC = kingpin.Command("annotate", "Add an annotation to Grafana charts")
 )
 
 func init() {
