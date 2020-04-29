@@ -85,8 +85,8 @@ var (
 )
 
 func init() {
-	AddExternalServiceC.Flag("name", "External service name").StringVar(&AddExternalService.ServiceName)
-	AddExternalServiceC.Flag("node-id", "External service node ID").StringVar(&AddExternalService.NodeID)
+	AddExternalServiceC.Flag("name", "External service name. Required").Required().StringVar(&AddExternalService.ServiceName)
+	AddExternalServiceC.Flag("node-id", "External service node ID. Required").Required().StringVar(&AddExternalService.NodeID)
 	AddExternalServiceC.Flag("environment", "Environment name").StringVar(&AddExternalService.Environment)
 	AddExternalServiceC.Flag("cluster", "Cluster name").StringVar(&AddExternalService.Cluster)
 	AddExternalServiceC.Flag("replication-set", "Replication set name").StringVar(&AddExternalService.ReplicationSet)
