@@ -25,7 +25,7 @@ import (
 var addAgentExternalExporterResultT = commands.ParseTemplate(`
 External Exporter added.
 Agent ID              : {{ .Agent.AgentID }}
-Runs on Node ID       : {{ .Agent.RunsOnNodeID }}
+Runs on node ID       : {{ .Agent.RunsOnNodeID }}
 Service ID            : {{ .Agent.ServiceID }}
 Username              : {{ .Agent.Username }}
 Scheme                : {{ .Agent.Scheme }}
