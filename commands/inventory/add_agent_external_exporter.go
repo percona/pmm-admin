@@ -29,8 +29,8 @@ Runs on Node ID       : {{ .Agent.RunsOnNodeID }}
 Service ID            : {{ .Agent.ServiceID }}
 Username              : {{ .Agent.Username }}
 Scheme                : {{ .Agent.Scheme }}
-Metric Path           : {{ .Agent.MetricPath }}
-Listen Port           : {{ .Agent.ListenPort }}
+Metric path           : {{ .Agent.MetricPath }}
+Listen port           : {{ .Agent.ListenPort }}
 
 Disabled              : {{ .Agent.Disabled }}
 Custom labels         : {{ .Agent.CustomLabels }}
