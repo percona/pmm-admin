@@ -30,7 +30,7 @@ Service ID            : {{ .Agent.ServiceID }}
 Username              : {{ .Agent.Username }}
 Scheme                : {{ .Agent.Scheme }}
 Metric Path           : {{ .Agent.MetricPath }}
-Listen port           : {{ .Agent.ListenPort }}
+Listen Port           : {{ .Agent.ListenPort }}
 
 Disabled              : {{ .Agent.Disabled }}
 Custom labels         : {{ .Agent.CustomLabels }}
