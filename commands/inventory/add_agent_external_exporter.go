@@ -25,11 +25,11 @@ import (
 var addAgentExternalExporterResultT = commands.ParseTemplate(`
 External Exporter added.
 Agent ID              : {{ .Agent.AgentID }}
-PMM-Agent ID          : {{ .Agent.PMMAgentID }}
+Runs on Node ID       : {{ .Agent.RunsOnNodeID }}
 Service ID            : {{ .Agent.ServiceID }}
 Username              : {{ .Agent.Username }}
 Scheme                : {{ .Agent.Scheme }}
-Metrics Path          : {{ .Agent.MetricsPath }}
+Metric Path           : {{ .Agent.MetricPath }}
 Listen port           : {{ .Agent.ListenPort }}
 
 Disabled              : {{ .Agent.Disabled }}
@@ -88,7 +88,7 @@ func (cmd *addAgentExternalExporterCommand) Run() (commands.Result, error) {
 // register command
 var (
 	AddAgentExternalExporter  = new(addAgentExternalExporterCommand)
-	AddAgentExternalExporterC = addAgentC.Command("external-exporter", "Add external exporter to inventory").Hide(hide)
+	AddAgentExternalExporterC = addAgentC.Command("external", "Add external exporter to inventory").Hide(hide)
 )
 
 func init() {
