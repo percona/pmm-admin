@@ -17,9 +17,7 @@ package management
 
 import (
 	"fmt"
-	"net"
 	"os"
-	"strconv"
 
 	"github.com/percona/pmm/api/managementpb/json/client"
 	proxysql "github.com/percona/pmm/api/managementpb/json/client/proxy_sql"
@@ -70,44 +68,12 @@ func (cmd *addProxySQLCommand) GetAddress() string {
 	return cmd.Address
 }
 
-func (cmd *addProxySQLCommand) processGlobalAddFlags() (serviceName string, socket string, host string, port uint16, err error) {
-	serviceName = cmd.GetServiceName()
-	if *addServiceNameFlag != "" {
-		serviceName = *addServiceNameFlag
-	}
+func (cmd *addProxySQLCommand) GetDefaultAddress() string {
+	return "127.0.0.1:6033"
+}
 
-	socket = cmd.Socket
-	address := cmd.GetAddress()
-	if socket == "" {
-		if address == "" {
-			address = "127.0.0.1:6033"
-		}
-	}
-
-	var portI int
-
-	if address != "" {
-		var portS string
-		host, portS, err = net.SplitHostPort(address)
-		if err != nil {
-			return "", "", "", 0, err
-		}
-
-		portI, err = strconv.Atoi(portS)
-		if err != nil {
-			return "", "", "", 0, err
-		}
-	}
-
-	if *addHostFlag != "" {
-		host = *addHostFlag
-	}
-
-	if *addPortFlag != 0 {
-		portI = int(*addPortFlag)
-	}
-
-	return serviceName, socket, host, uint16(portI), nil
+func (cmd *addProxySQLCommand) GetSocket() string {
+	return cmd.Socket
 }
 
 func (cmd *addProxySQLCommand) Run() (commands.Result, error) {
@@ -129,7 +95,7 @@ func (cmd *addProxySQLCommand) Run() (commands.Result, error) {
 		}
 	}
 
-	serviceName, socket, host, port, err := cmd.processGlobalAddFlags()
+	serviceName, socket, host, port, err := processGlobalAddFlagsWithSocket(cmd)
 	if err != nil {
 		return nil, err
 	}
