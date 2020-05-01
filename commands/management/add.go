@@ -87,10 +87,8 @@ func processGlobalAddFlagsWithSocket(cmd connectionGetter) (serviceName string, 
 
 	socket = cmd.GetSocket()
 	address := cmd.GetAddress()
-	if socket == "" {
-		if address == "" {
-			address = cmd.GetDefaultAddress()
-		}
+	if socket == "" && address == "" {
+		address = cmd.GetDefaultAddress()
 	}
 
 	var portI int
