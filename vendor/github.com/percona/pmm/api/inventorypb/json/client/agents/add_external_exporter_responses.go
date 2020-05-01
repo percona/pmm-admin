@@ -305,7 +305,7 @@ func (o *AddExternalExporterOKBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*AddExternalExporterOKBodyExternalExporter ExternalExporter runs on any Node.
+/*AddExternalExporterOKBodyExternalExporter ExternalExporter runs on any Node type, including Remote Node.
 swagger:model AddExternalExporterOKBodyExternalExporter
 */
 type AddExternalExporterOKBodyExternalExporter struct {
@@ -316,7 +316,7 @@ type AddExternalExporterOKBodyExternalExporter struct {
 	// Node identifier where this instance runs.
 	RunsOnNodeID string `json:"runs_on_node_id,omitempty"`
 
-	// Desired Agent status: enabled (false) or disabled (true).
+	// If disabled, metrics from this exporter will not be collected.
 	Disabled bool `json:"disabled,omitempty"`
 
 	// Service identifier.
@@ -325,10 +325,10 @@ type AddExternalExporterOKBodyExternalExporter struct {
 	// HTTP basic auth username for collecting metrics.
 	Username string `json:"username,omitempty"`
 
-	// Scheme to generate URI to exporter metrics endpoints.
+	// Scheme to generate URI to exporter metrics endpoints(default: http).
 	Scheme string `json:"scheme,omitempty"`
 
-	// Path under which metrics are exposed, used to generate URI.
+	// Path under which metrics are exposed, used to generate URI(default: /metrics).
 	MetricPath string `json:"metric_path,omitempty"`
 
 	// Custom user-assigned labels.
