@@ -241,7 +241,7 @@
 
 [[projects]]
   branch = "PMM-5257-ProxySQL-socket-connection"
-  digest = "1:7d7fa4aa2d72f33cad9593ddbc5bd166b8401dd804ff2a8b24a4499357fdda48"
+  digest = "1:1b0c29dacc9191a25165a36de04ed7d547468863d2daa988515c093a0ce4045b"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -268,7 +268,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "be3c7d763984e88245a7afe75aabc5da1cffb650"
+  revision = "c8600293a874e7740b7c9dcd8070d35ea1223bac"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
