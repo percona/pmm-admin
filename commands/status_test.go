@@ -32,7 +32,6 @@ func TestStatus(t *testing.T) {
 		NodeID:        "pmm-server",
 		ServerURL:     "https://username:password@address/",
 		ServerVersion: "2.4.0",
-		PMMVersion:    "2.5.0",
 		Agents: []agentlocal.AgentStatus{{
 			AgentID:   "/agent_id/1afe233f-b319-4645-be6c-a1e05d4a545b",
 			AgentType: "NODE_EXPORTER",
