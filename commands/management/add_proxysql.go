@@ -69,7 +69,7 @@ func (cmd *addProxySQLCommand) GetAddress() string {
 }
 
 func (cmd *addProxySQLCommand) GetDefaultAddress() string {
-	return "127.0.0.1:6033"
+	return "127.0.0.1:6032"
 }
 
 func (cmd *addProxySQLCommand) GetSocket() string {
@@ -143,7 +143,7 @@ func init() {
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddProxySQLC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddProxySQL.ServiceName)
 
-	AddProxySQLC.Arg("address", "ProxySQL address and port (default: 127.0.0.1:6033)").StringVar(&AddProxySQL.Address)
+	AddProxySQLC.Arg("address", "ProxySQL address and port (default: 127.0.0.1:6032)").StringVar(&AddProxySQL.Address)
 	AddProxySQLC.Flag("socket", "Path to ProxySQL socket").StringVar(&AddProxySQL.Socket)
 
 	AddProxySQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddProxySQL.NodeID)

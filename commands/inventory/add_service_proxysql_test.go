@@ -30,7 +30,7 @@ func TestAddServiceProxySQL(t *testing.T) {
 				ServiceName:    "ProxySQL Service",
 				NodeID:         "/node_id/1",
 				Address:        "127.0.0.1",
-				Port:           6033,
+				Port:           6032,
 				Environment:    "environment",
 				Cluster:        "proxysql-cluster",
 				ReplicationSet: "proxysql-replication-set",
@@ -42,7 +42,7 @@ Service ID     : /service_id/1
 Service name   : ProxySQL Service
 Node ID        : /node_id/1
 Address        : 127.0.0.1
-Port           : 6033
+Port           : 6032
 Environment    : environment
 Cluster name   : proxysql-cluster
 Replication set: proxysql-replication-set
@@ -57,7 +57,7 @@ Custom labels  : map[foo:bar key:value]
 				ServiceID:      "/service_id/1",
 				ServiceName:    "ProxySQL Socket Service",
 				NodeID:         "/node_id/1",
-				Socket:         "/tmp/proxysql.sock",
+				Socket:         "/tmp/proxysql_admin.sock",
 				Environment:    "environment",
 				Cluster:        "proxysql-cluster",
 				ReplicationSet: "proxysql-replication-set",
@@ -68,7 +68,7 @@ Custom labels  : map[foo:bar key:value]
 Service ID     : /service_id/1
 Service name   : ProxySQL Socket Service
 Node ID        : /node_id/1
-Socket         : /tmp/proxysql.sock
+Socket         : /tmp/proxysql_admin.sock
 Environment    : environment
 Cluster name   : proxysql-cluster
 Replication set: proxysql-replication-set
