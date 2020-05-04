@@ -29,6 +29,7 @@ import (
 	"github.com/percona/pmm/api/agentlocalpb/json/client"
 	agentlocal "github.com/percona/pmm/api/agentlocalpb/json/client/agent_local"
 	"github.com/sirupsen/logrus"
+	"github.com/percona/pmm/version"
 )
 
 // SetTransport configures transport for accessing local pmm-agent API.
@@ -70,6 +71,7 @@ type Status struct {
 	Connected        bool          `json:"connected"`
 	ServerClockDrift time.Duration `json:"server_clock_drift,omitempty"`
 	ServerLatency    time.Duration `json:"server_latency,omitempty"`
+	PMMVersion       string
 }
 
 type AgentStatus struct {
@@ -144,5 +146,6 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 		Connected:        p.ServerInfo.Connected,
 		ServerClockDrift: clockDrift,
 		ServerLatency:    latency,
+		PMMVersion: version.PMMVersion,
 	}, nil
 }

@@ -37,6 +37,7 @@ PMM-agent:
 	Connected : {{ .PMMAgentStatus.Connected }}{{ if .PMMAgentStatus.Connected }}
 	Time drift: {{ .PMMAgentStatus.ServerClockDrift }}
 	Latency   : {{ .PMMAgentStatus.ServerLatency }}
+	Version   : {{ .PMMAgentStatus.PMMVersion }}
 {{ end }}
 Agents:
 {{ range .PMMAgentStatus.Agents }}	{{ .AgentID }} {{ .AgentType | $.HumanReadableAgentType }} {{ .Status | $.NiceAgentStatus }}
