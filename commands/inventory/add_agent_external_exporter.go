@@ -93,7 +93,7 @@ var (
 
 func init() {
 	AddAgentExternalExporterC.Flag("runs-on-node-id", "Node identifier where this instance runs").Required().StringVar(&AddAgentExternalExporter.RunsOnNodeID)
-	AddAgentExternalExporterC.Flag("service-id", "Service identifier").StringVar(&AddAgentExternalExporter.ServiceID)
+	AddAgentExternalExporterC.Flag("service-id", "Service identifier").Required().StringVar(&AddAgentExternalExporter.ServiceID)
 	AddAgentExternalExporterC.Flag("username", "HTTP Basic auth username for scraping metrics").StringVar(&AddAgentExternalExporter.Username)
 	AddAgentExternalExporterC.Flag("password", "HTTP Basic auth password for scraping metrics").StringVar(&AddAgentExternalExporter.Password)
 	AddAgentExternalExporterC.Flag("scheme", "Scheme to generate URI to exporter metrics endpoints").StringVar(&AddAgentExternalExporter.Scheme)
