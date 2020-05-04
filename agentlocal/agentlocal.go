@@ -71,7 +71,7 @@ type Status struct {
 	Connected        bool          `json:"connected"`
 	ServerClockDrift time.Duration `json:"server_clock_drift,omitempty"`
 	ServerLatency    time.Duration `json:"server_latency,omitempty"`
-	PMMVersion       string        `json:"pmm_version"`
+	PMMVersion       string        `json:"pmm_version,omitempty"`
 }
 
 type AgentStatus struct {
@@ -122,6 +122,7 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 	}
 	var clockDrift time.Duration
 	var latency time.Duration
+	var pmmVersion string
 	if bool(requestNetworkInfo) && p.ServerInfo.Connected {
 		clockDrift, err = time.ParseDuration(p.ServerInfo.ClockDrift)
 		if err != nil {
@@ -131,6 +132,7 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 		if err != nil {
 			return nil, err
 		}
+		pmmVersion = version.PMMVersion
 	}
 
 	return &Status{
@@ -146,6 +148,6 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 		Connected:        p.ServerInfo.Connected,
 		ServerClockDrift: clockDrift,
 		ServerLatency:    latency,
-		PMMVersion:       version.PMMVersion,
+		PMMVersion:       pmmVersion,
 	}, nil
 }
