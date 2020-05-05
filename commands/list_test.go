@@ -65,3 +65,47 @@ Agent type                  Status     Agent ID                                 
 		})
 	}
 }
+
+func TestNiceAgentStatus(t *testing.T) {
+	type fields struct {
+		AgentType string
+		AgentID   string
+		ServiceID string
+		Status    string
+		Disabled  bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name: "emptyStatus",
+			fields: fields{
+				Status: "",
+			},
+			want: "Unknown",
+		},
+		{
+			name: "disabled",
+			fields: fields{
+				Disabled: true,
+			},
+			want: "Unknown (disabled)",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := listResultAgent{
+				AgentType: tt.fields.AgentType,
+				AgentID:   tt.fields.AgentID,
+				ServiceID: tt.fields.ServiceID,
+				Status:    tt.fields.Status,
+				Disabled:  tt.fields.Disabled,
+			}
+			if got := a.NiceAgentStatus(); got != tt.want {
+				t.Errorf("listResultAgent.NiceAgentStatus() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
