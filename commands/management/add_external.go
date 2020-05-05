@@ -48,7 +48,7 @@ type addExternalCommand struct {
 	Username       string
 	Password       string
 	Scheme         string
-	MetricPath     string
+	MetricsPath    string
 	ListenPort     uint16
 	NodeID         string
 	Environment    string
@@ -83,7 +83,7 @@ func (cmd *addExternalCommand) Run() (commands.Result, error) {
 			Username:       cmd.Username,
 			Password:       cmd.Password,
 			Scheme:         cmd.Scheme,
-			MetricPath:     cmd.MetricPath,
+			MetricsPath:    cmd.MetricsPath,
 			ListenPort:     int64(cmd.ListenPort),
 			NodeID:         cmd.NodeID,
 			Environment:    cmd.Environment,
@@ -121,7 +121,7 @@ func init() {
 	AddExternalC.Flag("password", "External password").StringVar(&AddExternal.Password)
 
 	AddExternalC.Flag("scheme", "Scheme to generate URI to exporter metrics endpoints").StringVar(&AddExternal.Scheme)
-	AddExternalC.Flag("metric-path", "Path under which metrics are exposed, used to generate URI.").StringVar(&AddExternal.MetricPath)
+	AddExternalC.Flag("metricы-path", "Path under which metrics are exposed, used to generate URI.").StringVar(&AddExternal.MetricsPath)
 	AddExternalC.Flag("listen-port", "Listen port of external exporter for scraping metrics.").Required().Uint16Var(&AddExternal.ListenPort)
 
 	AddExternalC.Flag("service-node-id", "Node ID where service runs (default is autodetected)").StringVar(&AddExternal.NodeID)
