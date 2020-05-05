@@ -69,7 +69,7 @@ func (cmd *addAgentExternalExporterCommand) Run() (commands.Result, error) {
 			Username:     cmd.Username,
 			Password:     cmd.Password,
 			Scheme:       cmd.Scheme,
-			MetricPath:   cmd.MetricsPath,
+			MetricsPath:  cmd.MetricsPath,
 			ListenPort:   cmd.ListenPort,
 			CustomLabels: customLabels,
 		},

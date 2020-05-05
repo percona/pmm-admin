@@ -240,8 +240,8 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-2.0"
-  digest = "1:90304c97d0dc595f481db984725b2f0945dfa6fcc310baace91082e6c113de46"
+  branch = "revert-522-revert-516-PMM-5777-inventory-add-external-exporter"
+  digest = "1:3d7b93e0c825fbdf7e9320747ba577f8172a0078530fc259fb234cee71c9c72f"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -268,7 +268,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "6850b2cc947045740f78538674b11eb92da32179"
+  revision = "c47d7551451be48884a869e824f6d3959ecc7a98"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
