@@ -19,7 +19,6 @@ package agentlocal
 import (
 	"reflect"
 	"testing"
-	"time"
 )
 
 func TestGetStatus(t *testing.T) {
@@ -37,25 +36,8 @@ func TestGetStatus(t *testing.T) {
 			args: args{
 				requestNetworkInfo: DoNotRequestNetworkInfo,
 			},
-			want: &Status{
-				"/agent_id/89718740-e04c-44eb-965a-99e0ff5e8a7c",
-				"/node_id/526f1957-d967-4cff-b71a-8e068100633a",
-				"https://admin:admin@127.0.0.1:443/",
-				true,
-				"2.5.0",
-				[]AgentStatus{
-					{
-						"/agent_id/bfb939ca-9ec0-4c07-b444-cafabc79707c",
-						"NODE_EXPORTER",
-						"RUNNING",
-					},
-				},
-				true,
-				time.Duration(0 * time.Second),
-				time.Duration(0 * time.Second),
-				"",
-			},
-			wantErr: false,
+			want:    nil,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
