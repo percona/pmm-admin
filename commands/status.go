@@ -73,7 +73,7 @@ func newStatusResult(status *agentlocal.Status) *statusResult {
 
 	return &statusResult{
 		PMMAgentStatus: status,
-		PMMVersion:     strings.Split(version.PMMVersion, "-")[0],
+		PMMVersion:     version.PMMVersion,
 	}
 }
 
