@@ -240,7 +240,7 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "revert-522-revert-516-PMM-5777-inventory-add-external-exporter"
+  branch = "PMM-2.0"
   digest = "1:3d7b93e0c825fbdf7e9320747ba577f8172a0078530fc259fb234cee71c9c72f"
   name = "github.com/percona/pmm"
   packages = [
@@ -268,7 +268,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "c47d7551451be48884a869e824f6d3959ecc7a98"
+  revision = "f0ed62da8023872a8be4a63b45b1c8c1841009f4"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
