@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/AlekSi/pointer"
@@ -132,7 +133,7 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 		if err != nil {
 			return nil, err
 		}
-		pmmVersion = version.PMMVersion
+		pmmVersion = strings.Split(version.PMMVersion, "-")[0]
 	}
 
 	return &Status{
