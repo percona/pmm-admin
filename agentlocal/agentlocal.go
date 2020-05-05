@@ -22,14 +22,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/AlekSi/pointer"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/percona/pmm/api/agentlocalpb/json/client"
 	agentlocal "github.com/percona/pmm/api/agentlocalpb/json/client/agent_local"
-	"github.com/percona/pmm/version"
 	"github.com/sirupsen/logrus"
 )
 
@@ -72,7 +70,6 @@ type Status struct {
 	Connected        bool          `json:"connected"`
 	ServerClockDrift time.Duration `json:"server_clock_drift,omitempty"`
 	ServerLatency    time.Duration `json:"server_latency,omitempty"`
-	PMMVersion       string        `json:"pmm_version,omitempty"`
 }
 
 type AgentStatus struct {
@@ -123,7 +120,6 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 	}
 	var clockDrift time.Duration
 	var latency time.Duration
-	var pmmVersion string
 	if bool(requestNetworkInfo) && p.ServerInfo.Connected {
 		clockDrift, err = time.ParseDuration(p.ServerInfo.ClockDrift)
 		if err != nil {
@@ -133,7 +129,6 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 		if err != nil {
 			return nil, err
 		}
-		pmmVersion = strings.Split(version.PMMVersion, "-")[0]
 	}
 
 	return &Status{
@@ -149,6 +144,5 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 		Connected:        p.ServerInfo.Connected,
 		ServerClockDrift: clockDrift,
 		ServerLatency:    latency,
-		PMMVersion:       pmmVersion,
 	}, nil
 }

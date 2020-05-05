@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/percona/pmm/api/inventorypb/types"
+	"github.com/percona/pmm/version"
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/agentlocal"
@@ -37,7 +38,7 @@ PMM-agent:
 	Connected : {{ .PMMAgentStatus.Connected }}{{ if .PMMAgentStatus.Connected }}
 	Time drift: {{ .PMMAgentStatus.ServerClockDrift }}
 	Latency   : {{ .PMMAgentStatus.ServerLatency }}
-	Version   : {{ .PMMAgentStatus.PMMVersion }}
+	Version   : {{ .PMMVersion }}
 {{ end }}
 Agents:
 {{ range .PMMAgentStatus.Agents }}	{{ .AgentID }} {{ .AgentType | $.HumanReadableAgentType }} {{ .Status | $.NiceAgentStatus }}
@@ -46,6 +47,7 @@ Agents:
 
 type statusResult struct {
 	PMMAgentStatus *agentlocal.Status `json:"pmm_agent_status"`
+	PMMVersion     string
 }
 
 func (res *statusResult) HumanReadableAgentType(agentType string) string {
@@ -71,6 +73,7 @@ func newStatusResult(status *agentlocal.Status) *statusResult {
 
 	return &statusResult{
 		PMMAgentStatus: status,
+		PMMVersion:     strings.Split(version.PMMVersion, "-")[0],
 	}
 }
 

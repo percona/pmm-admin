@@ -68,11 +68,8 @@ Agent type                  Status     Agent ID                                 
 
 func TestNiceAgentStatus(t *testing.T) {
 	type fields struct {
-		AgentType string
-		AgentID   string
-		ServiceID string
-		Status    string
-		Disabled  bool
+		Status   string
+		Disabled bool
 	}
 	tests := []struct {
 		name   string
@@ -97,15 +94,10 @@ func TestNiceAgentStatus(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := listResultAgent{
-				AgentType: tt.fields.AgentType,
-				AgentID:   tt.fields.AgentID,
-				ServiceID: tt.fields.ServiceID,
-				Status:    tt.fields.Status,
-				Disabled:  tt.fields.Disabled,
+				Status:   tt.fields.Status,
+				Disabled: tt.fields.Disabled,
 			}
-			if got := a.NiceAgentStatus(); got != tt.want {
-				t.Errorf("listResultAgent.NiceAgentStatus() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.want, a.NiceAgentStatus())
 		})
 	}
 }
