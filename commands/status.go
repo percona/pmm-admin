@@ -47,7 +47,7 @@ Agents:
 
 type statusResult struct {
 	PMMAgentStatus *agentlocal.Status `json:"pmm_agent_status"`
-	PMMVersion     string
+	PMMVersion     string `json:"pmm_admin_version"`
 }
 
 func (res *statusResult) HumanReadableAgentType(agentType string) string {
