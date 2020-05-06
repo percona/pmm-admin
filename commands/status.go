@@ -38,7 +38,9 @@ PMM-agent:
 	Connected : {{ .PMMAgentStatus.Connected }}{{ if .PMMAgentStatus.Connected }}
 	Time drift: {{ .PMMAgentStatus.ServerClockDrift }}
 	Latency   : {{ .PMMAgentStatus.ServerLatency }}
-	Version   : {{ .PMMVersion }}
+
+PMM-admin:
+	Version: {{ .PMMVersion }}
 {{ end }}
 Agents:
 {{ range .PMMAgentStatus.Agents }}	{{ .AgentID }} {{ .AgentType | $.HumanReadableAgentType }} {{ .Status | $.NiceAgentStatus }}
@@ -47,7 +49,7 @@ Agents:
 
 type statusResult struct {
 	PMMAgentStatus *agentlocal.Status `json:"pmm_agent_status"`
-	PMMVersion     string `json:"pmm_admin_version"`
+	PMMVersion     string             `json:"pmm_admin_version"`
 }
 
 func (res *statusResult) HumanReadableAgentType(agentType string) string {
