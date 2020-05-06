@@ -133,4 +133,12 @@ Table statistics collection disabled (always).
 		`)
 		assert.Equal(t, expected, strings.TrimSpace(res.String()))
 	})
+
+	t.Run("EmptyMysqlExporter", func(t *testing.T) {
+		res := &addMySQLResult{
+			MysqldExporter: nil,
+		}
+		expected := ""
+		assert.Equal(t, expected, strings.TrimSpace(res.TablestatStatus()))
+	})
 }
