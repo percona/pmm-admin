@@ -240,7 +240,7 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-5728-management-add-external"
+  branch = "PMM-2.0"
   digest = "1:df1a69d2139be5a3644304abe53a1a80c0d5cbacb93334fdf502d71a0f03432f"
   name = "github.com/percona/pmm"
   packages = [
@@ -269,7 +269,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "b24d3508d39b6bb21a213dfa26265b48650b0cde"
+  revision = "af481455337d1a474207e1906fc3b64d51a29f6f"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
