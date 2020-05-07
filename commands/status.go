@@ -34,13 +34,12 @@ PMM Server:
 	URL    : {{ .PMMAgentStatus.ServerURL }}
 	Version: {{ .PMMAgentStatus.ServerVersion }}
 
-PMM-agent:
-	Connected : {{ .PMMAgentStatus.Connected }}{{ if .PMMAgentStatus.Connected }}
-	Time drift: {{ .PMMAgentStatus.ServerClockDrift }}
-	Latency   : {{ .PMMAgentStatus.ServerLatency }}
-
-PMM-admin:
-	Version: {{ .PMMVersion }}
+PMM Client:
+	Connected        : {{ .PMMAgentStatus.Connected }}{{ if .PMMAgentStatus.Connected }}
+	Time drift       : {{ .PMMAgentStatus.ServerClockDrift }}
+	Latency          : {{ .PMMAgentStatus.ServerLatency }}
+	pmm-admin version: {{ .PMMVersion }}
+	pmm-agent version: {{ .PMMVersion }}
 {{ end }}
 Agents:
 {{ range .PMMAgentStatus.Agents }}	{{ .AgentID }} {{ .AgentType | $.HumanReadableAgentType }} {{ .Status | $.NiceAgentStatus }}
