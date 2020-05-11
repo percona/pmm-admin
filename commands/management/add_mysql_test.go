@@ -143,16 +143,24 @@ Table statistics collection disabled (always).
 	})
 }
 
-func TestProcessGlobalAddFlags(t *testing.T) {
-	t.Run("EmptyMySQLCommand", func(t *testing.T) {
-		cmd := &addMySQLCommand{}
-		_, _ = cmd.Run()
-		expected := &addMySQLCommand{
-			Address:    "",
-			Socket:     "",
-			NodeID:     "/node_id/526f1957-d967-4cff-b71a-8e068100633a",
-			PMMAgentID: "/agent_id/89718740-e04c-44eb-965a-99e0ff5e8a7c",
+func TestGetAddress(t *testing.T) {
+	t.Run("Address", func(t *testing.T) {
+		cmd := &addMySQLCommand{
+			Address: "127.0.0.1",
 		}
-		assert.Equal(t, expected, cmd)
+		res := cmd.GetAddress()
+		expected := "127.0.0.1"
+		assert.Equal(t, expected, res)
+	})
+}
+
+func TestGetServiceName(t *testing.T) {
+	t.Run("ServiceName", func(t *testing.T) {
+		cmd := &addMySQLCommand{
+			ServiceName: "MyDB",
+		}
+		res := cmd.GetServiceName()
+		expected := "MyDB"
+		assert.Equal(t, expected, res)
 	})
 }
