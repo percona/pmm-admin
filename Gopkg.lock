@@ -403,6 +403,27 @@
   source = "https://github.com/Percona-Lab/kingpin.git"
 
 [[projects]]
+  digest = "1:aebe32d1af029f012a9c605ff95051df68b8f744f5d1f4f1ac65162a03708938"
+  name = "gopkg.in/gcfg.v1"
+  packages = [
+    ".",
+    "scanner",
+    "token",
+    "types",
+  ]
+  pruneopts = "NUT"
+  revision = "61b2c08bc8f6068f7c5ca684372f9a6cb1c45ebe"
+  version = "v1.2.3"
+
+[[projects]]
+  digest = "1:b233ad4ec87ac916e7bf5e678e98a2cb9e8b52f6de6ad3e11834fc7a71b8e3bf"
+  name = "gopkg.in/warnings.v0"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "ec4a0fea49c7b46c2aeb0b51aac55779c607e52b"
+  version = "v0.1.2"
+
+[[projects]]
   digest = "1:5ad10df0893403ae9fdbd17c6f14814394a635339dd79595600bae52432befcf"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -447,6 +468,7 @@
     "golang.org/x/sys/unix",
     "golang.org/x/tools/cmd/goimports",
     "gopkg.in/alecthomas/kingpin.v2",
+    "gopkg.in/gcfg.v1",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
