@@ -19,12 +19,15 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/user"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/alecthomas/units"
 	"github.com/percona/pmm/api/managementpb/json/client"
 	mysql "github.com/percona/pmm/api/managementpb/json/client/my_sql"
+	"gopkg.in/gcfg.v1"
 
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
@@ -91,6 +94,7 @@ type addMySQLCommand struct {
 	NodeID         string
 	PMMAgentID     string
 	ServiceName    string
+	DefaultsFile   string
 	Username       string
 	Password       string
 	Environment    string
@@ -176,6 +180,32 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		}
 	}
 
+	if cmd.DefaultsFile != "" {
+		path := cmd.DefaultsFile
+
+		type Config struct {
+			Client struct {
+				User     string
+				Password string
+			}
+		}
+
+		if strings.HasPrefix(path, "~/") {
+			usr, _ := user.Current()
+			dir := usr.HomeDir
+			path = filepath.Join(dir, path[2:])
+		}
+
+		var cfg Config
+		err := gcfg.ReadFileInto(&cfg, path)
+		if err != nil {
+			return nil, err
+		}
+
+		cmd.Username = cfg.Client.User
+		cmd.Password = cfg.Client.Password
+	}
+
 	serviceName, socket, host, port, err := cmd.processGlobalAddFlags()
 	if err != nil {
 		return nil, err
@@ -247,6 +277,7 @@ func init() {
 	AddMySQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddMySQL.NodeID)
 	AddMySQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddMySQL.PMMAgentID)
 
+	AddMySQLC.Flag("defaults-file", "Load config defaults file").StringVar(&AddMySQL.DefaultsFile)
 	AddMySQLC.Flag("username", "MySQL username").Default("root").StringVar(&AddMySQL.Username)
 	AddMySQLC.Flag("password", "MySQL password").StringVar(&AddMySQL.Password)
 
