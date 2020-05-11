@@ -164,6 +164,11 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
+	if cmd.CreateUser {
+		return nil, fmt.Errorf("Unrecognized option. To create a user, see" +
+			"'https://www.percona.com/doc/percona-monitoring-and-management/2.x/concepts/services-mysql.html#pmm-conf-mysql-user-account-creating'")
+	}
+
 	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
@@ -180,11 +185,6 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 	serviceName, socket, host, port, err := cmd.processGlobalAddFlags()
 	if err != nil {
 		return nil, err
-	}
-
-	if cmd.CreateUser {
-		return nil, fmt.Errorf("Unrecognized option. To create a user, see" +
-			"'https://www.percona.com/doc/percona-monitoring-and-management/2.x/concepts/services-mysql.html#pmm-conf-mysql-user-account-creating'")
 	}
 
 	tablestatsGroupTableLimit := int32(cmd.DisableTablestatsLimit)
