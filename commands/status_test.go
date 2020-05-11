@@ -56,6 +56,7 @@ PMM Server:
 
 PMM Client:
 	Connected        : false
+	pmm-admin version: 
 Agents:
 	/agent_id/1afe233f-b319-4645-be6c-a1e05d4a545b node_exporter Running
 	/agent_id/2c7c0e04-6eef-411d-bcce-51e138e771cc postgresql_pgstatements_agent Running
