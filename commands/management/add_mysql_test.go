@@ -142,3 +142,17 @@ Table statistics collection disabled (always).
 		assert.Equal(t, expected, strings.TrimSpace(res.TablestatStatus()))
 	})
 }
+
+func TestProcessGlobalAddFlags(t *testing.T) {
+	t.Run("EmptyMySQLCommand", func(t *testing.T) {
+		cmd := &addMySQLCommand{}
+		_, _ = cmd.Run()
+		expected := &addMySQLCommand{
+			Address:    "",
+			Socket:     "",
+			NodeID:     "/node_id/526f1957-d967-4cff-b71a-8e068100633a",
+			PMMAgentID: "/agent_id/89718740-e04c-44eb-965a-99e0ff5e8a7c",
+		}
+		assert.Equal(t, expected, cmd)
+	})
+}
