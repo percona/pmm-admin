@@ -191,7 +191,10 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		}
 
 		if strings.HasPrefix(path, "~/") {
-			usr, _ := user.Current()
+			usr, err := user.Current()
+			if err != nil {
+				return nil, err
+			}
 			dir := usr.HomeDir
 			path = filepath.Join(dir, path[2:])
 		}
