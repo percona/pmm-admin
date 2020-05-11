@@ -180,33 +180,9 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		}
 	}
 
-	if cmd.DefaultsFile != "" {
-		path := cmd.DefaultsFile
-
-		type Config struct {
-			Client struct {
-				User     string
-				Password string
-			}
-		}
-
-		if strings.HasPrefix(path, "~/") {
-			usr, err := user.Current()
-			if err != nil {
-				return nil, err
-			}
-			dir := usr.HomeDir
-			path = filepath.Join(dir, path[2:])
-		}
-
-		var cfg Config
-		err := gcfg.ReadFileInto(&cfg, path)
-		if err != nil {
-			return nil, err
-		}
-
-		cmd.Username = cfg.Client.User
-		cmd.Password = cfg.Client.Password
+	err = cmd.LoadDefaultsFile()
+	if err != nil {
+		return nil, err
 	}
 
 	serviceName, socket, host, port, err := cmd.processGlobalAddFlags()
@@ -260,6 +236,42 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		MysqldExporter: resp.Payload.MysqldExporter,
 		TableCount:     resp.Payload.TableCount,
 	}, nil
+}
+
+func (cmd *addMySQLCommand) LoadDefaultsFile() error {
+	if cmd.DefaultsFile != "" {
+		path := cmd.DefaultsFile
+
+		type Client struct {
+			User     string
+			Password string
+		}
+		type Config struct {
+			Client Client
+		}
+
+		if strings.HasPrefix(path, "~/") {
+			usr, err := user.Current()
+			if err != nil {
+				return err
+			}
+			dir := usr.HomeDir
+			path = filepath.Join(dir, path[2:])
+		}
+
+		var cfg Config
+		err := gcfg.FatalOnly(gcfg.ReadFileInto(&cfg, path))
+		if err != nil {
+			return err
+		}
+
+		if (cfg.Client != Client{}) {
+			cmd.Username = cfg.Client.User
+			cmd.Password = cfg.Client.Password
+		}
+	}
+
+	return nil
 }
 
 // register command

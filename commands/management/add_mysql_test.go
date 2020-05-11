@@ -134,3 +134,20 @@ Table statistics collection disabled (always).
 		assert.Equal(t, expected, strings.TrimSpace(res.String()))
 	})
 }
+
+func TestLoadDefaultsFile(t *testing.T) {
+	t.Run("NoDefaultsFile", func(t *testing.T) {
+		res := &addMySQLCommand{
+			Username: "root",
+			Password: "root",
+		}
+		expected := &addMySQLCommand{
+			Username: "root",
+			Password: "root",
+		}
+
+		err := res.LoadDefaultsFile()
+		assert.NoError(t, err)
+		assert.Equal(t, expected, res)
+	})
+}
