@@ -240,8 +240,8 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-2.0"
-  digest = "1:df1a69d2139be5a3644304abe53a1a80c0d5cbacb93334fdf502d71a0f03432f"
+  branch = "PMM-5243-PostgreSQL-socket-conn"
+  digest = "1:2497e4b5880d4c6ae1962a17d5a5110742132821f4284aa5ea5c802341a8c93c"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -269,7 +269,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "af481455337d1a474207e1906fc3b64d51a29f6f"
+  revision = "cad36e4398e264597659b658430b516b0d021567"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
