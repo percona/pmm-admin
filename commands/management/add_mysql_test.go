@@ -150,4 +150,16 @@ func TestLoadDefaultsFile(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, expected, res)
 	})
+
+	t.Run("DefaultsFileNotFound", func(t *testing.T) {
+		res := &addMySQLCommand{
+			DefaultsFile: "notfound.cfg",
+		}
+		expected := "open notfound.cfg: no such file or directory"
+
+		err := res.LoadDefaultsFile()
+		if assert.Error(t, err) {
+			assert.Equal(t, expected, err.Error())
+		}
+	})
 }
