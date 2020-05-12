@@ -30,7 +30,7 @@ func TestAddServicePostgreSQL(t *testing.T) {
 				ServiceName:    "PostgreSQL Service",
 				NodeID:         "/node_id/1",
 				Address:        "127.0.0.1",
-				Port:           27017,
+				Port:           5432,
 				Environment:    "environment",
 				Cluster:        "postgresql-cluster",
 				ReplicationSet: "postgresql-replication-set",
@@ -42,7 +42,7 @@ Service ID     : /service_id/1
 Service name   : PostgreSQL Service
 Node ID        : /node_id/1
 Address        : 127.0.0.1
-Port           : 27017
+Port           : 5432
 Environment    : environment
 Cluster name   : postgresql-cluster
 Replication set: postgresql-replication-set

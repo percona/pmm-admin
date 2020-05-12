@@ -72,7 +72,7 @@ func (cmd *addPostgreSQLCommand) GetAddress() string {
 }
 
 func (cmd *addPostgreSQLCommand) GetDefaultAddress() string {
-	return "127.0.0.1:27017"
+	return "127.0.0.1:5432"
 }
 
 func (cmd *addPostgreSQLCommand) GetSocket() string {
