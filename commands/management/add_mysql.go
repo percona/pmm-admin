@@ -165,7 +165,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 	}
 
 	if cmd.CreateUser {
-		return nil, fmt.Errorf("Unrecognized option. To create a user, see" +
+		return nil, fmt.Errorf("Unrecognized option. To create a user, see " +
 			"'https://www.percona.com/doc/percona-monitoring-and-management/2.x/concepts/services-mysql.html#pmm-conf-mysql-user-account-creating'")
 	}
 
@@ -274,6 +274,6 @@ func init() {
 	AddMySQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddMySQL.SkipConnectionCheck)
 	AddMySQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMySQL.TLS)
 	AddMySQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMySQL.TLSSkipVerify)
-	AddMySQLC.Flag("create-user", "Create user root").Hidden().BoolVar(&AddMySQL.CreateUser)
+	AddMySQLC.Flag("create-user", "Create pmm user").Hidden().BoolVar(&AddMySQL.CreateUser)
 	addGlobalFlags(AddMySQLC)
 }

@@ -152,30 +152,8 @@ func TestRun(t *testing.T) {
 		_, err := cmd.Run()
 
 		if assert.Error(t, err) {
-			expected := errors.New("Unrecognized option. To create a user, see'https://www.percona.com/doc/percona-monitoring-and-management/2.x/concepts/services-mysql.html#pmm-conf-mysql-user-account-creating'")
+			expected := errors.New("Unrecognized option. To create a user, see 'https://www.percona.com/doc/percona-monitoring-and-management/2.x/concepts/services-mysql.html#pmm-conf-mysql-user-account-creating'")
 			assert.Equal(t, expected, err)
 		}
-	})
-}
-
-func TestGetAddress(t *testing.T) {
-	t.Run("Address", func(t *testing.T) {
-		cmd := &addMySQLCommand{
-			Address: "127.0.0.1",
-		}
-		res := cmd.GetAddress()
-		expected := "127.0.0.1"
-		assert.Equal(t, expected, res)
-	})
-}
-
-func TestGetServiceName(t *testing.T) {
-	t.Run("ServiceName", func(t *testing.T) {
-		cmd := &addMySQLCommand{
-			ServiceName: "MyDB",
-		}
-		res := cmd.GetServiceName()
-		expected := "MyDB"
-		assert.Equal(t, expected, res)
 	})
 }
