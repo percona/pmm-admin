@@ -156,7 +156,8 @@ func init() {
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddPostgreSQLC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddPostgreSQL.ServiceName)
 
-	AddPostgreSQLC.Arg("address", "PostgreSQL address and port (default: 127.0.0.1:5432)").Default("127.0.0.1:5432").StringVar(&AddPostgreSQL.Address)
+	AddPostgreSQLC.Arg("address", "PostgreSQL address and port (default: 127.0.0.1:5432)").StringVar(&AddPostgreSQL.Address)
+	AddPostgreSQLC.Flag("socket", "Path to socket").StringVar(&AddPostgreSQL.Socket)
 
 	AddPostgreSQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddPostgreSQL.NodeID)
 	AddPostgreSQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddPostgreSQL.PMMAgentID)
