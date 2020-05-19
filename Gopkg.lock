@@ -240,8 +240,8 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-5257-ProxySQL-socket-connection"
-  digest = "1:bc44eb5ea7e0d0fb08afa35cd448220e8b4202248ff624cf1cfc3d8e5d49b443"
+  branch = "PMM-2.0"
+  digest = "1:18a6d20c28482b0e31d10fbdc9431dc88f6de49b34bf4ad0dde76278754caf07"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -254,6 +254,7 @@
     "api/managementpb/json/client",
     "api/managementpb/json/client/actions",
     "api/managementpb/json/client/annotation",
+    "api/managementpb/json/client/external",
     "api/managementpb/json/client/mongo_db",
     "api/managementpb/json/client/my_sql",
     "api/managementpb/json/client/node",
@@ -268,7 +269,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "eb40f79e88268b9758fd8fe2d618c4aa7bed27db"
+  revision = "3ea9703793eded34f4ceb17fad6982d9ee97d099"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
