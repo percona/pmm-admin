@@ -427,6 +427,7 @@
     "github.com/percona/pmm/api/inventorypb/types",
     "github.com/percona/pmm/api/managementpb/json/client",
     "github.com/percona/pmm/api/managementpb/json/client/annotation",
+    "github.com/percona/pmm/api/managementpb/json/client/external",
     "github.com/percona/pmm/api/managementpb/json/client/mongo_db",
     "github.com/percona/pmm/api/managementpb/json/client/my_sql",
     "github.com/percona/pmm/api/managementpb/json/client/node",

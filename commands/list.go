@@ -151,6 +151,13 @@ func (cmd *listCommand) Run() (Result, error) {
 			AddressPort: addressPort,
 		})
 	}
+	for _, s := range servicesRes.Payload.External {
+		servicesList = append(servicesList, listResultService{
+			ServiceType: types.ServiceTypeExternalService,
+			ServiceID:   s.ServiceID,
+			ServiceName: s.ServiceName,
+		})
+	}
 
 	agentsRes, err := client.Default.Agents.ListAgents(&agents.ListAgentsParams{
 		Context: Ctx,
@@ -291,6 +298,15 @@ func (cmd *listCommand) Run() (Result, error) {
 				Disabled:  a.Disabled,
 			})
 		}
+	}
+	for _, a := range agentsRes.Payload.ExternalExporter {
+		agentsList = append(agentsList, listResultAgent{
+			AgentType: types.AgentTypeExternalExporter,
+			AgentID:   a.AgentID,
+			ServiceID: a.ServiceID,
+			Status:    getStatus(nil),
+			Disabled:  a.Disabled,
+		})
 	}
 
 	return &listResult{

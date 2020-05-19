@@ -160,4 +160,5 @@ func init() {
 	AddProxySQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddProxySQL.SkipConnectionCheck)
 	AddProxySQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddProxySQL.TLS)
 	AddProxySQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddProxySQL.TLSSkipVerify)
+	addGlobalFlags(AddProxySQLC)
 }

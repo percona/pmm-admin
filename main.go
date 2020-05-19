@@ -82,6 +82,7 @@ func main() {
 		management.AddMongoDBC.FullCommand():    management.AddMongoDB,
 		management.AddPostgreSQLC.FullCommand(): management.AddPostgreSQL,
 		management.AddProxySQLC.FullCommand():   management.AddProxySQL,
+		management.AddExternalC.FullCommand():   management.AddExternal,
 
 		management.RemoveC.FullCommand(): management.Remove,
 
@@ -117,6 +118,7 @@ func main() {
 		inventory.AddAgentQANMongoDBProfilerAgentC.FullCommand():        inventory.AddAgentQANMongoDBProfilerAgent,
 		inventory.AddAgentQANPostgreSQLPgStatementsAgentC.FullCommand(): inventory.AddAgentQANPostgreSQLPgStatementsAgent,
 		inventory.AddAgentRDSExporterC.FullCommand():                    inventory.AddAgentRDSExporter,
+		inventory.AddAgentExternalExporterC.FullCommand():               inventory.AddAgentExternalExporter,
 
 		inventory.RemoveAgentC.FullCommand(): inventory.RemoveAgent,
 
