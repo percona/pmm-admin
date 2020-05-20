@@ -17,34 +17,33 @@
 package agentlocal
 
 import (
-	"context"
 	"testing"
 
+	"github.com/percona/pmm/api/agentlocalpb/json/client/agent_local"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetRawStatus(t *testing.T) {
+func TestGetStatus(t *testing.T) {
 	type args struct {
-		ctx                context.Context
 		requestNetworkInfo NetworkInfo
 	}
 	tests := []struct {
 		name string
 		args args
-		want string
+		want (*agent_local.StatusOKBody)
 	}{
 		{
-			name: "emptyContext",
-			args: args{},
-			want: "Post http://127.0.0.1:7777/local/Status: context deadline exceeded",
+			name: "empty",
+			args: args{
+				requestNetworkInfo: false,
+			},
+			want: nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := GetRawStatus(tt.args.ctx, tt.args.requestNetworkInfo)
-			if assert.Error(t, err) {
-				assert.Equal(t, tt.want, err.Error())
-			}
+			status, _ := GetRawStatus(nil, tt.args.requestNetworkInfo)
+			assert.Equal(t, tt.want, status)
 		})
 	}
 }
