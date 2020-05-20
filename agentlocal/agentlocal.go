@@ -139,7 +139,7 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 		ServerURL:         u.String(),
 		ServerInsecureTLS: p.ServerInfo.InsecureTLS,
 		ServerVersion:     p.ServerInfo.Version,
-		AgentVersion:      p.ServerInfo.AgentVersion,
+		AgentVersion:      p.AgentVersion,
 
 		Agents: agents,
 

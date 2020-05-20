@@ -38,8 +38,8 @@ PMM Client:
 	Connected        : {{ .PMMAgentStatus.Connected }}{{ if .PMMAgentStatus.Connected }}
 	Time drift       : {{ .PMMAgentStatus.ServerClockDrift }}
 	Latency          : {{ .PMMAgentStatus.ServerLatency }}{{ end }}
-	pmm-admin version: {{ .PMMVersion }}{{ if .PMMAgentStatus.Connected }}
-	pmm-agent version: {{ .PMMAgentStatus.AgentVersion }}{{ end }}
+	pmm-admin version: {{ .PMMVersion }}
+	pmm-agent version: {{ .PMMAgentStatus.AgentVersion }}
 Agents:
 {{ range .PMMAgentStatus.Agents }}	{{ .AgentID }} {{ .AgentType | $.HumanReadableAgentType }} {{ .Status | $.NiceAgentStatus }}
 {{ end }}
