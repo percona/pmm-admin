@@ -71,9 +71,14 @@ func newStatusResult(status *agentlocal.Status) *statusResult {
 		status.ServerURL = u.String()
 	}
 
+	pmmVersion := version.PMMVersion
+	if pmmVersion == "" {
+		pmmVersion = "unknown"
+	}
+
 	return &statusResult{
 		PMMAgentStatus: status,
-		PMMVersion:     version.PMMVersion,
+		PMMVersion:     pmmVersion,
 	}
 }
 

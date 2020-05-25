@@ -132,6 +132,11 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 		}
 	}
 
+	agentVersion := p.AgentVersion
+	if agentVersion == "" {
+		agentVersion = "unknown"
+	}
+
 	return &Status{
 		AgentID: p.AgentID,
 		NodeID:  p.RunsOnNodeID,
@@ -139,7 +144,7 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 		ServerURL:         u.String(),
 		ServerInsecureTLS: p.ServerInfo.InsecureTLS,
 		ServerVersion:     p.ServerInfo.Version,
-		AgentVersion:      p.AgentVersion,
+		AgentVersion:      agentVersion,
 
 		Agents: agents,
 

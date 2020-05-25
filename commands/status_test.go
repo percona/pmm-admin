@@ -47,6 +47,7 @@ func TestStatus(t *testing.T) {
 			Status:    "RUNNING",
 		}},
 	})
+
 	expected := strings.TrimSpace(`
 Agent ID: pmm-server
 Node ID : pmm-server
@@ -57,7 +58,7 @@ PMM Server:
 
 PMM Client:
 	Connected        : false
-	pmm-admin version: 
+	pmm-admin version: unknown
 	pmm-agent version: 2.5.1
 Agents:
 	/agent_id/1afe233f-b319-4645-be6c-a1e05d4a545b node_exporter Running
