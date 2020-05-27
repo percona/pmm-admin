@@ -101,7 +101,7 @@ func init() {
 	AddServiceMongoDBC.Arg("node-id", "Node ID").StringVar(&AddServiceMongoDB.NodeID)
 	AddServiceMongoDBC.Arg("address", "Address").StringVar(&AddServiceMongoDB.Address)
 	AddServiceMongoDBC.Arg("port", "Port").Int64Var(&AddServiceMongoDB.Port)
-	AddServiceProxySQLC.Flag("socket", "Path to socket").StringVar(&AddServiceMongoDB.Socket)
+	AddServiceMongoDBC.Flag("socket", "Path to socket").StringVar(&AddServiceMongoDB.Socket)
 
 	AddServiceMongoDBC.Flag("environment", "Environment name").StringVar(&AddServiceMongoDB.Environment)
 	AddServiceMongoDBC.Flag("cluster", "Cluster name").StringVar(&AddServiceMongoDB.Cluster)
