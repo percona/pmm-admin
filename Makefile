@@ -58,7 +58,7 @@ check-style:                    ## Run style checkers and linters.
 	golangci-lint run -c=.golangci.yml ./... --new-from-rev=master
 	go-consistent -pedantic ./...
 
-check-all: check check-style    ## Run golang ci linter to check new changes from master.
+check-all: check check-style    ## Run all linters for new code..
 
 FILES = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
