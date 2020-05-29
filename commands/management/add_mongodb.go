@@ -174,5 +174,5 @@ func init() {
 	AddMongoDBC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMongoDB.TLS)
 	AddMongoDBC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMongoDB.TLSSkipVerify)
 	addGlobalFlags(AddMongoDBC)
-	AddMongoDBC.Flag("socket", "Path to socket").ExistingFileVar(&AddMongoDB.Socket)
+	AddMongoDBC.Flag("socket", "Path to socket").StringVar(&AddMongoDB.Socket)
 }
