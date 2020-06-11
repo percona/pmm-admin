@@ -16,8 +16,6 @@
 package commands
 
 import (
-	"errors"
-
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-submodules/sources/pmm-admin/src/github.com/percona/pmm-admin/commands"
 	"github.com/percona/pmm/api/inventorypb/json/client"
@@ -77,26 +75,15 @@ func (cmd *annotationServiceCommand) Run() (commands.Result, error) {
 	} else {
 		params := &services.CheckServiceParams{
 			Body: services.CheckServiceBody{
-				ServiceName: cmd.ServiceName,
+				ServiceID: status.NodeName,
 			},
 			Context: commands.Ctx,
 		}
 
-		result, err := client.Default.Services.CheckService(params)
-		if err != nil {
-			return nil, err
-		}
-
-		if !result.Payload.Exists {
-			return nil, errors.New("service name doesnt exists")
-		}
-
-		servicesNameList = append(servicesNameList, cmd.ServiceName)
+		client.Default.Services.CheckService(params)
 	}
 
-	//iterate servicesNameList and do request for annotate
-
-	return nil, nil
+	return &annotationServiceResult{}, nil
 }
 
 // register command
