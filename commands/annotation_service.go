@@ -18,9 +18,10 @@ package commands
 import (
 	"errors"
 
-	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
+
+	"github.com/percona/pmm-admin/agentlocal"
 )
 
 type annotationServiceCommand struct {
