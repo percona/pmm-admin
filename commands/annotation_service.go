@@ -19,7 +19,6 @@ import (
 	"errors"
 
 	"github.com/percona/pmm-admin/agentlocal"
-	"github.com/percona/pmm-admin/commands"
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
 )
@@ -39,7 +38,7 @@ func (res *annotationServiceResult) String() string {
 	return ""
 }
 
-func (cmd *annotationServiceCommand) Run() (commands.Result, error) {
+func (cmd *annotationServiceCommand) Run() (Result, error) {
 	var servicesNameList []string
 	if cmd.ServiceName == "" {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
@@ -51,7 +50,7 @@ func (cmd *annotationServiceCommand) Run() (commands.Result, error) {
 			Body: services.ListServicesBody{
 				NodeID: status.NodeID,
 			},
-			Context: commands.Ctx,
+			Context: Ctx,
 		}
 
 		result, err := client.Default.Services.ListServices(params)
@@ -79,7 +78,7 @@ func (cmd *annotationServiceCommand) Run() (commands.Result, error) {
 			Body: services.CheckServiceBody{
 				ServiceName: cmd.ServiceName,
 			},
-			Context: commands.Ctx,
+			Context: Ctx,
 		}
 
 		result, err := client.Default.Services.CheckService(params)
