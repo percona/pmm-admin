@@ -15,10 +15,75 @@
 
 package commands
 
+import (
+	"github.com/percona/pmm-admin/agentlocal"
+	"github.com/percona/pmm-submodules/sources/pmm-admin/src/github.com/percona/pmm-admin/commands"
+	"github.com/percona/pmm/api/inventorypb/json/client"
+	"github.com/percona/pmm/api/inventorypb/json/client/services"
+)
+
 type annotationServiceCommand struct {
 	Text        string
 	Tags        string
 	ServiceName string
+}
+
+type annotationServiceResult struct {
+}
+
+func (res *annotationServiceResult) Result() {}
+
+func (res *annotationServiceResult) String() string {
+	return ""
+}
+
+func (cmd *annotationServiceCommand) Run() (commands.Result, error) {
+	var servicesNameList []string
+	if cmd.ServiceName == "" {
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		if err != nil {
+			return nil, err
+		}
+
+		params := &services.ListServicesParams{
+			Body: services.ListServicesBody{
+				NodeID: status.NodeID,
+			},
+			Context: commands.Ctx,
+		}
+
+		result, err := client.Default.Services.ListServices(params)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, s := range result.Payload.Mysql {
+			servicesNameList = append(servicesNameList, s.ServiceName)
+		}
+		for _, s := range result.Payload.Mongodb {
+			servicesNameList = append(servicesNameList, s.ServiceName)
+		}
+		for _, s := range result.Payload.Postgresql {
+			servicesNameList = append(servicesNameList, s.ServiceName)
+		}
+		for _, s := range result.Payload.Proxysql {
+			servicesNameList = append(servicesNameList, s.ServiceName)
+		}
+		for _, s := range result.Payload.External {
+			servicesNameList = append(servicesNameList, s.ServiceName)
+		}
+	} else {
+		params := &services.CheckServiceParams{
+			Body: services.CheckServiceBody{
+				ServiceID: status.NodeName,
+			},
+			Context: commands.Ctx,
+		}
+
+		client.Default.Services.CheckService(params)
+	}
+
+	return &annotationServiceResult{}, nil
 }
 
 // register command

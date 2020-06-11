@@ -240,8 +240,8 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-2.0"
-  digest = "1:4be02ea0d8692d30f1aedc6135de6bb018119acf79147d5866bd48505a8e094d"
+  branch = "PMM-5563-annotation-service-node"
+  digest = "1:16a5061405d2115a445c3b5a1a2f8f6203ca52ee64103313cbe274b6e6bc7574"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -261,6 +261,7 @@
     "api/managementpb/json/client/postgre_sql",
     "api/managementpb/json/client/proxy_sql",
     "api/managementpb/json/client/rds",
+    "api/managementpb/json/client/security_checks",
     "api/managementpb/json/client/service",
     "api/serverpb/json/client",
     "api/serverpb/json/client/server",
@@ -269,7 +270,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "08b8f17f58f21d2173bc255df8e02f7272ed4c9d"
+  revision = "0662d8c5c97bc22a6a6d82bc6abcbdc98d3ee6f5"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"

@@ -15,10 +15,66 @@
 
 package commands
 
+import (
+	"github.com/percona/pmm-admin/agentlocal"
+	"github.com/percona/pmm-submodules/sources/pmm-admin/src/github.com/percona/pmm-admin/commands"
+)
+
 type annotationNodeCommand struct {
 	Text     string
 	Tags     string
 	NodeName string
+}
+
+type annotationNodeResult struct {
+}
+
+func (res *annotationNodeResult) Result() {}
+
+func (res *annotationNodeResult) String() string {
+	return ""
+}
+
+func (cmd *annotationNodeCommand) Run() (commands.Result, error) {
+	if cmd.NodeName == "" {
+		_, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		if err != nil {
+			return nil, err
+		}
+
+		// params := &nodes.ListNodesParams{
+		// 	Body: nodes.ListNodesBody{
+		// 		NodeID: status.NodeID,
+		// 	},
+		// 	Context: commands.Ctx,
+		// }
+
+		// result, err := client.
+		// if err != nil {
+		// 	return nil, err
+		// }
+
+		// params := &nodes.ListNodesParams{
+		// 	Body:    nodes.ListNodesBody{NodeType: status.nodeType},
+		// 	Context: commands.Ctx,
+		// }
+		// result, err := client.Default.Nodes.ListNodes(params)
+		// if err != nil {
+		// 	return nil, err
+		// }
+
+		// var nodesList []listResultNode
+		// for _, n := range result.Payload.Generic {
+		// 	nodesList = append(nodesList, listResultNode{
+		// 		NodeType: types.NodeTypeGenericNode,
+		// 		NodeName: n.NodeName,
+		// 		Address:  n.Address,
+		// 		NodeID:   n.NodeID,
+		// 	})
+		// }
+	}
+
+	return nil, nil
 }
 
 // register command
