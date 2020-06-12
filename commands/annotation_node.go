@@ -24,7 +24,7 @@ import (
 
 func (cmd *annotationCommand) nodeName() (string, error) {
 	nodeName := cmd.NodeName
-	if nodeName == "" {
+	if cmd.Node {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
 			return "", err
