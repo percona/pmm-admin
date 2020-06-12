@@ -22,9 +22,9 @@ import (
 	"github.com/percona/pmm-admin/agentlocal"
 )
 
-func (cmd *annotationCommand) serviceNames() []string {
+func (cmd *annotationCommand) serviceNames() ([]string, error) {
 	var servicesNameList []string
-	if cmd.Service || cmd.ServiceName == "" {
+	if cmd.Service {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
 			return nil, err
@@ -61,5 +61,5 @@ func (cmd *annotationCommand) serviceNames() []string {
 		servicesNameList = append(servicesNameList, cmd.ServiceName)
 	}
 
-	return servicesNameList
+	return servicesNameList, nil
 }

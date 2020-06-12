@@ -22,12 +22,12 @@ import (
 	"github.com/percona/pmm-admin/agentlocal"
 )
 
-func (cmd *annotationCommand) nodeName() string {
+func (cmd *annotationCommand) nodeName() (string, error) {
 	nodeName := cmd.NodeName
 	if nodeName == "" {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 
 		params := &nodes.GetNodeParams{
@@ -39,11 +39,11 @@ func (cmd *annotationCommand) nodeName() string {
 
 		result, err := client.Default.Nodes.GetNode(params)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 
 		nodeName = result.Payload.Generic.NodeName
 	}
 
-	return nodeName
+	return nodeName, nil
 }

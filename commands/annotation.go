@@ -54,12 +54,21 @@ func (cmd *annotationCommand) Run() (Result, error) {
 		tags[i] = strings.TrimSpace(tags[i])
 	}
 
-	_, err := client.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
+	nodeName, err := cmd.nodeName()
+	if err != nil {
+		return nil, err
+	}
+	serviceNames, err := cmd.serviceNames()
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = client.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
 		Body: annotation.AddAnnotationBody{
 			Text:        cmd.Text,
 			Tags:        tags,
-			NodeName:    cmd.nodeName(),
-			ServiceName: cmd.serviceNames(),
+			NodeName:    nodeName,
+			ServiceName: serviceNames,
 		},
 		Context: Ctx,
 	})
