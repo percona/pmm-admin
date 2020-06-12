@@ -16,13 +16,11 @@
 package commands
 
 import (
-	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/nodes"
-	managementClient "github.com/percona/pmm/api/managementpb/json/client"
+	"github.com/percona/pmm/api/managementpb/json/client/"
 	"github.com/percona/pmm/api/managementpb/json/client/annotation"
 
 	"github.com/percona/pmm-admin/agentlocal"
@@ -34,16 +32,7 @@ type annotationNodeCommand struct {
 	NodeName string
 }
 
-// type annotationNodeResult struct {
-// }
-
-// func (res *annotationNodeResult) Result() {}
-
-// func (res *annotationNodeResult) String() string {
-// 	return ""
-// }
-
-func (cmd *annotationNodeCommand) Run() (Result, error) {
+func (cmd *annotationCommand) node() (Result, error) {
 	name := cmd.NodeName
 	if name == "" {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
@@ -66,30 +55,14 @@ func (cmd *annotationNodeCommand) Run() (Result, error) {
 		name = result.Payload.Generic.NodeName
 	}
 
-	params := &nodes.CheckNodeParams{
-		Body: nodes.CheckNodeBody{
-			NodeName: name,
-		},
-		Context: Ctx,
-	}
-
-	result, err := client.Default.Nodes.CheckNode(params)
-	if err != nil {
-		return nil, err
-	}
-
-	if !result.Payload.Exists {
-		return nil, errors.New("service name doesnt exists")
-	}
-
 	tags := strings.Split(cmd.Tags, ",")
 	for i := range tags {
 		tags[i] = strings.TrimSpace(tags[i])
 	}
 
-	_, err = managementClient.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
+	_, err := client.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
 		Body: annotation.AddAnnotationBody{
-			Text: fmt.Sprintf("%s (Node Name: %s)", cmd.Text, name),
+			Text: cmd.Text,
 			Tags: tags,
 		},
 		Context: Ctx,
@@ -99,16 +72,4 @@ func (cmd *annotationNodeCommand) Run() (Result, error) {
 	}
 
 	return new(annotationResult), nil
-}
-
-// register command
-var (
-	AnnotationNode  = new(annotationNodeCommand)
-	AnnotationNodeC = AnnotationC.Command("node", "Add an node annotation to Grafana charts")
-)
-
-func init() {
-	AnnotationNodeC.Arg("text", "Text of annotation").Required().StringVar(&AnnotationNode.Text)
-	AnnotationNodeC.Flag("tags", "Tags to filter annotations. Multiple tags are separated by a comma").StringVar(&AnnotationNode.Tags)
-	AnnotationNodeC.Flag("node-name", "Name of node for annotate").StringVar(&AnnotationNode.NodeName)
 }

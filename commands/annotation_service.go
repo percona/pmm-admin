@@ -17,12 +17,11 @@ package commands
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
-	managementClient "github.com/percona/pmm/api/managementpb/json/client"
+	"github.com/percona/pmm/api/managementpb/json/client"
 	"github.com/percona/pmm/api/managementpb/json/client/annotation"
 
 	"github.com/percona/pmm-admin/agentlocal"
@@ -34,16 +33,7 @@ type annotationServiceCommand struct {
 	ServiceName string
 }
 
-// type annotationServiceResult struct {
-// }
-
-// func (res *annotationServiceResult) Result() {}
-
-// func (res *annotationServiceResult) String() string {
-// 	return ""
-// }
-
-func (cmd *annotationServiceCommand) Run() (Result, error) {
+func (cmd *annotationCommand) service() (Result, error) {
 	var servicesNameList []string
 	if cmd.ServiceName == "" {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
@@ -103,10 +93,10 @@ func (cmd *annotationServiceCommand) Run() (Result, error) {
 		tags[i] = strings.TrimSpace(tags[i])
 	}
 
-	for _, name := range servicesNameList {
-		_, err := managementClient.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
+	for _, s := range servicesNameList {
+		_, err := client.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
 			Body: annotation.AddAnnotationBody{
-				Text: fmt.Sprintf("%s (Node Name: %s)", cmd.Text, name),
+				Text: cmd.Text,
 				Tags: tags,
 			},
 			Context: Ctx,
@@ -117,16 +107,4 @@ func (cmd *annotationServiceCommand) Run() (Result, error) {
 	}
 
 	return new(annotationResult), nil
-}
-
-// register command
-var (
-	AnnotationService  = new(annotationServiceCommand)
-	AnnotationServiceC = AnnotationC.Command("service", "Add an service annotation to Grafana charts")
-)
-
-func init() {
-	AnnotationServiceC.Arg("text", "Text of annotation").Required().StringVar(&AnnotationService.Text)
-	AnnotationServiceC.Flag("tags", "Tags to filter annotations. Multiple tags are separated by a comma").StringVar(&AnnotationService.Tags)
-	AnnotationServiceC.Flag("service-name", "Name of service for annotate").StringVar(&AnnotationService.ServiceName)
 }

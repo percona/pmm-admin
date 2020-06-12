@@ -39,12 +39,46 @@ func (res *annotationResult) String() string {
 }
 
 type annotationCommand struct {
-	Text string
-	Tags string
+	Text        string
+	Tags        string
+	Node        bool
+	NodeName    string
+	Service     bool
+	ServiceName string
 }
 
 // Run runs annotation command.
 func (cmd *annotationCommand) Run() (Result, error) {
+	var errs []error
+	if cmd.Node || cmd.NodeName != "" {
+		_, err = append(results, cmd.node())
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if cmd.Service || cmd.ServiceName != "" {
+		_, err = append(cmd.service())
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if !cmd.Service && cmd.ServiceName == "" && !cmd.Node && cmd.NodeName == "" {
+		_, err = cmd.global()
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if len(errs) > 0 {
+		return nil, errs[0]
+	}
+
+	return new(annotationResult), nil
+}
+
+func (cmd *annotationCommand) global() (Result, error) {
 	tags := strings.Split(cmd.Tags, ",")
 	for i := range tags {
 		tags[i] = strings.TrimSpace(tags[i])
@@ -69,3 +103,12 @@ var (
 	Annotation  = new(annotationCommand)
 	AnnotationC = kingpin.Command("annotate", "Add an annotation to Grafana charts")
 )
+
+func init() {
+	AnnotationC.Arg("text", "Text of annotation").Required().StringVar(&Annotation.Text)
+	AnnotationC.Flag("tags", "Tags to filter annotations. Multiple tags are separated by a comma").StringVar(&Annotation.Tags)
+	AnnotationC.Flag("node", "Annotate current node").BoolVar(&Annotation.Node)
+	AnnotationC.Flag("node-name", "Name of node to annotate").StringVar(&Annotation.NodeName)
+	AnnotationC.Flag("service", "Annotate services of current node").BoolVar(&Annotation.Service)
+	AnnotationC.Flag("service-name", "Name of service to annotate").StringVar(&Annotation.ServiceName)
+}
