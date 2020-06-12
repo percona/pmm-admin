@@ -49,36 +49,6 @@ type annotationCommand struct {
 
 // Run runs annotation command.
 func (cmd *annotationCommand) Run() (Result, error) {
-	var errs []error
-	if cmd.Node || cmd.NodeName != "" {
-		_, err = append(results, cmd.node())
-		if err != nil {
-			errs = append(errs, err)
-		}
-	}
-
-	if cmd.Service || cmd.ServiceName != "" {
-		_, err = append(cmd.service())
-		if err != nil {
-			errs = append(errs, err)
-		}
-	}
-
-	if !cmd.Service && cmd.ServiceName == "" && !cmd.Node && cmd.NodeName == "" {
-		_, err = cmd.global()
-		if err != nil {
-			errs = append(errs, err)
-		}
-	}
-
-	if len(errs) > 0 {
-		return nil, errs[0]
-	}
-
-	return new(annotationResult), nil
-}
-
-func (cmd *annotationCommand) global() (Result, error) {
 	tags := strings.Split(cmd.Tags, ",")
 	for i := range tags {
 		tags[i] = strings.TrimSpace(tags[i])
@@ -86,8 +56,10 @@ func (cmd *annotationCommand) global() (Result, error) {
 
 	_, err := client.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
 		Body: annotation.AddAnnotationBody{
-			Text: cmd.Text,
-			Tags: tags,
+			Text:        cmd.Text,
+			Tags:        tags,
+			NodeName:    cmd.nodeName(),
+			ServiceName: cmd.serviceNames(),
 		},
 		Context: Ctx,
 	})

@@ -126,6 +126,12 @@ type AddAnnotationBody struct {
 
 	// Tags are used to filter annotations.
 	Tags []string `json:"tags"`
+
+	// node name
+	NodeName string `json:"node_name,omitempty"`
+
+	// service name
+	ServiceName []string `json:"service_name"`
 }
 
 // Validate validates this add annotation body

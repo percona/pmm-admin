@@ -16,25 +16,15 @@
 package commands
 
 import (
-	"strings"
-
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/nodes"
-	"github.com/percona/pmm/api/managementpb/json/client/"
-	"github.com/percona/pmm/api/managementpb/json/client/annotation"
 
 	"github.com/percona/pmm-admin/agentlocal"
 )
 
-type annotationNodeCommand struct {
-	Text     string
-	Tags     string
-	NodeName string
-}
-
-func (cmd *annotationCommand) node() (Result, error) {
-	name := cmd.NodeName
-	if name == "" {
+func (cmd *annotationCommand) nodeName() string {
+	nodeName := cmd.NodeName
+	if nodeName == "" {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
 			return nil, err
@@ -52,24 +42,8 @@ func (cmd *annotationCommand) node() (Result, error) {
 			return nil, err
 		}
 
-		name = result.Payload.Generic.NodeName
+		nodeName = result.Payload.Generic.NodeName
 	}
 
-	tags := strings.Split(cmd.Tags, ",")
-	for i := range tags {
-		tags[i] = strings.TrimSpace(tags[i])
-	}
-
-	_, err := client.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
-		Body: annotation.AddAnnotationBody{
-			Text: cmd.Text,
-			Tags: tags,
-		},
-		Context: Ctx,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return new(annotationResult), nil
+	return nodeName
 }
