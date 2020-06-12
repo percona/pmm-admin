@@ -16,7 +16,6 @@
 package management
 
 import (
-	"errors"
 	"strings"
 	"testing"
 
@@ -152,8 +151,8 @@ func TestRun(t *testing.T) {
 		_, err := cmd.Run()
 
 		if assert.Error(t, err) {
-			expected := errors.New("Unrecognized option. To create a user, see 'https://www.percona.com/doc/percona-monitoring-and-management/2.x/concepts/services-mysql.html#pmm-conf-mysql-user-account-creating'")
-			assert.Equal(t, expected, err)
+			expected := "Unrecognized option. To create a user, see 'https://www.percona.com/doc/percona-monitoring-and-management/2.x/concepts/services-mysql.html#pmm-conf-mysql-user-account-creating'"
+			assert.Equal(t, expected, err.Error())
 		}
 	})
 }
