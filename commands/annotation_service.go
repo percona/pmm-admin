@@ -17,9 +17,13 @@ package commands
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
+	managementClient "github.com/percona/pmm/api/managementpb/json/client"
+	"github.com/percona/pmm/api/managementpb/json/client/annotation"
 
 	"github.com/percona/pmm-admin/agentlocal"
 )
@@ -30,14 +34,14 @@ type annotationServiceCommand struct {
 	ServiceName string
 }
 
-type annotationServiceResult struct {
-}
+// type annotationServiceResult struct {
+// }
 
-func (res *annotationServiceResult) Result() {}
+// func (res *annotationServiceResult) Result() {}
 
-func (res *annotationServiceResult) String() string {
-	return ""
-}
+// func (res *annotationServiceResult) String() string {
+// 	return ""
+// }
 
 func (cmd *annotationServiceCommand) Run() (Result, error) {
 	var servicesNameList []string
@@ -94,9 +98,25 @@ func (cmd *annotationServiceCommand) Run() (Result, error) {
 		servicesNameList = append(servicesNameList, cmd.ServiceName)
 	}
 
-	//iterate servicesNameList and do request for annotate
+	tags := strings.Split(cmd.Tags, ",")
+	for i := range tags {
+		tags[i] = strings.TrimSpace(tags[i])
+	}
 
-	return nil, nil
+	for _, name := range servicesNameList {
+		_, err := managementClient.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
+			Body: annotation.AddAnnotationBody{
+				Text: fmt.Sprintf("%s (Node Name: %s)", cmd.Text, name),
+				Tags: tags,
+			},
+			Context: Ctx,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return new(annotationResult), nil
 }
 
 // register command
