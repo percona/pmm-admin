@@ -240,8 +240,8 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-5563-annotation-service-node"
-  digest = "1:ce70433a5f5ff9647d1751dbb8a2a27f2758c1d2be90a9bd14058102833d900d"
+  branch = "PMM-2.0"
+  digest = "1:babb0d59c55465d56a39a9f0c35df60867dfc02686ac9deeb7dd6440fdb57683"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -270,7 +270,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "99d229fa7894963f85d302a1755cb6b16ee7638c"
+  revision = "2785bb4d1a6be1cf5ebf60dd12ab24ce44d60cd6"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
