@@ -23,7 +23,7 @@ import (
 )
 
 func (cmd *annotationCommand) nodeName() (string, error) {
-	nodeName := cmd.NodeName
+	nodeName := ""
 	if cmd.Node {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
@@ -43,6 +43,10 @@ func (cmd *annotationCommand) nodeName() (string, error) {
 		}
 
 		nodeName = result.Payload.Generic.NodeName
+	}
+
+	if cmd.NodeName != "" {
+		nodeName = cmd.NodeName
 	}
 
 	return nodeName, nil

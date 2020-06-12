@@ -57,8 +57,10 @@ func (cmd *annotationCommand) serviceNames() ([]string, error) {
 		for _, s := range result.Payload.External {
 			servicesNameList = append(servicesNameList, s.ServiceName)
 		}
-	} else {
-		servicesNameList = append(servicesNameList, cmd.ServiceName)
+	}
+
+	if cmd.ServiceName != "" {
+		servicesNameList = []string{cmd.ServiceName}
 	}
 
 	return servicesNameList, nil
