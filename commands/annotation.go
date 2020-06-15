@@ -21,7 +21,7 @@ import (
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/nodes"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
-	managmentClient "github.com/percona/pmm/api/managementpb/json/client"
+	managementClient "github.com/percona/pmm/api/managementpb/json/client"
 	"github.com/percona/pmm/api/managementpb/json/client/annotation"
 	"gopkg.in/alecthomas/kingpin.v2"
 
@@ -50,54 +50,6 @@ type annotationCommand struct {
 	NodeName    string
 	Service     bool
 	ServiceName string
-}
-
-// Run runs annotation command.
-func (cmd *annotationCommand) Run() (Result, error) {
-	tags := strings.Split(cmd.Tags, ",")
-	for i := range tags {
-		tags[i] = strings.TrimSpace(tags[i])
-	}
-
-	nodeName, err := cmd.nodeName()
-	if err != nil {
-		return nil, err
-	}
-
-	serviceNames, err := cmd.serviceNames()
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = managmentClient.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
-		Body: annotation.AddAnnotationBody{
-			Text:         cmd.Text,
-			Tags:         tags,
-			NodeName:     nodeName,
-			ServiceNames: serviceNames,
-		},
-		Context: Ctx,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return new(annotationResult), nil
-}
-
-// register command
-var (
-	Annotation  = new(annotationCommand)
-	AnnotationC = kingpin.Command("annotate", "Add an annotation to Grafana charts")
-)
-
-func init() {
-	AnnotationC.Arg("text", "Text of annotation").Required().StringVar(&Annotation.Text)
-	AnnotationC.Flag("tags", "Tags to filter annotations. Multiple tags are separated by a comma").StringVar(&Annotation.Tags)
-	AnnotationC.Flag("node", "Annotate current node").BoolVar(&Annotation.Node)
-	AnnotationC.Flag("node-name", "Name of node to annotate").StringVar(&Annotation.NodeName)
-	AnnotationC.Flag("service", "Annotate services of current node").BoolVar(&Annotation.Service)
-	AnnotationC.Flag("service-name", "Name of service to annotate").StringVar(&Annotation.ServiceName)
 }
 
 func (cmd *annotationCommand) nodeName() (string, error) {
@@ -137,13 +89,13 @@ func (cmd *annotationCommand) serviceNames() ([]string, error) {
 	case cmd.ServiceName != "":
 		return []string{cmd.ServiceName}, nil
 	case cmd.Service:
-		return cmd.getNodeAllServices()
+		return cmd.getCurrentNodeAllServices()
 	default:
 		return []string{}, nil
 	}
 }
 
-func (cmd *annotationCommand) getNodeAllServices() ([]string, error) {
+func (cmd *annotationCommand) getCurrentNodeAllServices() ([]string, error) {
 	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 	if err != nil {
 		return nil, err
@@ -179,4 +131,52 @@ func (cmd *annotationCommand) getNodeAllServices() ([]string, error) {
 	}
 
 	return servicesNameList, nil
+}
+
+// Run runs annotation command.
+func (cmd *annotationCommand) Run() (Result, error) {
+	tags := strings.Split(cmd.Tags, ",")
+	for i := range tags {
+		tags[i] = strings.TrimSpace(tags[i])
+	}
+
+	nodeName, err := cmd.nodeName()
+	if err != nil {
+		return nil, err
+	}
+
+	serviceNames, err := cmd.serviceNames()
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = managementClient.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
+		Body: annotation.AddAnnotationBody{
+			Text:         cmd.Text,
+			Tags:         tags,
+			NodeName:     nodeName,
+			ServiceNames: serviceNames,
+		},
+		Context: Ctx,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return new(annotationResult), nil
+}
+
+// register command
+var (
+	Annotation  = new(annotationCommand)
+	AnnotationC = kingpin.Command("annotate", "Add an annotation to Grafana charts")
+)
+
+func init() {
+	AnnotationC.Arg("text", "Text of annotation").Required().StringVar(&Annotation.Text)
+	AnnotationC.Flag("tags", "Tags to filter annotations. Multiple tags are separated by a comma").StringVar(&Annotation.Tags)
+	AnnotationC.Flag("node", "Annotate current node").BoolVar(&Annotation.Node)
+	AnnotationC.Flag("node-name", "Name of node to annotate").StringVar(&Annotation.NodeName)
+	AnnotationC.Flag("service", "Annotate services of current node").BoolVar(&Annotation.Service)
+	AnnotationC.Flag("service-name", "Name of service to annotate").StringVar(&Annotation.ServiceName)
 }
