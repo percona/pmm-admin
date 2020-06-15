@@ -18,7 +18,11 @@ package commands
 import (
 	"strings"
 
-	"github.com/percona/pmm/api/managementpb/json/client"
+	"github.com/percona/pmm-admin/agentlocal"
+	"github.com/percona/pmm/api/inventorypb/json/client"
+	"github.com/percona/pmm/api/inventorypb/json/client/nodes"
+	"github.com/percona/pmm/api/inventorypb/json/client/services"
+	managmentClient "github.com/percona/pmm/api/managementpb/json/client"
 	"github.com/percona/pmm/api/managementpb/json/client/annotation"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -63,12 +67,12 @@ func (cmd *annotationCommand) Run() (Result, error) {
 		return nil, err
 	}
 
-	_, err = client.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
+	_, err = managmentClient.Default.Annotation.AddAnnotation(&annotation.AddAnnotationParams{
 		Body: annotation.AddAnnotationBody{
-			Text:        cmd.Text,
-			Tags:        tags,
-			NodeName:    nodeName,
-			ServiceName: serviceNames,
+			Text:         cmd.Text,
+			Tags:         tags,
+			NodeName:     nodeName,
+			ServiceNames: serviceNames,
 		},
 		Context: Ctx,
 	})
@@ -92,4 +96,73 @@ func init() {
 	AnnotationC.Flag("node-name", "Name of node to annotate").StringVar(&Annotation.NodeName)
 	AnnotationC.Flag("service", "Annotate services of current node").BoolVar(&Annotation.Service)
 	AnnotationC.Flag("service-name", "Name of service to annotate").StringVar(&Annotation.ServiceName)
+}
+
+func (cmd *annotationCommand) nodeName() (string, error) {
+	if cmd.Node {
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		if err != nil {
+			return "", err
+		}
+
+		params := &nodes.GetNodeParams{
+			Body: nodes.GetNodeBody{
+				NodeID: status.NodeID,
+			},
+			Context: Ctx,
+		}
+
+		result, err := client.Default.Nodes.GetNode(params)
+		if err != nil {
+			return "", err
+		}
+
+		return result.Payload.Generic.NodeName, nil
+	}
+
+	return cmd.NodeName, nil
+}
+
+func (cmd *annotationCommand) serviceNames() ([]string, error) {
+	var servicesNameList []string
+	if cmd.Service {
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		if err != nil {
+			return nil, err
+		}
+
+		params := &services.ListServicesParams{
+			Body: services.ListServicesBody{
+				NodeID: status.NodeID,
+			},
+			Context: Ctx,
+		}
+
+		result, err := client.Default.Services.ListServices(params)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, s := range result.Payload.Mysql {
+			servicesNameList = append(servicesNameList, s.ServiceName)
+		}
+		for _, s := range result.Payload.Mongodb {
+			servicesNameList = append(servicesNameList, s.ServiceName)
+		}
+		for _, s := range result.Payload.Postgresql {
+			servicesNameList = append(servicesNameList, s.ServiceName)
+		}
+		for _, s := range result.Payload.Proxysql {
+			servicesNameList = append(servicesNameList, s.ServiceName)
+		}
+		for _, s := range result.Payload.External {
+			servicesNameList = append(servicesNameList, s.ServiceName)
+		}
+	}
+
+	if cmd.ServiceName != "" {
+		servicesNameList = []string{cmd.ServiceName}
+	}
+
+	return servicesNameList, nil
 }
