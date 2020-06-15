@@ -100,6 +100,7 @@ func init() {
 }
 
 func (cmd *annotationCommand) nodeName() (string, error) {
+	nodeName := ""
 	if cmd.Node {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
@@ -118,10 +119,14 @@ func (cmd *annotationCommand) nodeName() (string, error) {
 			return "", err
 		}
 
-		return result.Payload.Generic.NodeName, nil
+		nodeName = result.Payload.Generic.NodeName
 	}
 
-	return cmd.NodeName, nil
+	if cmd.NodeName != "" {
+		nodeName = cmd.NodeName
+	}
+
+	return nodeName, nil
 }
 
 func (cmd *annotationCommand) serviceNames() ([]string, error) {
