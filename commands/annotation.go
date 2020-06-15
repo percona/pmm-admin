@@ -63,6 +63,7 @@ func (cmd *annotationCommand) Run() (Result, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	serviceNames, err := cmd.serviceNames()
 	if err != nil {
 		return nil, err
@@ -100,74 +101,81 @@ func init() {
 }
 
 func (cmd *annotationCommand) nodeName() (string, error) {
-	nodeName := ""
-	if cmd.Node {
-		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
-		if err != nil {
-			return "", err
-		}
+	switch {
+	case cmd.NodeName != "":
+		return cmd.NodeName, nil
+	case cmd.Node:
+		return cmd.getCurrentNode()
+	default:
+		return "", nil
+	}
+}
 
-		params := &nodes.GetNodeParams{
-			Body: nodes.GetNodeBody{
-				NodeID: status.NodeID,
-			},
-			Context: Ctx,
-		}
-
-		result, err := client.Default.Nodes.GetNode(params)
-		if err != nil {
-			return "", err
-		}
-
-		nodeName = result.Payload.Generic.NodeName
+func (cmd *annotationCommand) getCurrentNode() (string, error) {
+	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+	if err != nil {
+		return "", err
 	}
 
-	if cmd.NodeName != "" {
-		nodeName = cmd.NodeName
+	params := &nodes.GetNodeParams{
+		Body: nodes.GetNodeBody{
+			NodeID: status.NodeID,
+		},
+		Context: Ctx,
 	}
 
-	return nodeName, nil
+	result, err := client.Default.Nodes.GetNode(params)
+	if err != nil {
+		return "", err
+	}
+
+	return result.Payload.Generic.NodeName, nil
 }
 
 func (cmd *annotationCommand) serviceNames() ([]string, error) {
-	var servicesNameList []string
-	if cmd.Service {
-		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
-		if err != nil {
-			return nil, err
-		}
+	switch {
+	case cmd.ServiceName != "":
+		return []string{cmd.ServiceName}, nil
+	case cmd.Service:
+		return cmd.getNodeAllServices()
+	default:
+		return []string{}, nil
+	}
+}
 
-		params := &services.ListServicesParams{
-			Body: services.ListServicesBody{
-				NodeID: status.NodeID,
-			},
-			Context: Ctx,
-		}
-
-		result, err := client.Default.Services.ListServices(params)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, s := range result.Payload.Mysql {
-			servicesNameList = append(servicesNameList, s.ServiceName)
-		}
-		for _, s := range result.Payload.Mongodb {
-			servicesNameList = append(servicesNameList, s.ServiceName)
-		}
-		for _, s := range result.Payload.Postgresql {
-			servicesNameList = append(servicesNameList, s.ServiceName)
-		}
-		for _, s := range result.Payload.Proxysql {
-			servicesNameList = append(servicesNameList, s.ServiceName)
-		}
-		for _, s := range result.Payload.External {
-			servicesNameList = append(servicesNameList, s.ServiceName)
-		}
+func (cmd *annotationCommand) getNodeAllServices() ([]string, error) {
+	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+	if err != nil {
+		return nil, err
 	}
 
-	if cmd.ServiceName != "" {
-		servicesNameList = []string{cmd.ServiceName}
+	params := &services.ListServicesParams{
+		Body: services.ListServicesBody{
+			NodeID: status.NodeID,
+		},
+		Context: Ctx,
+	}
+
+	result, err := client.Default.Services.ListServices(params)
+	if err != nil {
+		return nil, err
+	}
+
+	servicesNameList := []string{}
+	for _, s := range result.Payload.Mysql {
+		servicesNameList = append(servicesNameList, s.ServiceName)
+	}
+	for _, s := range result.Payload.Mongodb {
+		servicesNameList = append(servicesNameList, s.ServiceName)
+	}
+	for _, s := range result.Payload.Postgresql {
+		servicesNameList = append(servicesNameList, s.ServiceName)
+	}
+	for _, s := range result.Payload.Proxysql {
+		servicesNameList = append(servicesNameList, s.ServiceName)
+	}
+	for _, s := range result.Payload.External {
+		servicesNameList = append(servicesNameList, s.ServiceName)
 	}
 
 	return servicesNameList, nil
