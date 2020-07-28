@@ -84,6 +84,7 @@ func main() {
 		management.AddMongoDBC.FullCommand():    management.AddMongoDB,
 		management.AddPostgreSQLC.FullCommand(): management.AddPostgreSQL,
 		management.AddProxySQLC.FullCommand():   management.AddProxySQL,
+		management.AddExternalC.FullCommand():   management.AddExternal,
 
 		management.RemoveC.FullCommand(): management.Remove,
 
@@ -92,6 +93,7 @@ func main() {
 		inventory.AddNodeGenericC.FullCommand():   inventory.AddNodeGeneric,
 		inventory.AddNodeContainerC.FullCommand(): inventory.AddNodeContainer,
 		inventory.AddNodeRemoteC.FullCommand():    inventory.AddNodeRemote,
+		inventory.AddNodeRemoteRDSC.FullCommand(): inventory.AddNodeRemoteRDS,
 
 		inventory.RemoveNodeC.FullCommand(): inventory.RemoveNode,
 
@@ -101,6 +103,7 @@ func main() {
 		inventory.AddServiceMongoDBC.FullCommand():    inventory.AddServiceMongoDB,
 		inventory.AddServicePostgreSQLC.FullCommand(): inventory.AddServicePostgreSQL,
 		inventory.AddServiceProxySQLC.FullCommand():   inventory.AddServiceProxySQL,
+		inventory.AddExternalServiceC.FullCommand():   inventory.AddExternalService,
 
 		inventory.RemoveServiceC.FullCommand(): inventory.RemoveService,
 
@@ -116,20 +119,30 @@ func main() {
 		inventory.AddAgentQANMySQLSlowlogAgentC.FullCommand():           inventory.AddAgentQANMySQLSlowlogAgent,
 		inventory.AddAgentQANMongoDBProfilerAgentC.FullCommand():        inventory.AddAgentQANMongoDBProfilerAgent,
 		inventory.AddAgentQANPostgreSQLPgStatementsAgentC.FullCommand(): inventory.AddAgentQANPostgreSQLPgStatementsAgent,
+		inventory.AddAgentRDSExporterC.FullCommand():                    inventory.AddAgentRDSExporter,
+		inventory.AddAgentExternalExporterC.FullCommand():               inventory.AddAgentExternalExporter,
 
 		inventory.RemoveAgentC.FullCommand(): inventory.RemoveAgent,
 
-		commands.ListC.FullCommand():    commands.List,
-		commands.StatusC.FullCommand():  commands.Status,
-		commands.SummaryC.FullCommand(): commands.Summary,
-		commands.ConfigC.FullCommand():  commands.Config,
+		commands.ListC.FullCommand():       commands.List,
+		commands.AnnotationC.FullCommand(): commands.Annotation,
+		commands.StatusC.FullCommand():     commands.Status,
+		commands.SummaryC.FullCommand():    commands.Summary,
+		commands.ConfigC.FullCommand():     commands.Config,
 	}
 	command := allCommands[cmd]
+
 	if command == nil {
 		logrus.Panicf("Unhandled command %q. Please report this bug.", cmd)
 	}
 
-	res, err := command.Run()
+	var res commands.Result
+	var err error
+	if cc, ok := command.(commands.CommandWithContext); ok {
+		res, err = cc.RunWithContext(ctx)
+	} else {
+		res, err = command.Run()
+	}
 	logrus.Debugf("Result: %#v", res)
 	logrus.Debugf("Error: %#v", err)
 

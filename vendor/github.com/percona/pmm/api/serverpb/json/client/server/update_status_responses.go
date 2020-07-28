@@ -8,11 +8,12 @@ package server
 import (
 	"fmt"
 	"io"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // UpdateStatusReader is a Reader for the UpdateStatus structure.
@@ -83,7 +84,7 @@ func NewUpdateStatusDefault(code int) *UpdateStatusDefault {
 
 /*UpdateStatusDefault handles this case with default header values.
 
-An error response.
+An unexpected error response
 */
 type UpdateStatusDefault struct {
 	_statusCode int
@@ -151,23 +152,60 @@ func (o *UpdateStatusBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*UpdateStatusDefaultBody ErrorResponse is a message returned on HTTP error.
+/*UpdateStatusDefaultBody update status default body
 swagger:model UpdateStatusDefaultBody
 */
 type UpdateStatusDefaultBody struct {
 
-	// code
-	Code int32 `json:"code,omitempty"`
-
 	// error
 	Error string `json:"error,omitempty"`
 
+	// code
+	Code int32 `json:"code,omitempty"`
+
 	// message
 	Message string `json:"message,omitempty"`
+
+	// details
+	Details []*DetailsItems0 `json:"details"`
 }
 
 // Validate validates this update status default body
 func (o *UpdateStatusDefaultBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *UpdateStatusDefaultBody) validateDetails(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Details) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Details); i++ {
+		if swag.IsZero(o.Details[i]) { // not required
+			continue
+		}
+
+		if o.Details[i] != nil {
+			if err := o.Details[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("UpdateStatus default" + "." + "details" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -194,14 +232,14 @@ swagger:model UpdateStatusOKBody
 */
 type UpdateStatusOKBody struct {
 
-	// True when update is done.
-	Done bool `json:"done,omitempty"`
-
 	// Progress log lines.
 	LogLines []string `json:"log_lines"`
 
 	// Progress log offset for the next request.
 	LogOffset int64 `json:"log_offset,omitempty"`
+
+	// True when update is done.
+	Done bool `json:"done,omitempty"`
 }
 
 // Validate validates this update status OK body

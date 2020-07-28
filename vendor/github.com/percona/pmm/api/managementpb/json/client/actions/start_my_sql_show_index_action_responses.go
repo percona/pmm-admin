@@ -8,11 +8,12 @@ package actions
 import (
 	"fmt"
 	"io"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // StartMySQLShowIndexActionReader is a Reader for the StartMySQLShowIndexAction structure.
@@ -83,7 +84,7 @@ func NewStartMySQLShowIndexActionDefault(code int) *StartMySQLShowIndexActionDef
 
 /*StartMySQLShowIndexActionDefault handles this case with default header values.
 
-An error response.
+An unexpected error response
 */
 type StartMySQLShowIndexActionDefault struct {
 	_statusCode int
@@ -121,9 +122,6 @@ swagger:model StartMySQLShowIndexActionBody
 */
 type StartMySQLShowIndexActionBody struct {
 
-	// Database name. Required if not given in the table_name field.
-	Database string `json:"database,omitempty"`
-
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -132,6 +130,9 @@ type StartMySQLShowIndexActionBody struct {
 
 	// Table name. Required. May additionally contain a database name.
 	TableName string `json:"table_name,omitempty"`
+
+	// Database name. Required if not given in the table_name field.
+	Database string `json:"database,omitempty"`
 }
 
 // Validate validates this start my SQL show index action body
@@ -157,23 +158,60 @@ func (o *StartMySQLShowIndexActionBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*StartMySQLShowIndexActionDefaultBody ErrorResponse is a message returned on HTTP error.
+/*StartMySQLShowIndexActionDefaultBody start my SQL show index action default body
 swagger:model StartMySQLShowIndexActionDefaultBody
 */
 type StartMySQLShowIndexActionDefaultBody struct {
 
-	// code
-	Code int32 `json:"code,omitempty"`
-
 	// error
 	Error string `json:"error,omitempty"`
 
+	// code
+	Code int32 `json:"code,omitempty"`
+
 	// message
 	Message string `json:"message,omitempty"`
+
+	// details
+	Details []*DetailsItems0 `json:"details"`
 }
 
 // Validate validates this start my SQL show index action default body
 func (o *StartMySQLShowIndexActionDefaultBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *StartMySQLShowIndexActionDefaultBody) validateDetails(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Details) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Details); i++ {
+		if swag.IsZero(o.Details[i]) { // not required
+			continue
+		}
+
+		if o.Details[i] != nil {
+			if err := o.Details[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("StartMySQLShowIndexAction default" + "." + "details" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 

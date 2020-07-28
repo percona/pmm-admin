@@ -24,6 +24,7 @@ import (
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
+	"github.com/percona/pmm/api/inventorypb/types"
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/agentlocal"
@@ -32,11 +33,11 @@ import (
 var listResultT = ParseTemplate(`
 Service type  Service name         Address and port  Service ID
 {{ range .Services }}
-{{- printf "%-13s" .ServiceType }} {{ printf "%-20s" .ServiceName }} {{ printf "%-17s" .AddressPort }} {{ .ServiceID }}
+{{- printf "%-13s" .HumanReadableServiceType }} {{ printf "%-20s" .ServiceName }} {{ printf "%-17s" .AddressPort }} {{ .ServiceID }}
 {{ end }}
 Agent type                  Status     Agent ID                                        Service ID
 {{ range .Agents }}
-{{- printf "%-27s" .AgentType }} {{ printf "%-10s" .Status }} {{ .AgentID }}  {{ .ServiceID }}
+{{- printf "%-27s" .HumanReadableAgentType }} {{ printf "%-10s" .NiceAgentStatus }} {{ .AgentID }}  {{ .ServiceID }}
 {{ end }}
 `)
 
@@ -45,6 +46,23 @@ type listResultAgent struct {
 	AgentID   string `json:"agent_id"`
 	ServiceID string `json:"service_id"`
 	Status    string `json:"status"`
+	Disabled  bool   `json:"disabled"`
+}
+
+func (a listResultAgent) HumanReadableAgentType() string {
+	return types.AgentTypeName(a.AgentType)
+}
+
+func (a listResultAgent) NiceAgentStatus() string {
+	res := a.Status
+	if res == "" {
+		res = "unknown"
+	}
+	res = strings.Title(strings.ToLower(res))
+	if a.Disabled {
+		res += " (disabled)"
+	}
+	return res
 }
 
 type listResultService struct {
@@ -52,6 +70,10 @@ type listResultService struct {
 	ServiceID   string `json:"service_id"`
 	ServiceName string `json:"service_name"`
 	AddressPort string `json:"address_port"`
+}
+
+func (s listResultService) HumanReadableServiceType() string {
+	return types.ServiceTypeName(s.ServiceType)
 }
 
 type listResult struct {
@@ -88,37 +110,51 @@ func (cmd *listCommand) Run() (Result, error) {
 		return nil, err
 	}
 
-	var services []listResultService
+	getAddressPort := func(socket, address string, port int64) string {
+		if socket != "" {
+			return socket
+		}
+		return net.JoinHostPort(address, strconv.FormatInt(port, 10))
+	}
+
+	var servicesList []listResultService
 	for _, s := range servicesRes.Payload.Mysql {
-		services = append(services, listResultService{
-			ServiceType: "MySQL",
+		servicesList = append(servicesList, listResultService{
+			ServiceType: types.ServiceTypeMySQLService,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
-			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
+			AddressPort: getAddressPort(s.Socket, s.Address, s.Port),
 		})
 	}
 	for _, s := range servicesRes.Payload.Mongodb {
-		services = append(services, listResultService{
-			ServiceType: "MongoDB",
+		servicesList = append(servicesList, listResultService{
+			ServiceType: types.ServiceTypeMongoDBService,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
-			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
+			AddressPort: getAddressPort(s.Socket, s.Address, s.Port),
 		})
 	}
 	for _, s := range servicesRes.Payload.Postgresql {
-		services = append(services, listResultService{
-			ServiceType: "PostgreSQL",
+		servicesList = append(servicesList, listResultService{
+			ServiceType: types.ServiceTypePostgreSQLService,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
-			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
+			AddressPort: getAddressPort(s.Socket, s.Address, s.Port),
 		})
 	}
 	for _, s := range servicesRes.Payload.Proxysql {
-		services = append(services, listResultService{
-			ServiceType: "ProxySQL",
+		servicesList = append(servicesList, listResultService{
+			ServiceType: types.ServiceTypeProxySQLService,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
-			AddressPort: net.JoinHostPort(s.Address, strconv.FormatInt(s.Port, 10)),
+			AddressPort: getAddressPort(s.Socket, s.Address, s.Port),
+		})
+	}
+	for _, s := range servicesRes.Payload.External {
+		servicesList = append(servicesList, listResultService{
+			ServiceType: types.ServiceTypeExternalService,
+			ServiceID:   s.ServiceID,
+			ServiceName: s.ServiceName,
 		})
 	}
 
@@ -129,19 +165,16 @@ func (cmd *listCommand) Run() (Result, error) {
 		return nil, err
 	}
 
-	getStatus := func(s *string, disabled bool) string {
-		res := strings.ToLower(pointer.GetString(s))
+	getStatus := func(s *string) string {
+		res := pointer.GetString(s)
 		if res == "" {
 			res = "unknown"
 		}
-		if disabled {
-			res += " (disabled)"
-		}
-		return res
+		return strings.ToUpper(res)
 	}
 
 	pmmAgentIDs := map[string]struct{}{}
-	var agents []listResultAgent
+	var agentsList []listResultAgent
 	for _, a := range agentsRes.Payload.PMMAgent {
 		if a.RunsOnNodeID == cmd.NodeID {
 			pmmAgentIDs[a.AgentID] = struct{}{}
@@ -150,107 +183,134 @@ func (cmd *listCommand) Run() (Result, error) {
 			if a.Connected {
 				status = "connected"
 			}
-			agents = append(agents, listResultAgent{
-				AgentType: "pmm-agent",
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: types.AgentTypePMMAgent,
 				AgentID:   a.AgentID,
-				Status:    status,
+				Status:    strings.ToUpper(status),
 			})
 		}
 	}
 	for _, a := range agentsRes.Payload.NodeExporter {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "node_exporter",
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: types.AgentTypeNodeExporter,
 				AgentID:   a.AgentID,
-				Status:    getStatus(a.Status, a.Disabled),
+				Status:    getStatus(a.Status),
+				Disabled:  a.Disabled,
 			})
 		}
 	}
 	for _, a := range agentsRes.Payload.MysqldExporter {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "mysqld_exporter",
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: types.AgentTypeMySQLdExporter,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
-				Status:    getStatus(a.Status, a.Disabled),
-			})
-		}
-	}
-	for _, a := range agentsRes.Payload.QANMysqlPerfschemaAgent {
-		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "qan-mysql-perfschema-agent",
-				AgentID:   a.AgentID,
-				ServiceID: a.ServiceID,
-				Status:    getStatus(a.Status, a.Disabled),
-			})
-		}
-	}
-	for _, a := range agentsRes.Payload.QANMysqlSlowlogAgent {
-		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "qan-mysql-slowlog-agent",
-				AgentID:   a.AgentID,
-				ServiceID: a.ServiceID,
-				Status:    getStatus(a.Status, a.Disabled),
+				Status:    getStatus(a.Status),
+				Disabled:  a.Disabled,
 			})
 		}
 	}
 	for _, a := range agentsRes.Payload.MongodbExporter {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "mongodb_exporter",
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: types.AgentTypeMongoDBExporter,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
-				Status:    getStatus(a.Status, a.Disabled),
+				Status:    getStatus(a.Status),
+				Disabled:  a.Disabled,
 			})
 		}
 	}
 	for _, a := range agentsRes.Payload.PostgresExporter {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "postgres_exporter",
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: types.AgentTypePostgresExporter,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
-				Status:    getStatus(a.Status, a.Disabled),
-			})
-		}
-	}
-
-	for _, a := range agentsRes.Payload.QANMongodbProfilerAgent {
-		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "qan-mongodb-profiler-agent",
-				AgentID:   a.AgentID,
-				ServiceID: a.ServiceID,
-				Status:    getStatus(a.Status, a.Disabled),
+				Status:    getStatus(a.Status),
+				Disabled:  a.Disabled,
 			})
 		}
 	}
 	for _, a := range agentsRes.Payload.ProxysqlExporter {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "proxysql_exporter",
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: types.AgentTypeProxySQLExporter,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
-				Status:    getStatus(a.Status, a.Disabled),
+				Status:    getStatus(a.Status),
+				Disabled:  a.Disabled,
+			})
+		}
+	}
+	for _, a := range agentsRes.Payload.RDSExporter {
+		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: types.AgentTypeRDSExporter,
+				AgentID:   a.AgentID,
+				Status:    getStatus(a.Status),
+				Disabled:  a.Disabled,
+			})
+		}
+	}
+	for _, a := range agentsRes.Payload.QANMysqlPerfschemaAgent {
+		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: types.AgentTypeQANMySQLPerfSchemaAgent,
+				AgentID:   a.AgentID,
+				ServiceID: a.ServiceID,
+				Status:    getStatus(a.Status),
+				Disabled:  a.Disabled,
+			})
+		}
+	}
+	for _, a := range agentsRes.Payload.QANMysqlSlowlogAgent {
+		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: types.AgentTypeQANMySQLSlowlogAgent,
+				AgentID:   a.AgentID,
+				ServiceID: a.ServiceID,
+				Status:    getStatus(a.Status),
+				Disabled:  a.Disabled,
+			})
+		}
+	}
+	for _, a := range agentsRes.Payload.QANMongodbProfilerAgent {
+		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: types.AgentTypeQANMongoDBProfilerAgent,
+				AgentID:   a.AgentID,
+				ServiceID: a.ServiceID,
+				Status:    getStatus(a.Status),
+				Disabled:  a.Disabled,
 			})
 		}
 	}
 	for _, a := range agentsRes.Payload.QANPostgresqlPgstatementsAgent {
 		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
-			agents = append(agents, listResultAgent{
-				AgentType: "qan-postgresql-pgstatements-agent",
+			agentsList = append(agentsList, listResultAgent{
+				AgentType: types.AgentTypeQANPostgreSQLPgStatementsAgent,
 				AgentID:   a.AgentID,
 				ServiceID: a.ServiceID,
-				Status:    getStatus(a.Status, a.Disabled),
+				Status:    getStatus(a.Status),
+				Disabled:  a.Disabled,
 			})
 		}
 	}
+	for _, a := range agentsRes.Payload.ExternalExporter {
+		agentsList = append(agentsList, listResultAgent{
+			AgentType: types.AgentTypeExternalExporter,
+			AgentID:   a.AgentID,
+			ServiceID: a.ServiceID,
+			Status:    getStatus(nil),
+			Disabled:  a.Disabled,
+		})
+	}
 
 	return &listResult{
-		Services: services,
-		Agents:   agents,
+		Services: servicesList,
+		Agents:   agentsList,
 	}, nil
 }
 

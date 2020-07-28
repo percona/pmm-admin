@@ -16,6 +16,11 @@
 package commands
 
 import (
+	"net/url"
+	"strings"
+
+	"github.com/percona/pmm/api/inventorypb/types"
+	"github.com/percona/pmm/version"
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/agentlocal"
@@ -29,24 +34,52 @@ PMM Server:
 	URL    : {{ .PMMAgentStatus.ServerURL }}
 	Version: {{ .PMMAgentStatus.ServerVersion }}
 
-PMM-agent:
-	Connected : {{ .PMMAgentStatus.Connected }}{{ if .PMMAgentStatus.Connected }}
-	Time drift: {{ .PMMAgentStatus.ServerClockDrift }}
-	Latency   : {{ .PMMAgentStatus.ServerLatency }}
-{{ end }}
+PMM Client:
+	Connected        : {{ .PMMAgentStatus.Connected }}{{ if .PMMAgentStatus.Connected }}
+	Time drift       : {{ .PMMAgentStatus.ServerClockDrift }}
+	Latency          : {{ .PMMAgentStatus.ServerLatency }}{{ end }}
+	pmm-admin version: {{ .PMMVersion }}
+	pmm-agent version: {{ .PMMAgentStatus.AgentVersion }}
 Agents:
-{{ range .PMMAgentStatus.Agents }}	{{ .AgentID }} {{ .AgentType }} {{ .Status }}
+{{ range .PMMAgentStatus.Agents }}	{{ .AgentID }} {{ .AgentType | $.HumanReadableAgentType }} {{ .Status | $.NiceAgentStatus }}
 {{ end }}
 `)
 
 type statusResult struct {
 	PMMAgentStatus *agentlocal.Status `json:"pmm_agent_status"`
+	PMMVersion     string             `json:"pmm_admin_version"`
+}
+
+func (res *statusResult) HumanReadableAgentType(agentType string) string {
+	return types.AgentTypeName(agentType)
+}
+
+func (res *statusResult) NiceAgentStatus(status string) string {
+	return strings.Title(strings.ToLower(status))
 }
 
 func (res *statusResult) Result() {}
 
 func (res *statusResult) String() string {
 	return RenderTemplate(statusResultT, res)
+}
+
+func newStatusResult(status *agentlocal.Status) *statusResult {
+	// hide username and password from PMM Server URL - if we have it at all
+	if u, err := url.Parse(status.ServerURL); err == nil {
+		u.User = nil
+		status.ServerURL = u.String()
+	}
+
+	pmmVersion := version.PMMVersion
+	if pmmVersion == "" {
+		pmmVersion = "unknown"
+	}
+
+	return &statusResult{
+		PMMAgentStatus: status,
+		PMMVersion:     pmmVersion,
+	}
 }
 
 type statusCommand struct {
@@ -61,11 +94,7 @@ func (cmd *statusCommand) Run() (Result, error) {
 		return nil, err
 	}
 
-	status.ServerURL.User = nil // Hide username and password
-
-	return &statusResult{
-		PMMAgentStatus: status,
-	}, nil
+	return newStatusResult(status), nil
 }
 
 // register command

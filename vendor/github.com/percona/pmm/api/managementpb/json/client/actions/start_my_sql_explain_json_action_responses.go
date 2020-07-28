@@ -8,11 +8,12 @@ package actions
 import (
 	"fmt"
 	"io"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // StartMySQLExplainJSONActionReader is a Reader for the StartMySQLExplainJSONAction structure.
@@ -83,7 +84,7 @@ func NewStartMySQLExplainJSONActionDefault(code int) *StartMySQLExplainJSONActio
 
 /*StartMySQLExplainJSONActionDefault handles this case with default header values.
 
-An error response.
+An unexpected error response
 */
 type StartMySQLExplainJSONActionDefault struct {
 	_statusCode int
@@ -121,17 +122,17 @@ swagger:model StartMySQLExplainJSONActionBody
 */
 type StartMySQLExplainJSONActionBody struct {
 
-	// Database name. Required if it can't be deduced from the query.
-	Database string `json:"database,omitempty"`
-
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+
+	// Service ID for this Action. Required.
+	ServiceID string `json:"service_id,omitempty"`
 
 	// SQL query. Required.
 	Query string `json:"query,omitempty"`
 
-	// Service ID for this Action. Required.
-	ServiceID string `json:"service_id,omitempty"`
+	// Database name. Required if it can't be deduced from the query.
+	Database string `json:"database,omitempty"`
 }
 
 // Validate validates this start my SQL explain JSON action body
@@ -157,23 +158,60 @@ func (o *StartMySQLExplainJSONActionBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*StartMySQLExplainJSONActionDefaultBody ErrorResponse is a message returned on HTTP error.
+/*StartMySQLExplainJSONActionDefaultBody start my SQL explain JSON action default body
 swagger:model StartMySQLExplainJSONActionDefaultBody
 */
 type StartMySQLExplainJSONActionDefaultBody struct {
 
-	// code
-	Code int32 `json:"code,omitempty"`
-
 	// error
 	Error string `json:"error,omitempty"`
 
+	// code
+	Code int32 `json:"code,omitempty"`
+
 	// message
 	Message string `json:"message,omitempty"`
+
+	// details
+	Details []*DetailsItems0 `json:"details"`
 }
 
 // Validate validates this start my SQL explain JSON action default body
 func (o *StartMySQLExplainJSONActionDefaultBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *StartMySQLExplainJSONActionDefaultBody) validateDetails(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Details) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Details); i++ {
+		if swag.IsZero(o.Details[i]) { // not required
+			continue
+		}
+
+		if o.Details[i] != nil {
+			if err := o.Details[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("StartMySQLExplainJSONAction default" + "." + "details" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 

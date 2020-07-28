@@ -62,9 +62,16 @@ type Result interface {
 // Command should not:
 //  * return both result and error;
 //  * exit with logrus.Fatal, os.Exit, etc;
-//  * use logrus.Print, logrus.Info and higher levels.
+//  * use logrus.Print, logrus.Info and higher levels except:
+//    * summary command (for progress output).
 type Command interface {
 	Run() (Result, error)
+}
+
+// TODO remove Command above, rename CommandWithContext to Command
+type CommandWithContext interface {
+	// TODO rename to Run
+	RunWithContext(ctx context.Context) (Result, error)
 }
 
 type ErrorResponse interface {
@@ -96,9 +103,10 @@ func ParseTemplate(text string) *template.Template {
 func RenderTemplate(t *template.Template, data interface{}) string {
 	var buf bytes.Buffer
 	if err := t.Execute(&buf, data); err != nil {
-		logrus.Panicf("Failed to render response.\n%s.\nPlease report this bug.", err)
+		logrus.Panicf("Failed to render response.\n%s.\nTemplate data: %#v.\nPlease report this bug.", err, data)
 	}
-	return buf.String()
+
+	return strings.TrimSpace(buf.String()) + "\n"
 }
 
 type globalFlagsValues struct {
@@ -160,7 +168,7 @@ func SetupClients(ctx context.Context, serverURL, serverUsername, serverPassword
 			logrus.Fatalf("Failed to get PMM Server parameters from local pmm-agent: %s.\n"+
 				"Please use --server-url flag to specify PMM Server URL.", err)
 		}
-		GlobalFlags.ServerURL = status.ServerURL
+		GlobalFlags.ServerURL, _ = url.Parse(status.ServerURL)
 		GlobalFlags.ServerInsecureTLS = status.ServerInsecureTLS
 	} else {
 		var err error
@@ -222,6 +230,7 @@ func SetupClients(ctx context.Context, serverURL, serverUsername, serverPassword
 	})
 	transport.Consumers = map[string]runtime.Consumer{
 		runtime.JSONMime:    runtime.JSONConsumer(),
+		"application/zip":   runtime.ByteStreamConsumer(),
 		runtime.HTMLMime:    errorConsumer,
 		runtime.TextMime:    errorConsumer,
 		runtime.DefaultMime: errorConsumer,
@@ -291,7 +300,7 @@ Flags:
 {{.Context.Flags|FlagsToTwoColumns|FormatTwoColumns}}
 {{end}}\
 {{if .Context.Args}}\
-Args:
+Positional arguments:
 {{.Context.Args|ArgsToTwoColumns|FormatTwoColumns}}
 {{end}}\
 {{if .Context.SelectedCommand}}\

@@ -8,13 +8,13 @@ package server
 import (
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // CheckUpdatesReader is a Reader for the CheckUpdates structure.
@@ -85,7 +85,7 @@ func NewCheckUpdatesDefault(code int) *CheckUpdatesDefault {
 
 /*CheckUpdatesDefault handles this case with default header values.
 
-An error response.
+An unexpected error response
 */
 type CheckUpdatesDefault struct {
 	_statusCode int
@@ -150,23 +150,60 @@ func (o *CheckUpdatesBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*CheckUpdatesDefaultBody ErrorResponse is a message returned on HTTP error.
+/*CheckUpdatesDefaultBody check updates default body
 swagger:model CheckUpdatesDefaultBody
 */
 type CheckUpdatesDefaultBody struct {
 
-	// code
-	Code int32 `json:"code,omitempty"`
-
 	// error
 	Error string `json:"error,omitempty"`
 
+	// code
+	Code int32 `json:"code,omitempty"`
+
 	// message
 	Message string `json:"message,omitempty"`
+
+	// details
+	Details []*DetailsItems0 `json:"details"`
 }
 
 // Validate validates this check updates default body
 func (o *CheckUpdatesDefaultBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *CheckUpdatesDefaultBody) validateDetails(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Details) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Details); i++ {
+		if swag.IsZero(o.Details[i]) { // not required
+			continue
+		}
+
+		if o.Details[i] != nil {
+			if err := o.Details[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("CheckUpdates default" + "." + "details" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -193,32 +230,32 @@ swagger:model CheckUpdatesOKBody
 */
 type CheckUpdatesOKBody struct {
 
-	// installed
-	Installed *CheckUpdatesOKBodyInstalled `json:"installed,omitempty"`
+	// True if there is a PMM Server update available.
+	UpdateAvailable bool `json:"update_available,omitempty"`
+
+	// Latest available PMM Server release announcement URL.
+	LatestNewsURL string `json:"latest_news_url,omitempty"`
 
 	// Last check time.
 	// Format: date-time
 	LastCheck strfmt.DateTime `json:"last_check,omitempty"`
 
+	// installed
+	Installed *CheckUpdatesOKBodyInstalled `json:"installed,omitempty"`
+
 	// latest
 	Latest *CheckUpdatesOKBodyLatest `json:"latest,omitempty"`
-
-	// Latest available PMM Server release announcement URL.
-	LatestNewsURL string `json:"latest_news_url,omitempty"`
-
-	// True if there is a PMM Server update available.
-	UpdateAvailable bool `json:"update_available,omitempty"`
 }
 
 // Validate validates this check updates OK body
 func (o *CheckUpdatesOKBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := o.validateInstalled(formats); err != nil {
+	if err := o.validateLastCheck(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := o.validateLastCheck(formats); err != nil {
+	if err := o.validateInstalled(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -229,6 +266,19 @@ func (o *CheckUpdatesOKBody) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *CheckUpdatesOKBody) validateLastCheck(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.LastCheck) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("checkUpdatesOk"+"."+"last_check", "body", "date-time", o.LastCheck.String(), formats); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -245,19 +295,6 @@ func (o *CheckUpdatesOKBody) validateInstalled(formats strfmt.Registry) error {
 			}
 			return err
 		}
-	}
-
-	return nil
-}
-
-func (o *CheckUpdatesOKBody) validateLastCheck(formats strfmt.Registry) error {
-
-	if swag.IsZero(o.LastCheck) { // not required
-		return nil
-	}
-
-	if err := validate.FormatOf("checkUpdatesOk"+"."+"last_check", "body", "date-time", o.LastCheck.String(), formats); err != nil {
-		return err
 	}
 
 	return nil
@@ -304,15 +341,15 @@ swagger:model CheckUpdatesOKBodyInstalled
 */
 type CheckUpdatesOKBodyInstalled struct {
 
+	// User-visible version.
+	Version string `json:"version,omitempty"`
+
 	// Full version for debugging.
 	FullVersion string `json:"full_version,omitempty"`
 
 	// Build or release date.
 	// Format: date-time
 	Timestamp strfmt.DateTime `json:"timestamp,omitempty"`
-
-	// User-visible version.
-	Version string `json:"version,omitempty"`
 }
 
 // Validate validates this check updates OK body installed
@@ -365,15 +402,15 @@ swagger:model CheckUpdatesOKBodyLatest
 */
 type CheckUpdatesOKBodyLatest struct {
 
+	// User-visible version.
+	Version string `json:"version,omitempty"`
+
 	// Full version for debugging.
 	FullVersion string `json:"full_version,omitempty"`
 
 	// Build or release date.
 	// Format: date-time
 	Timestamp strfmt.DateTime `json:"timestamp,omitempty"`
-
-	// User-visible version.
-	Version string `json:"version,omitempty"`
 }
 
 // Validate validates this check updates OK body latest

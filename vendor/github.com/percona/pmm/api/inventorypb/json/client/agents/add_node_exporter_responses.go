@@ -9,13 +9,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // AddNodeExporterReader is a Reader for the AddNodeExporter structure.
@@ -86,7 +86,7 @@ func NewAddNodeExporterDefault(code int) *AddNodeExporterDefault {
 
 /*AddNodeExporterDefault handles this case with default header values.
 
-An error response.
+An unexpected error response
 */
 type AddNodeExporterDefault struct {
 	_statusCode int
@@ -124,11 +124,11 @@ swagger:model AddNodeExporterBody
 */
 type AddNodeExporterBody struct {
 
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
-
 	// The pmm-agent identifier which runs this instance.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 }
 
 // Validate validates this add node exporter body
@@ -154,23 +154,60 @@ func (o *AddNodeExporterBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*AddNodeExporterDefaultBody ErrorResponse is a message returned on HTTP error.
+/*AddNodeExporterDefaultBody add node exporter default body
 swagger:model AddNodeExporterDefaultBody
 */
 type AddNodeExporterDefaultBody struct {
 
-	// code
-	Code int32 `json:"code,omitempty"`
-
 	// error
 	Error string `json:"error,omitempty"`
 
+	// code
+	Code int32 `json:"code,omitempty"`
+
 	// message
 	Message string `json:"message,omitempty"`
+
+	// details
+	Details []*DetailsItems0 `json:"details"`
 }
 
 // Validate validates this add node exporter default body
 func (o *AddNodeExporterDefaultBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *AddNodeExporterDefaultBody) validateDetails(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Details) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Details); i++ {
+		if swag.IsZero(o.Details[i]) { // not required
+			continue
+		}
+
+		if o.Details[i] != nil {
+			if err := o.Details[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("AddNodeExporter default" + "." + "details" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -259,17 +296,14 @@ type AddNodeExporterOKBodyNodeExporter struct {
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// The pmm-agent identifier which runs this instance.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -280,6 +314,9 @@ type AddNodeExporterOKBodyNodeExporter struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
 }
 
 // Validate validates this add node exporter OK body node exporter
@@ -331,7 +368,7 @@ const (
 
 // prop value enum
 func (o *AddNodeExporterOKBodyNodeExporter) validateStatusEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, addNodeExporterOkBodyNodeExporterTypeStatusPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, addNodeExporterOkBodyNodeExporterTypeStatusPropEnum, true); err != nil {
 		return err
 	}
 	return nil

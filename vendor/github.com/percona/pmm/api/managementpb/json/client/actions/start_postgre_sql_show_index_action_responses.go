@@ -8,11 +8,12 @@ package actions
 import (
 	"fmt"
 	"io"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // StartPostgreSQLShowIndexActionReader is a Reader for the StartPostgreSQLShowIndexAction structure.
@@ -83,7 +84,7 @@ func NewStartPostgreSQLShowIndexActionDefault(code int) *StartPostgreSQLShowInde
 
 /*StartPostgreSQLShowIndexActionDefault handles this case with default header values.
 
-An error response.
+An unexpected error response
 */
 type StartPostgreSQLShowIndexActionDefault struct {
 	_statusCode int
@@ -121,9 +122,6 @@ swagger:model StartPostgreSQLShowIndexActionBody
 */
 type StartPostgreSQLShowIndexActionBody struct {
 
-	// Database name. Required if not given in the table_name field.
-	Database string `json:"database,omitempty"`
-
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -132,6 +130,9 @@ type StartPostgreSQLShowIndexActionBody struct {
 
 	// Table name. Required. May additionally contain a database name.
 	TableName string `json:"table_name,omitempty"`
+
+	// Database name. Required if not given in the table_name field.
+	Database string `json:"database,omitempty"`
 }
 
 // Validate validates this start postgre SQL show index action body
@@ -157,23 +158,60 @@ func (o *StartPostgreSQLShowIndexActionBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*StartPostgreSQLShowIndexActionDefaultBody ErrorResponse is a message returned on HTTP error.
+/*StartPostgreSQLShowIndexActionDefaultBody start postgre SQL show index action default body
 swagger:model StartPostgreSQLShowIndexActionDefaultBody
 */
 type StartPostgreSQLShowIndexActionDefaultBody struct {
 
-	// code
-	Code int32 `json:"code,omitempty"`
-
 	// error
 	Error string `json:"error,omitempty"`
 
+	// code
+	Code int32 `json:"code,omitempty"`
+
 	// message
 	Message string `json:"message,omitempty"`
+
+	// details
+	Details []*DetailsItems0 `json:"details"`
 }
 
 // Validate validates this start postgre SQL show index action default body
 func (o *StartPostgreSQLShowIndexActionDefaultBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *StartPostgreSQLShowIndexActionDefaultBody) validateDetails(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Details) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Details); i++ {
+		if swag.IsZero(o.Details[i]) { // not required
+			continue
+		}
+
+		if o.Details[i] != nil {
+			if err := o.Details[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("StartPostgreSQLShowIndexAction default" + "." + "details" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 

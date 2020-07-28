@@ -9,13 +9,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // ChangeNodeExporterReader is a Reader for the ChangeNodeExporter structure.
@@ -86,7 +86,7 @@ func NewChangeNodeExporterDefault(code int) *ChangeNodeExporterDefault {
 
 /*ChangeNodeExporterDefault handles this case with default header values.
 
-An error response.
+An unexpected error response
 */
 type ChangeNodeExporterDefault struct {
 	_statusCode int
@@ -181,23 +181,60 @@ func (o *ChangeNodeExporterBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*ChangeNodeExporterDefaultBody ErrorResponse is a message returned on HTTP error.
+/*ChangeNodeExporterDefaultBody change node exporter default body
 swagger:model ChangeNodeExporterDefaultBody
 */
 type ChangeNodeExporterDefaultBody struct {
 
-	// code
-	Code int32 `json:"code,omitempty"`
-
 	// error
 	Error string `json:"error,omitempty"`
 
+	// code
+	Code int32 `json:"code,omitempty"`
+
 	// message
 	Message string `json:"message,omitempty"`
+
+	// details
+	Details []*DetailsItems0 `json:"details"`
 }
 
 // Validate validates this change node exporter default body
 func (o *ChangeNodeExporterDefaultBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *ChangeNodeExporterDefaultBody) validateDetails(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Details) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Details); i++ {
+		if swag.IsZero(o.Details[i]) { // not required
+			continue
+		}
+
+		if o.Details[i] != nil {
+			if err := o.Details[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("ChangeNodeExporter default" + "." + "details" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -286,17 +323,14 @@ type ChangeNodeExporterOKBodyNodeExporter struct {
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
-	// Custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
 	// Desired Agent status: enabled (false) or disabled (true).
 	Disabled bool `json:"disabled,omitempty"`
 
-	// Listen port for scraping metrics.
-	ListenPort int64 `json:"listen_port,omitempty"`
-
-	// The pmm-agent identifier which runs this instance.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
 	// AgentStatus represents actual Agent status.
 	//
@@ -307,6 +341,9 @@ type ChangeNodeExporterOKBodyNodeExporter struct {
 	//  - DONE: Agent finished.
 	// Enum: [AGENT_STATUS_INVALID STARTING RUNNING WAITING STOPPING DONE]
 	Status *string `json:"status,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
 }
 
 // Validate validates this change node exporter OK body node exporter
@@ -358,7 +395,7 @@ const (
 
 // prop value enum
 func (o *ChangeNodeExporterOKBodyNodeExporter) validateStatusEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, changeNodeExporterOkBodyNodeExporterTypeStatusPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, changeNodeExporterOkBodyNodeExporterTypeStatusPropEnum, true); err != nil {
 		return err
 	}
 	return nil
@@ -401,14 +438,14 @@ swagger:model ChangeNodeExporterParamsBodyCommon
 */
 type ChangeNodeExporterParamsBodyCommon struct {
 
-	// Replace all custom user-assigned labels.
-	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+	// Enable this Agent. Can't be used with disabled.
+	Enable bool `json:"enable,omitempty"`
 
 	// Disable this Agent. Can't be used with enabled.
 	Disable bool `json:"disable,omitempty"`
 
-	// Enable this Agent. Can't be used with disabled.
-	Enable bool `json:"enable,omitempty"`
+	// Replace all custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
 	// Remove all custom user-assigned labels.
 	RemoveCustomLabels bool `json:"remove_custom_labels,omitempty"`

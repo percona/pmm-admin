@@ -27,8 +27,12 @@ MySQL Service added.
 Service ID     : {{ .Service.ServiceID }}
 Service name   : {{ .Service.ServiceName }}
 Node ID        : {{ .Service.NodeID }}
+{{ if .Service.Socket -}}
+Socket         : {{ .Service.Socket }}
+{{- else -}}
 Address        : {{ .Service.Address }}
 Port           : {{ .Service.Port }}
+{{- end }}
 Environment    : {{ .Service.Environment }}
 Cluster name   : {{ .Service.Cluster }}
 Replication set: {{ .Service.ReplicationSet }}
@@ -48,6 +52,7 @@ func (res *addServiceMySQLResult) String() string {
 type addServiceMySQLCommand struct {
 	ServiceName    string
 	NodeID         string
+	Socket         string
 	Address        string
 	Port           int64
 	Environment    string
@@ -65,6 +70,7 @@ func (cmd *addServiceMySQLCommand) Run() (commands.Result, error) {
 		Body: services.AddMySQLServiceBody{
 			ServiceName:    cmd.ServiceName,
 			NodeID:         cmd.NodeID,
+			Socket:         cmd.Socket,
 			Address:        cmd.Address,
 			Port:           cmd.Port,
 			Environment:    cmd.Environment,
@@ -95,6 +101,7 @@ func init() {
 	AddServiceMySQLC.Arg("node-id", "Node ID").StringVar(&AddServiceMySQL.NodeID)
 	AddServiceMySQLC.Arg("address", "Address").StringVar(&AddServiceMySQL.Address)
 	AddServiceMySQLC.Arg("port", "Port").Int64Var(&AddServiceMySQL.Port)
+	AddServiceMySQLC.Flag("socket", "Path to MySQL socket").StringVar(&AddServiceMySQL.Socket)
 
 	AddServiceMySQLC.Flag("environment", "Environment name").StringVar(&AddServiceMySQL.Environment)
 	AddServiceMySQLC.Flag("cluster", "Cluster name").StringVar(&AddServiceMySQL.Cluster)

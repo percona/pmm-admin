@@ -8,11 +8,12 @@ package actions
 import (
 	"fmt"
 	"io"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // GetActionReader is a Reader for the GetAction structure.
@@ -83,7 +84,7 @@ func NewGetActionDefault(code int) *GetActionDefault {
 
 /*GetActionDefault handles this case with default header values.
 
-An error response.
+An unexpected error response
 */
 type GetActionDefault struct {
 	_statusCode int
@@ -148,23 +149,60 @@ func (o *GetActionBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*GetActionDefaultBody ErrorResponse is a message returned on HTTP error.
+/*GetActionDefaultBody get action default body
 swagger:model GetActionDefaultBody
 */
 type GetActionDefaultBody struct {
 
-	// code
-	Code int32 `json:"code,omitempty"`
-
 	// error
 	Error string `json:"error,omitempty"`
 
+	// code
+	Code int32 `json:"code,omitempty"`
+
 	// message
 	Message string `json:"message,omitempty"`
+
+	// details
+	Details []*DetailsItems0 `json:"details"`
 }
 
 // Validate validates this get action default body
 func (o *GetActionDefaultBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *GetActionDefaultBody) validateDetails(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Details) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Details); i++ {
+		if swag.IsZero(o.Details[i]) { // not required
+			continue
+		}
+
+		if o.Details[i] != nil {
+			if err := o.Details[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("GetAction default" + "." + "details" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -194,17 +232,17 @@ type GetActionOKBody struct {
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
+	// pmm-agent ID where this Action is running / was run.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+
+	// Current Action output; may be partial if Action is still running.
+	Output string `json:"output,omitempty"`
+
 	// True if Action is finished.
 	Done bool `json:"done,omitempty"`
 
 	// Error message if Action failed.
 	Error string `json:"error,omitempty"`
-
-	// Current Action output; may be partial if Action is still running.
-	Output string `json:"output,omitempty"`
-
-	// pmm-agent ID where this Action is running / was run.
-	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 }
 
 // Validate validates this get action OK body

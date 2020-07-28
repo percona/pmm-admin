@@ -3,11 +3,12 @@ help:                           ## Display this help message.
 	@grep '^[a-zA-Z]' $(MAKEFILE_LIST) | \
 		awk -F ':.*?## ' 'NF==2 {printf "  %-26s%s\n", $$1, $$2}'
 
+# `cut` is used to remove first `v` from `git describe` output
 PMM_RELEASE_PATH ?= bin
-PMM_RELEASE_VERSION ?= 2.0.0-dev
+PMM_RELEASE_VERSION ?= $(shell git describe --always --dirty | cut -b2-)
 PMM_RELEASE_TIMESTAMP ?= $(shell date '+%s')
 PMM_RELEASE_FULLCOMMIT ?= $(shell git rev-parse HEAD)
-PMM_RELEASE_BRANCH ?= $(shell git describe --all --contains --dirty HEAD)
+PMM_RELEASE_BRANCH ?= $(shell git describe --always --contains --all)
 
 LD_FLAGS = -ldflags " \
 			-X 'github.com/percona/pmm-admin/vendor/github.com/percona/pmm/version.ProjectName=pmm-admin' \
@@ -38,7 +39,7 @@ install-race:                   ## Install pmm-admin binary with race detector.
 
 TEST_FLAGS ?= -timeout=20s
 
-test:                           ## Run tests.
+test: install                   ## Run tests.
 	go test $(TEST_FLAGS) ./...
 
 test-race:                      ## Run tests with race detector.
@@ -54,8 +55,10 @@ check:                          ## Run required checkers and linters.
 	go run .github/check-license.go
 
 check-style:                    ## Run style checkers and linters.
-	golangci-lint run ./... --new-from-rev=master
+	golangci-lint run -c=.golangci.yml ./... --new-from-rev=master
 	go-consistent -pedantic ./...
+
+check-all: check check-style    ## Run all linters for new code..
 
 FILES = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
@@ -68,3 +71,7 @@ env-up:                         ## Start development environment.
 
 env-down:                       ## Stop development environment.
 	docker-compose down --volumes --remove-orphans
+
+ci-reviewdog:                   ## Runs reviewdog checks.
+	golangci-lint run -c=.golangci-required.yml --out-format=line-number | bin/reviewdog -f=golangci-lint -level=error -reporter=github-pr-check
+	golangci-lint run -c=.golangci.yml --out-format=line-number | bin/reviewdog -f=golangci-lint -level=error -reporter=github-pr-review

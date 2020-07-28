@@ -6,13 +6,14 @@ package server
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"github.com/go-openapi/runtime"
+	"io"
 
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 )
 
 // New creates a new server API client.
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *Client {
+func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
 	return &Client{transport: transport, formats: formats}
 }
 
@@ -24,8 +25,64 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
+// ClientService is the interface for Client methods
+type ClientService interface {
+	AWSInstanceCheck(params *AWSInstanceCheckParams) (*AWSInstanceCheckOK, error)
+
+	ChangeSettings(params *ChangeSettingsParams) (*ChangeSettingsOK, error)
+
+	CheckUpdates(params *CheckUpdatesParams) (*CheckUpdatesOK, error)
+
+	GetSettings(params *GetSettingsParams) (*GetSettingsOK, error)
+
+	Logs(params *LogsParams, writer io.Writer) (*LogsOK, error)
+
+	Readiness(params *ReadinessParams) (*ReadinessOK, error)
+
+	StartUpdate(params *StartUpdateParams) (*StartUpdateOK, error)
+
+	UpdateStatus(params *UpdateStatusParams) (*UpdateStatusOK, error)
+
+	Version(params *VersionParams) (*VersionOK, error)
+
+	SetTransport(transport runtime.ClientTransport)
+}
+
 /*
-ChangeSettings changes settings changes PMM server settings
+  AWSInstanceCheck AWSs instance check checks AWS e c2 instance ID
+*/
+func (a *Client) AWSInstanceCheck(params *AWSInstanceCheckParams) (*AWSInstanceCheckOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAWSInstanceCheckParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "AWSInstanceCheck",
+		Method:             "POST",
+		PathPattern:        "/v1/AWSInstanceCheck",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AWSInstanceCheckReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AWSInstanceCheckOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AWSInstanceCheckDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  ChangeSettings changes settings changes PMM server settings
 */
 func (a *Client) ChangeSettings(params *ChangeSettingsParams) (*ChangeSettingsOK, error) {
 	// TODO: Validate the params before sending
@@ -58,7 +115,7 @@ func (a *Client) ChangeSettings(params *ChangeSettingsParams) (*ChangeSettingsOK
 }
 
 /*
-CheckUpdates checks updates checks PMM server updates availability
+  CheckUpdates checks updates checks PMM server updates availability
 */
 func (a *Client) CheckUpdates(params *CheckUpdatesParams) (*CheckUpdatesOK, error) {
 	// TODO: Validate the params before sending
@@ -91,7 +148,7 @@ func (a *Client) CheckUpdates(params *CheckUpdatesParams) (*CheckUpdatesOK, erro
 }
 
 /*
-GetSettings gets settings returns current PMM server settings
+  GetSettings gets settings returns current PMM server settings
 */
 func (a *Client) GetSettings(params *GetSettingsParams) (*GetSettingsOK, error) {
 	// TODO: Validate the params before sending
@@ -124,7 +181,40 @@ func (a *Client) GetSettings(params *GetSettingsParams) (*GetSettingsOK, error) 
 }
 
 /*
-Readiness readinesses returns an error when some PMM server component is not ready yet or is being restarted it can be used as for docker health check or kubernetes readiness probe
+  Logs logs returns logs of the PMM server
+*/
+func (a *Client) Logs(params *LogsParams, writer io.Writer) (*LogsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewLogsParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "Logs",
+		Method:             "GET",
+		PathPattern:        "/logs.zip",
+		ProducesMediaTypes: []string{"application/zip"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &LogsReader{formats: a.formats, writer: writer},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*LogsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*LogsDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  Readiness readinesses returns an error when some PMM server component is not ready yet or is being restarted it can be used as for docker health check or kubernetes readiness probe
 */
 func (a *Client) Readiness(params *ReadinessParams) (*ReadinessOK, error) {
 	// TODO: Validate the params before sending
@@ -157,7 +247,7 @@ func (a *Client) Readiness(params *ReadinessParams) (*ReadinessOK, error) {
 }
 
 /*
-StartUpdate starts update starts PMM server update
+  StartUpdate starts update starts PMM server update
 */
 func (a *Client) StartUpdate(params *StartUpdateParams) (*StartUpdateOK, error) {
 	// TODO: Validate the params before sending
@@ -190,7 +280,7 @@ func (a *Client) StartUpdate(params *StartUpdateParams) (*StartUpdateOK, error) 
 }
 
 /*
-UpdateStatus updates status returns PMM server update status
+  UpdateStatus updates status returns PMM server update status
 */
 func (a *Client) UpdateStatus(params *UpdateStatusParams) (*UpdateStatusOK, error) {
 	// TODO: Validate the params before sending
@@ -223,7 +313,7 @@ func (a *Client) UpdateStatus(params *UpdateStatusParams) (*UpdateStatusOK, erro
 }
 
 /*
-Version versions returns PMM server versions
+  Version versions returns PMM server versions
 */
 func (a *Client) Version(params *VersionParams) (*VersionOK, error) {
 	// TODO: Validate the params before sending

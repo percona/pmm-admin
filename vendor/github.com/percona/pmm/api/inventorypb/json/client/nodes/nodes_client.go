@@ -7,12 +7,11 @@ package nodes
 
 import (
 	"github.com/go-openapi/runtime"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
 // New creates a new nodes API client.
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *Client {
+func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
 	return &Client{transport: transport, formats: formats}
 }
 
@@ -24,8 +23,27 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
+// ClientService is the interface for Client methods
+type ClientService interface {
+	AddContainerNode(params *AddContainerNodeParams) (*AddContainerNodeOK, error)
+
+	AddGenericNode(params *AddGenericNodeParams) (*AddGenericNodeOK, error)
+
+	AddRemoteNode(params *AddRemoteNodeParams) (*AddRemoteNodeOK, error)
+
+	AddRemoteRDSNode(params *AddRemoteRDSNodeParams) (*AddRemoteRDSNodeOK, error)
+
+	GetNode(params *GetNodeParams) (*GetNodeOK, error)
+
+	ListNodes(params *ListNodesParams) (*ListNodesOK, error)
+
+	RemoveNode(params *RemoveNodeParams) (*RemoveNodeOK, error)
+
+	SetTransport(transport runtime.ClientTransport)
+}
+
 /*
-AddContainerNode adds container node adds container node
+  AddContainerNode adds container node adds container node
 */
 func (a *Client) AddContainerNode(params *AddContainerNodeParams) (*AddContainerNodeOK, error) {
 	// TODO: Validate the params before sending
@@ -58,7 +76,7 @@ func (a *Client) AddContainerNode(params *AddContainerNodeParams) (*AddContainer
 }
 
 /*
-AddGenericNode adds generic node adds generic node
+  AddGenericNode adds generic node adds generic node
 */
 func (a *Client) AddGenericNode(params *AddGenericNodeParams) (*AddGenericNodeOK, error) {
 	// TODO: Validate the params before sending
@@ -91,7 +109,7 @@ func (a *Client) AddGenericNode(params *AddGenericNodeParams) (*AddGenericNodeOK
 }
 
 /*
-AddRemoteNode adds remote node adds remote node
+  AddRemoteNode adds remote node adds remote node
 */
 func (a *Client) AddRemoteNode(params *AddRemoteNodeParams) (*AddRemoteNodeOK, error) {
 	// TODO: Validate the params before sending
@@ -124,7 +142,40 @@ func (a *Client) AddRemoteNode(params *AddRemoteNodeParams) (*AddRemoteNodeOK, e
 }
 
 /*
-GetNode gets node returns a single node by ID
+  AddRemoteRDSNode adds remote RDS node adds remote RDS node
+*/
+func (a *Client) AddRemoteRDSNode(params *AddRemoteRDSNodeParams) (*AddRemoteRDSNodeOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAddRemoteRDSNodeParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "AddRemoteRDSNode",
+		Method:             "POST",
+		PathPattern:        "/v1/inventory/Nodes/AddRemoteRDS",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AddRemoteRDSNodeReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AddRemoteRDSNodeOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AddRemoteRDSNodeDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  GetNode gets node returns a single node by ID
 */
 func (a *Client) GetNode(params *GetNodeParams) (*GetNodeOK, error) {
 	// TODO: Validate the params before sending
@@ -157,7 +208,7 @@ func (a *Client) GetNode(params *GetNodeParams) (*GetNodeOK, error) {
 }
 
 /*
-ListNodes lists nodes returns a list of all nodes
+  ListNodes lists nodes returns a list of all nodes
 */
 func (a *Client) ListNodes(params *ListNodesParams) (*ListNodesOK, error) {
 	// TODO: Validate the params before sending
@@ -190,7 +241,7 @@ func (a *Client) ListNodes(params *ListNodesParams) (*ListNodesOK, error) {
 }
 
 /*
-RemoveNode removes node removes node
+  RemoveNode removes node removes node
 */
 func (a *Client) RemoveNode(params *RemoveNodeParams) (*RemoveNodeOK, error) {
 	// TODO: Validate the params before sending

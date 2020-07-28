@@ -13,10 +13,9 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // StatusReader is a Reader for the Status structure.
@@ -87,7 +86,7 @@ func NewStatusDefault(code int) *StatusDefault {
 
 /*StatusDefault handles this case with default header values.
 
-An error response.
+An unexpected error response
 */
 type StatusDefault struct {
 	_statusCode int
@@ -129,7 +128,7 @@ type AgentsInfoItems0 struct {
 	AgentID string `json:"agent_id,omitempty"`
 
 	// AgentType describes supported Agent types.
-	// Enum: [AGENT_TYPE_INVALID PMM_AGENT NODE_EXPORTER MYSQLD_EXPORTER MONGODB_EXPORTER POSTGRES_EXPORTER PROXYSQL_EXPORTER QAN_MYSQL_PERFSCHEMA_AGENT QAN_MYSQL_SLOWLOG_AGENT QAN_MONGODB_PROFILER_AGENT QAN_POSTGRESQL_PGSTATEMENTS_AGENT]
+	// Enum: [AGENT_TYPE_INVALID PMM_AGENT NODE_EXPORTER MYSQLD_EXPORTER MONGODB_EXPORTER POSTGRES_EXPORTER PROXYSQL_EXPORTER QAN_MYSQL_PERFSCHEMA_AGENT QAN_MYSQL_SLOWLOG_AGENT QAN_MONGODB_PROFILER_AGENT QAN_POSTGRESQL_PGSTATEMENTS_AGENT RDS_EXPORTER EXTERNAL_EXPORTER]
 	AgentType *string `json:"agent_type,omitempty"`
 
 	// AgentStatus represents actual Agent status.
@@ -165,7 +164,7 @@ var agentsInfoItems0TypeAgentTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["AGENT_TYPE_INVALID","PMM_AGENT","NODE_EXPORTER","MYSQLD_EXPORTER","MONGODB_EXPORTER","POSTGRES_EXPORTER","PROXYSQL_EXPORTER","QAN_MYSQL_PERFSCHEMA_AGENT","QAN_MYSQL_SLOWLOG_AGENT","QAN_MONGODB_PROFILER_AGENT","QAN_POSTGRESQL_PGSTATEMENTS_AGENT"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["AGENT_TYPE_INVALID","PMM_AGENT","NODE_EXPORTER","MYSQLD_EXPORTER","MONGODB_EXPORTER","POSTGRES_EXPORTER","PROXYSQL_EXPORTER","QAN_MYSQL_PERFSCHEMA_AGENT","QAN_MYSQL_SLOWLOG_AGENT","QAN_MONGODB_PROFILER_AGENT","QAN_POSTGRESQL_PGSTATEMENTS_AGENT","RDS_EXPORTER","EXTERNAL_EXPORTER"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -207,11 +206,17 @@ const (
 
 	// AgentsInfoItems0AgentTypeQANPOSTGRESQLPGSTATEMENTSAGENT captures enum value "QAN_POSTGRESQL_PGSTATEMENTS_AGENT"
 	AgentsInfoItems0AgentTypeQANPOSTGRESQLPGSTATEMENTSAGENT string = "QAN_POSTGRESQL_PGSTATEMENTS_AGENT"
+
+	// AgentsInfoItems0AgentTypeRDSEXPORTER captures enum value "RDS_EXPORTER"
+	AgentsInfoItems0AgentTypeRDSEXPORTER string = "RDS_EXPORTER"
+
+	// AgentsInfoItems0AgentTypeEXTERNALEXPORTER captures enum value "EXTERNAL_EXPORTER"
+	AgentsInfoItems0AgentTypeEXTERNALEXPORTER string = "EXTERNAL_EXPORTER"
 )
 
 // prop value enum
 func (o *AgentsInfoItems0) validateAgentTypeEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, agentsInfoItems0TypeAgentTypePropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, agentsInfoItems0TypeAgentTypePropEnum, true); err != nil {
 		return err
 	}
 	return nil
@@ -266,7 +271,7 @@ const (
 
 // prop value enum
 func (o *AgentsInfoItems0) validateStatusEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, agentsInfoItems0TypeStatusPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, agentsInfoItems0TypeStatusPropEnum, true); err != nil {
 		return err
 	}
 	return nil
@@ -336,23 +341,60 @@ func (o *StatusBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*StatusDefaultBody ErrorResponse is a message returned on HTTP error.
+/*StatusDefaultBody status default body
 swagger:model StatusDefaultBody
 */
 type StatusDefaultBody struct {
 
-	// code
-	Code int32 `json:"code,omitempty"`
-
 	// error
 	Error string `json:"error,omitempty"`
 
+	// code
+	Code int32 `json:"code,omitempty"`
+
 	// message
 	Message string `json:"message,omitempty"`
+
+	// details
+	Details []*DetailsItems0 `json:"details"`
 }
 
 // Validate validates this status default body
 func (o *StatusDefaultBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *StatusDefaultBody) validateDetails(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Details) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Details); i++ {
+		if swag.IsZero(o.Details[i]) { // not required
+			continue
+		}
+
+		if o.Details[i] != nil {
+			if err := o.Details[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("Status default" + "." + "details" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -382,14 +424,17 @@ type StatusOKBody struct {
 	// agent id
 	AgentID string `json:"agent_id,omitempty"`
 
+	// runs on node id
+	RunsOnNodeID string `json:"runs_on_node_id,omitempty"`
+
 	// agents info
 	AgentsInfo []*AgentsInfoItems0 `json:"agents_info"`
 
 	// Config file path if pmm-agent was started with one.
 	ConfigFilepath string `json:"config_filepath,omitempty"`
 
-	// runs on node id
-	RunsOnNodeID string `json:"runs_on_node_id,omitempty"`
+	// PMM Agent version.
+	AgentVersion string `json:"agent_version,omitempty"`
 
 	// server info
 	ServerInfo *StatusOKBodyServerInfo `json:"server_info,omitempty"`
@@ -479,23 +524,23 @@ swagger:model StatusOKBodyServerInfo
 */
 type StatusOKBodyServerInfo struct {
 
-	// Clock drift from PMM Server (if agent is connected).
-	ClockDrift string `json:"clock_drift,omitempty"`
-
-	// True if pmm-agent is currently connected to the server.
-	Connected bool `json:"connected,omitempty"`
+	// PMM Server URL in a form https://HOST:PORT/.
+	URL string `json:"url,omitempty"`
 
 	// PMM Server's TLS certificate validation should be skipped if true.
 	InsecureTLS bool `json:"insecure_tls,omitempty"`
 
-	// Ping time from pmm-agent to pmm-managed (if agent is connected).
-	Latency string `json:"latency,omitempty"`
-
-	// PMM Server URL in a form https://HOST:PORT/.
-	URL string `json:"url,omitempty"`
+	// True if pmm-agent is currently connected to the server.
+	Connected bool `json:"connected,omitempty"`
 
 	// PMM Server version (if agent is connected).
 	Version string `json:"version,omitempty"`
+
+	// Ping time from pmm-agent to pmm-managed (if agent is connected).
+	Latency string `json:"latency,omitempty"`
+
+	// Clock drift from PMM Server (if agent is connected).
+	ClockDrift string `json:"clock_drift,omitempty"`
 }
 
 // Validate validates this status OK body server info

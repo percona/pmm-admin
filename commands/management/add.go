@@ -16,10 +16,75 @@
 package management
 
 import (
+	"net"
+	"strconv"
+
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 // register command
 var (
 	AddC = kingpin.Command("add", "Add Service to monitoring")
+
+	addServiceNameFlag string
+	addHostFlag        string
+	addPortFlag        uint16
 )
+
+func addGlobalFlags(cmd *kingpin.CmdClause) {
+	// Add command global flags
+	cmd.Flag("service-name", "Service name (overrides positional argument)").PlaceHolder("NAME").StringVar(&addServiceNameFlag)
+	cmd.Flag("host", "Service hostname or IP address (overrides positional argument)").StringVar(&addHostFlag)
+	cmd.Flag("port", "Service port number (overrides positional argument)").Uint16Var(&addPortFlag)
+}
+
+type connectionGetter interface {
+	GetServiceName() string
+	GetAddress() string
+	GetDefaultAddress() string
+	GetSocket() string
+}
+
+// Types implementing the getter interface:
+// - addMySQLCommand
+// - addProxySQLCommand
+// - addPostgreSQLCommand
+// - addMongoDBCommand
+// Returns service name, socket, host, port, error.
+func processGlobalAddFlagsWithSocket(cmd connectionGetter) (serviceName string, socket string, host string, port uint16, err error) {
+	serviceName = cmd.GetServiceName()
+	if addServiceNameFlag != "" {
+		serviceName = addServiceNameFlag
+	}
+
+	socket = cmd.GetSocket()
+	address := cmd.GetAddress()
+	if socket == "" && address == "" {
+		address = cmd.GetDefaultAddress()
+	}
+
+	var portI int
+
+	if address != "" {
+		var portS string
+		host, portS, err = net.SplitHostPort(address)
+		if err != nil {
+			return "", "", "", 0, err
+		}
+
+		portI, err = strconv.Atoi(portS)
+		if err != nil {
+			return "", "", "", 0, err
+		}
+	}
+
+	if addHostFlag != "" {
+		host = addHostFlag
+	}
+
+	if addPortFlag != 0 {
+		portI = int(addPortFlag)
+	}
+
+	return serviceName, socket, host, uint16(portI), nil
+}

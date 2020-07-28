@@ -17,7 +17,6 @@ package management
 
 import (
 	"fmt"
-	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -30,14 +29,24 @@ import (
 	"github.com/percona/pmm-admin/commands"
 )
 
+const (
+	mysqlQuerySourceSlowLog    = "slowlog"
+	mysqlQuerySourcePerfSchema = "perfschema"
+	mysqlQuerySourceNone       = "none"
+)
+
 var addMySQLResultT = commands.ParseTemplate(`
 MySQL Service added.
 Service ID  : {{ .Service.ServiceID }}
 Service name: {{ .Service.ServiceName }}
+
+{{ .TablestatStatus }}
 `)
 
 type addMySQLResult struct {
-	Service *mysql.AddMySQLOKBodyService `json:"service"`
+	Service        *mysql.AddMySQLOKBodyService        `json:"service"`
+	MysqldExporter *mysql.AddMySQLOKBodyMysqldExporter `json:"mysqld_exporter,omitempty"`
+	TableCount     int32                               `json:"table_count,omitempty"`
 }
 
 func (res *addMySQLResult) Result() {}
@@ -46,8 +55,38 @@ func (res *addMySQLResult) String() string {
 	return commands.RenderTemplate(addMySQLResultT, res)
 }
 
+func (res *addMySQLResult) TablestatStatus() string {
+	if res.MysqldExporter == nil {
+		return ""
+	}
+
+	status := "enabled"
+	if res.MysqldExporter.TablestatsGroupDisabled {
+		status = "disabled"
+	}
+
+	s := "Table statistics collection " + status
+
+	switch {
+	case res.MysqldExporter.TablestatsGroupTableLimit == 0: // no limit
+		s += " (the table count limit is not set)."
+	case res.MysqldExporter.TablestatsGroupTableLimit < 0: // always disabled
+		s += " (always)."
+	default:
+		count := "unknown"
+		if res.TableCount > 0 {
+			count = strconv.Itoa(int(res.TableCount))
+		}
+
+		s += fmt.Sprintf(" (the limit is %d, the actual table count is %s).", res.MysqldExporter.TablestatsGroupTableLimit, count)
+	}
+
+	return s
+}
+
 type addMySQLCommand struct {
-	AddressPort    string
+	Address        string
+	Socket         string
 	NodeID         string
 	PMMAgentID     string
 	ServiceName    string
@@ -60,21 +99,41 @@ type addMySQLCommand struct {
 
 	QuerySource string
 
-	// TODO remove it https://jira.percona.com/browse/PMM-4704
-	UsePerfschema bool
-	UseSlowLog    bool
+	SkipConnectionCheck    bool
+	DisableQueryExamples   bool
+	MaxSlowlogFileSize     units.Base2Bytes
+	TLS                    bool
+	TLSSkipVerify          bool
+	DisableTablestats      bool
+	DisableTablestatsLimit uint16
+	CreateUser             bool
+}
 
-	SkipConnectionCheck  bool
-	DisableQueryExamples bool
-	MaxSlowlogFileSize   units.Base2Bytes
-	TLS                  bool
-	TLSSkipVerify        bool
+func (cmd *addMySQLCommand) GetServiceName() string {
+	return cmd.ServiceName
+}
+
+func (cmd *addMySQLCommand) GetAddress() string {
+	return cmd.Address
+}
+
+func (cmd *addMySQLCommand) GetDefaultAddress() string {
+	return "127.0.0.1:3306"
+}
+
+func (cmd *addMySQLCommand) GetSocket() string {
+	return cmd.Socket
 }
 
 func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
+	}
+
+	if cmd.CreateUser {
+		return nil, fmt.Errorf("Unrecognized option. To create a user, see " +
+			"'https://www.percona.com/doc/percona-monitoring-and-management/2.x/concepts/services-mysql.html#pmm-conf-mysql-user-account-creating'")
 	}
 
 	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
@@ -90,33 +149,26 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		}
 	}
 
-	host, portS, err := net.SplitHostPort(cmd.AddressPort)
-	if err != nil {
-		return nil, err
-	}
-	port, err := strconv.Atoi(portS)
+	serviceName, socket, host, port, err := processGlobalAddFlagsWithSocket(cmd)
 	if err != nil {
 		return nil, err
 	}
 
-	// ignore query source if old flags are present for compatibility
-	useSlowLog, usePerfschema := cmd.UseSlowLog, cmd.UsePerfschema
-	if !(useSlowLog || usePerfschema) {
-		switch cmd.QuerySource {
-		case "slowlog":
-			useSlowLog = true
-		case "perfschema":
-			usePerfschema = true
-		case "none":
-			// nothing
+	tablestatsGroupTableLimit := int32(cmd.DisableTablestatsLimit)
+	if cmd.DisableTablestats {
+		if tablestatsGroupTableLimit != 0 {
+			return nil, fmt.Errorf("both --disable-tablestats and --disable-tablestats-limit are passed")
 		}
+
+		tablestatsGroupTableLimit = -1
 	}
 
 	params := &mysql.AddMySQLParams{
 		Body: mysql.AddMySQLBody{
 			NodeID:         cmd.NodeID,
-			ServiceName:    cmd.ServiceName,
+			ServiceName:    serviceName,
 			Address:        host,
+			Socket:         socket,
 			Port:           int64(port),
 			PMMAgentID:     cmd.PMMAgentID,
 			Environment:    cmd.Environment,
@@ -126,14 +178,15 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			Password:       cmd.Password,
 			CustomLabels:   customLabels,
 
-			QANMysqlSlowlog:    useSlowLog,
-			QANMysqlPerfschema: usePerfschema,
+			QANMysqlSlowlog:    cmd.QuerySource == mysqlQuerySourceSlowLog,
+			QANMysqlPerfschema: cmd.QuerySource == mysqlQuerySourcePerfSchema,
 
-			SkipConnectionCheck:  cmd.SkipConnectionCheck,
-			DisableQueryExamples: cmd.DisableQueryExamples,
-			MaxSlowlogFileSize:   strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
-			TLS:                  cmd.TLS,
-			TLSSkipVerify:        cmd.TLSSkipVerify,
+			SkipConnectionCheck:       cmd.SkipConnectionCheck,
+			DisableQueryExamples:      cmd.DisableQueryExamples,
+			MaxSlowlogFileSize:        strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
+			TLS:                       cmd.TLS,
+			TLSSkipVerify:             cmd.TLSSkipVerify,
+			TablestatsGroupTableLimit: tablestatsGroupTableLimit,
 		},
 		Context: commands.Ctx,
 	}
@@ -143,7 +196,9 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 	}
 
 	return &addMySQLResult{
-		Service: resp.Payload.Service,
+		Service:        resp.Payload.Service,
+		MysqldExporter: resp.Payload.MysqldExporter,
+		TableCount:     resp.Payload.TableCount,
 	}, nil
 }
 
@@ -159,7 +214,8 @@ func init() {
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddMySQLC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddMySQL.ServiceName)
 
-	AddMySQLC.Arg("address", "MySQL address and port (default: 127.0.0.1:3306)").Default("127.0.0.1:3306").StringVar(&AddMySQL.AddressPort)
+	AddMySQLC.Arg("address", "MySQL address and port (default: 127.0.0.1:3306)").StringVar(&AddMySQL.Address)
+	AddMySQLC.Flag("socket", "Path to MySQL socket").StringVar(&AddMySQL.Socket)
 
 	AddMySQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddMySQL.NodeID)
 	AddMySQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddMySQL.PMMAgentID)
@@ -167,14 +223,15 @@ func init() {
 	AddMySQLC.Flag("username", "MySQL username").Default("root").StringVar(&AddMySQL.Username)
 	AddMySQLC.Flag("password", "MySQL password").StringVar(&AddMySQL.Password)
 
-	querySources := []string{"slowlog", "perfschema", "none"} // TODO add "auto"
+	querySources := []string{mysqlQuerySourceSlowLog, mysqlQuerySourcePerfSchema, mysqlQuerySourceNone} // TODO add "auto", make it default
 	querySourceHelp := fmt.Sprintf("Source of SQL queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
 	AddMySQLC.Flag("query-source", querySourceHelp).Default(querySources[0]).EnumVar(&AddMySQL.QuerySource, querySources...)
-	AddMySQLC.Flag("use-perfschema", "Run QAN perf schema agent").Hidden().BoolVar(&AddMySQL.UsePerfschema)
-	AddMySQLC.Flag("use-slowlog", "Run QAN slow log agent").Hidden().BoolVar(&AddMySQL.UseSlowLog)
 	AddMySQLC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddMySQL.DisableQueryExamples)
-	AddMySQLC.Flag("size-slow-logs", "Rotate slow log file at this size (default: 1GB; negative value disables rotation)").
+	AddMySQLC.Flag("size-slow-logs", "Rotate slow log file at this size (default: server-defined; negative value disables rotation)").
 		BytesVar(&AddMySQL.MaxSlowlogFileSize)
+	AddMySQLC.Flag("disable-tablestats", "Disable table statistics collection").BoolVar(&AddMySQL.DisableTablestats)
+	AddMySQLC.Flag("disable-tablestats-limit", "Table statistics collection will be disabled if there are more than specified number of tables (default: server-defined)").
+		Uint16Var(&AddMySQL.DisableTablestatsLimit)
 
 	AddMySQLC.Flag("environment", "Environment name").StringVar(&AddMySQL.Environment)
 	AddMySQLC.Flag("cluster", "Cluster name").StringVar(&AddMySQL.Cluster)
@@ -184,4 +241,6 @@ func init() {
 	AddMySQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddMySQL.SkipConnectionCheck)
 	AddMySQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMySQL.TLS)
 	AddMySQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMySQL.TLSSkipVerify)
+	AddMySQLC.Flag("create-user", "Create pmm user").Hidden().BoolVar(&AddMySQL.CreateUser)
+	addGlobalFlags(AddMySQLC)
 }

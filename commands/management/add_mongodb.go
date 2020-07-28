@@ -17,9 +17,7 @@ package management
 
 import (
 	"fmt"
-	"net"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/percona/pmm/api/managementpb/json/client"
@@ -27,6 +25,11 @@ import (
 
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
+)
+
+const (
+	mongodbQuerySourceProfiler = "profiler"
+	mongodbQuerySourceNone     = "none"
 )
 
 var addMongoDBResultT = commands.ParseTemplate(`
@@ -46,7 +49,8 @@ func (res *addMongoDBResult) String() string {
 }
 
 type addMongoDBCommand struct {
-	AddressPort    string
+	Address        string
+	Socket         string
 	NodeID         string
 	PMMAgentID     string
 	ServiceName    string
@@ -58,11 +62,26 @@ type addMongoDBCommand struct {
 	CustomLabels   string
 
 	QuerySource string
-	UseProfiler bool // TODO remove it https://jira.percona.com/browse/PMM-4704
 
 	SkipConnectionCheck bool
 	TLS                 bool
 	TLSSkipVerify       bool
+}
+
+func (cmd *addMongoDBCommand) GetServiceName() string {
+	return cmd.ServiceName
+}
+
+func (cmd *addMongoDBCommand) GetAddress() string {
+	return cmd.Address
+}
+
+func (cmd *addMongoDBCommand) GetDefaultAddress() string {
+	return "127.0.0.1:27017"
+}
+
+func (cmd *addMongoDBCommand) GetSocket() string {
+	return cmd.Socket
 }
 
 func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
@@ -84,32 +103,18 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 		}
 	}
 
-	host, portS, err := net.SplitHostPort(cmd.AddressPort)
+	serviceName, socket, host, port, err := processGlobalAddFlagsWithSocket(cmd)
 	if err != nil {
 		return nil, err
-	}
-	port, err := strconv.Atoi(portS)
-	if err != nil {
-		return nil, err
-	}
-
-	// ignore query source if old flags are present for compatibility
-	useProfiler := cmd.UseProfiler
-	if !useProfiler {
-		switch cmd.QuerySource {
-		case "profiler":
-			useProfiler = true
-		case "none":
-			// nothing
-		}
 	}
 
 	params := &mongodb.AddMongoDBParams{
 		Body: mongodb.AddMongoDBBody{
 			NodeID:         cmd.NodeID,
-			ServiceName:    cmd.ServiceName,
+			ServiceName:    serviceName,
 			Address:        host,
 			Port:           int64(port),
+			Socket:         socket,
 			PMMAgentID:     cmd.PMMAgentID,
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
@@ -117,7 +122,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 			Username:       cmd.Username,
 			Password:       cmd.Password,
 
-			QANMongodbProfiler: useProfiler,
+			QANMongodbProfiler: cmd.QuerySource == mongodbQuerySourceProfiler,
 
 			CustomLabels:        customLabels,
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
@@ -148,7 +153,7 @@ func init() {
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
 	AddMongoDBC.Arg("name", serviceNameHelp).Default(serviceName).StringVar(&AddMongoDB.ServiceName)
 
-	AddMongoDBC.Arg("address", "MongoDB address and port (default: 127.0.0.1:27017)").Default("127.0.0.1:27017").StringVar(&AddMongoDB.AddressPort)
+	AddMongoDBC.Arg("address", "MongoDB address and port (default: 127.0.0.1:27017)").StringVar(&AddMongoDB.Address)
 
 	AddMongoDBC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddMongoDB.NodeID)
 	AddMongoDBC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddMongoDB.PMMAgentID)
@@ -156,10 +161,9 @@ func init() {
 	AddMongoDBC.Flag("username", "MongoDB username").StringVar(&AddMongoDB.Username)
 	AddMongoDBC.Flag("password", "MongoDB password").StringVar(&AddMongoDB.Password)
 
-	querySources := []string{"profiler", "none"} // TODO add "auto"
+	querySources := []string{mongodbQuerySourceProfiler, mongodbQuerySourceNone} // TODO add "auto"
 	querySourceHelp := fmt.Sprintf("Source of queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
 	AddMongoDBC.Flag("query-source", querySourceHelp).Default(querySources[0]).EnumVar(&AddMongoDB.QuerySource, querySources...)
-	AddMongoDBC.Flag("use-profiler", "Run QAN profiler agent").Hidden().BoolVar(&AddMongoDB.UseProfiler)
 
 	AddMongoDBC.Flag("environment", "Environment name").StringVar(&AddMongoDB.Environment)
 	AddMongoDBC.Flag("cluster", "Cluster name").StringVar(&AddMongoDB.Cluster)
@@ -169,4 +173,6 @@ func init() {
 	AddMongoDBC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddMongoDB.SkipConnectionCheck)
 	AddMongoDBC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMongoDB.TLS)
 	AddMongoDBC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMongoDB.TLSSkipVerify)
+	addGlobalFlags(AddMongoDBC)
+	AddMongoDBC.Flag("socket", "Path to socket").StringVar(&AddMongoDB.Socket)
 }

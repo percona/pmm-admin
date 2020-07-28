@@ -18,6 +18,7 @@ package inventory
 import (
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/nodes"
+	"github.com/percona/pmm/api/inventorypb/types"
 
 	"github.com/percona/pmm-admin/commands"
 )
@@ -31,11 +32,22 @@ Nodes list.
 {{ end }}
 `)
 
+var acceptableNodeTypes = map[string][]string{
+	types.NodeTypeGenericNode:   {types.NodeTypeName(types.NodeTypeGenericNode)},
+	types.NodeTypeContainerNode: {types.NodeTypeName(types.NodeTypeContainerNode)},
+	types.NodeTypeRemoteNode:    {types.NodeTypeName(types.NodeTypeRemoteNode)},
+	types.NodeTypeRemoteRDSNode: {types.NodeTypeName(types.NodeTypeRemoteRDSNode)},
+}
+
 type listResultNode struct {
 	NodeType string `json:"node_type"`
 	NodeName string `json:"node_name"`
 	Address  string `json:"address"`
 	NodeID   string `json:"node_id"`
+}
+
+func (n listResultNode) HumanReadableNodeType() string {
+	return types.NodeTypeName(n.NodeType)
 }
 
 type listNodesResult struct {
@@ -49,10 +61,17 @@ func (res *listNodesResult) String() string {
 }
 
 type listNodeCommand struct {
+	NodeType string
 }
 
 func (cmd *listNodeCommand) Run() (commands.Result, error) {
+	nodeType, err := formatTypeValue(acceptableNodeTypes, cmd.NodeType)
+	if err != nil {
+		return nil, err
+	}
+
 	params := &nodes.ListNodesParams{
+		Body:    nodes.ListNodesBody{NodeType: nodeType},
 		Context: commands.Ctx,
 	}
 	result, err := client.Default.Nodes.ListNodes(params)
@@ -60,18 +79,34 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	var nodes []listResultNode
+	var nodesList []listResultNode
 	for _, n := range result.Payload.Generic {
-		nodes = append(nodes, listResultNode{
-			NodeType: "Generic",
+		nodesList = append(nodesList, listResultNode{
+			NodeType: types.NodeTypeGenericNode,
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
 		})
 	}
 	for _, n := range result.Payload.Container {
-		nodes = append(nodes, listResultNode{
-			NodeType: "Container",
+		nodesList = append(nodesList, listResultNode{
+			NodeType: types.NodeTypeContainerNode,
+			NodeName: n.NodeName,
+			Address:  n.Address,
+			NodeID:   n.NodeID,
+		})
+	}
+	for _, n := range result.Payload.Remote {
+		nodesList = append(nodesList, listResultNode{
+			NodeType: types.NodeTypeRemoteNode,
+			NodeName: n.NodeName,
+			Address:  n.Address,
+			NodeID:   n.NodeID,
+		})
+	}
+	for _, n := range result.Payload.RemoteRDS {
+		nodesList = append(nodesList, listResultNode{
+			NodeType: types.NodeTypeRemoteRDSNode,
 			NodeName: n.NodeName,
 			Address:  n.Address,
 			NodeID:   n.NodeID,
@@ -79,7 +114,7 @@ func (cmd *listNodeCommand) Run() (commands.Result, error) {
 	}
 
 	return &listNodesResult{
-		Nodes: nodes,
+		Nodes: nodesList,
 	}, nil
 }
 
@@ -88,3 +123,7 @@ var (
 	ListNodes  = new(listNodeCommand)
 	ListNodesC = inventoryListC.Command("nodes", "Show nodes in inventory").Hide(hide)
 )
+
+func init() {
+	ListNodesC.Flag("node-type", "Filter by Node type").StringVar(&ListNodes.NodeType)
+}

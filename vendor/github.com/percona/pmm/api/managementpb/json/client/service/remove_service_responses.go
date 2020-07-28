@@ -9,13 +9,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // RemoveServiceReader is a Reader for the RemoveService structure.
@@ -84,7 +84,7 @@ func NewRemoveServiceDefault(code int) *RemoveServiceDefault {
 
 /*RemoveServiceDefault handles this case with default header values.
 
-An error response.
+An unexpected error response
 */
 type RemoveServiceDefault struct {
 	_statusCode int
@@ -117,10 +117,50 @@ func (o *RemoveServiceDefault) readResponse(response runtime.ClientResponse, con
 	return nil
 }
 
+/*DetailsItems0 details items0
+swagger:model DetailsItems0
+*/
+type DetailsItems0 struct {
+
+	// type url
+	TypeURL string `json:"type_url,omitempty"`
+
+	// value
+	// Format: byte
+	Value strfmt.Base64 `json:"value,omitempty"`
+}
+
+// Validate validates this details items0
+func (o *DetailsItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *DetailsItems0) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *DetailsItems0) UnmarshalBinary(b []byte) error {
+	var res DetailsItems0
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
 /*RemoveServiceBody remove service body
 swagger:model RemoveServiceBody
 */
 type RemoveServiceBody struct {
+
+	// ServiceType describes supported Service types.
+	// Enum: [SERVICE_TYPE_INVALID MYSQL_SERVICE MONGODB_SERVICE POSTGRESQL_SERVICE PROXYSQL_SERVICE EXTERNAL_SERVICE]
+	ServiceType *string `json:"service_type,omitempty"`
 
 	// Service ID or Service Name is required.
 	// Unique randomly generated instance identifier.
@@ -128,10 +168,6 @@ type RemoveServiceBody struct {
 
 	// Unique across all Services user-defined name.
 	ServiceName string `json:"service_name,omitempty"`
-
-	// ServiceType describes supported Service types.
-	// Enum: [SERVICE_TYPE_INVALID MYSQL_SERVICE MONGODB_SERVICE POSTGRESQL_SERVICE PROXYSQL_SERVICE]
-	ServiceType *string `json:"service_type,omitempty"`
 }
 
 // Validate validates this remove service body
@@ -152,7 +188,7 @@ var removeServiceBodyTypeServiceTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["SERVICE_TYPE_INVALID","MYSQL_SERVICE","MONGODB_SERVICE","POSTGRESQL_SERVICE","PROXYSQL_SERVICE"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["SERVICE_TYPE_INVALID","MYSQL_SERVICE","MONGODB_SERVICE","POSTGRESQL_SERVICE","PROXYSQL_SERVICE","EXTERNAL_SERVICE"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -176,11 +212,14 @@ const (
 
 	// RemoveServiceBodyServiceTypePROXYSQLSERVICE captures enum value "PROXYSQL_SERVICE"
 	RemoveServiceBodyServiceTypePROXYSQLSERVICE string = "PROXYSQL_SERVICE"
+
+	// RemoveServiceBodyServiceTypeEXTERNALSERVICE captures enum value "EXTERNAL_SERVICE"
+	RemoveServiceBodyServiceTypeEXTERNALSERVICE string = "EXTERNAL_SERVICE"
 )
 
 // prop value enum
 func (o *RemoveServiceBody) validateServiceTypeEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, removeServiceBodyTypeServiceTypePropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, removeServiceBodyTypeServiceTypePropEnum, true); err != nil {
 		return err
 	}
 	return nil
@@ -218,23 +257,60 @@ func (o *RemoveServiceBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*RemoveServiceDefaultBody ErrorResponse is a message returned on HTTP error.
+/*RemoveServiceDefaultBody remove service default body
 swagger:model RemoveServiceDefaultBody
 */
 type RemoveServiceDefaultBody struct {
 
-	// code
-	Code int32 `json:"code,omitempty"`
-
 	// error
 	Error string `json:"error,omitempty"`
 
+	// code
+	Code int32 `json:"code,omitempty"`
+
 	// message
 	Message string `json:"message,omitempty"`
+
+	// details
+	Details []*DetailsItems0 `json:"details"`
 }
 
 // Validate validates this remove service default body
 func (o *RemoveServiceDefaultBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *RemoveServiceDefaultBody) validateDetails(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Details) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Details); i++ {
+		if swag.IsZero(o.Details[i]) { // not required
+			continue
+		}
+
+		if o.Details[i] != nil {
+			if err := o.Details[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("RemoveService default" + "." + "details" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 

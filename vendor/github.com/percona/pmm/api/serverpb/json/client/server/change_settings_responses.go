@@ -8,12 +8,12 @@ package server
 import (
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // ChangeSettingsReader is a Reader for the ChangeSettings structure.
@@ -84,7 +84,7 @@ func NewChangeSettingsDefault(code int) *ChangeSettingsDefault {
 
 /*ChangeSettingsDefault handles this case with default header values.
 
-An error response.
+An unexpected error response
 */
 type ChangeSettingsDefault struct {
 	_statusCode int
@@ -122,14 +122,38 @@ swagger:model ChangeSettingsBody
 */
 type ChangeSettingsBody struct {
 
-	// A number of full days for Prometheus and QAN data retention. Should have a suffix in JSON: 2592000s, 43200m, 720h.
-	DataRetention string `json:"data_retention,omitempty"`
+	// enable telemetry
+	EnableTelemetry bool `json:"enable_telemetry,omitempty"`
 
 	// disable telemetry
 	DisableTelemetry bool `json:"disable_telemetry,omitempty"`
 
-	// enable telemetry
-	EnableTelemetry bool `json:"enable_telemetry,omitempty"`
+	// A number of full days for Prometheus and QAN data retention. Should have a suffix in JSON: 2592000s, 43200m, 720h.
+	DataRetention string `json:"data_retention,omitempty"`
+
+	// ssh key
+	SSHKey string `json:"ssh_key,omitempty"`
+
+	// aws partitions
+	AWSPartitions []string `json:"aws_partitions"`
+
+	// Prometheus AlertManager URL (e.g., https://username:password@1.2.3.4/path).
+	AlertManagerURL string `json:"alert_manager_url,omitempty"`
+
+	// remove alert manager url
+	RemoveAlertManagerURL bool `json:"remove_alert_manager_url,omitempty"`
+
+	// alert manager rules
+	AlertManagerRules string `json:"alert_manager_rules,omitempty"`
+
+	// remove alert manager rules
+	RemoveAlertManagerRules bool `json:"remove_alert_manager_rules,omitempty"`
+
+	// Enable Security Threat Tool
+	EnableStt bool `json:"enable_stt,omitempty"`
+
+	// Disable Security Threat Tool
+	DisableStt bool `json:"disable_stt,omitempty"`
 
 	// metrics resolutions
 	MetricsResolutions *ChangeSettingsParamsBodyMetricsResolutions `json:"metrics_resolutions,omitempty"`
@@ -185,23 +209,60 @@ func (o *ChangeSettingsBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*ChangeSettingsDefaultBody ErrorResponse is a message returned on HTTP error.
+/*ChangeSettingsDefaultBody change settings default body
 swagger:model ChangeSettingsDefaultBody
 */
 type ChangeSettingsDefaultBody struct {
 
-	// code
-	Code int32 `json:"code,omitempty"`
-
 	// error
 	Error string `json:"error,omitempty"`
 
+	// code
+	Code int32 `json:"code,omitempty"`
+
 	// message
 	Message string `json:"message,omitempty"`
+
+	// details
+	Details []*DetailsItems0 `json:"details"`
 }
 
 // Validate validates this change settings default body
 func (o *ChangeSettingsDefaultBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *ChangeSettingsDefaultBody) validateDetails(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Details) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Details); i++ {
+		if swag.IsZero(o.Details[i]) { // not required
+			continue
+		}
+
+		if o.Details[i] != nil {
+			if err := o.Details[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("ChangeSettings default" + "." + "details" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -287,17 +348,32 @@ swagger:model ChangeSettingsOKBodySettings
 */
 type ChangeSettingsOKBodySettings struct {
 
-	// data retention
-	DataRetention string `json:"data_retention,omitempty"`
-
-	// metrics resolutions
-	MetricsResolutions *ChangeSettingsOKBodySettingsMetricsResolutions `json:"metrics_resolutions,omitempty"`
+	// updates disabled
+	UpdatesDisabled bool `json:"updates_disabled,omitempty"`
 
 	// telemetry enabled
 	TelemetryEnabled bool `json:"telemetry_enabled,omitempty"`
 
-	// updates disabled
-	UpdatesDisabled bool `json:"updates_disabled,omitempty"`
+	// data retention
+	DataRetention string `json:"data_retention,omitempty"`
+
+	// ssh key
+	SSHKey string `json:"ssh_key,omitempty"`
+
+	// aws partitions
+	AWSPartitions []string `json:"aws_partitions"`
+
+	// Prometheus AlertManager URL (e.g., https://username:password@1.2.3.4/path).
+	AlertManagerURL string `json:"alert_manager_url,omitempty"`
+
+	// alert manager rules
+	AlertManagerRules string `json:"alert_manager_rules,omitempty"`
+
+	// Security Threat Tool enabled
+	SttEnabled bool `json:"stt_enabled,omitempty"`
+
+	// metrics resolutions
+	MetricsResolutions *ChangeSettingsOKBodySettingsMetricsResolutions `json:"metrics_resolutions,omitempty"`
 }
 
 // Validate validates this change settings OK body settings
@@ -358,11 +434,11 @@ type ChangeSettingsOKBodySettingsMetricsResolutions struct {
 	// High resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Hr string `json:"hr,omitempty"`
 
-	// Low resolution. Should have a suffix in JSON: 1s, 1m, 1h.
-	Lr string `json:"lr,omitempty"`
-
 	// Medium resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Mr string `json:"mr,omitempty"`
+
+	// Low resolution. Should have a suffix in JSON: 1s, 1m, 1h.
+	Lr string `json:"lr,omitempty"`
 }
 
 // Validate validates this change settings OK body settings metrics resolutions
@@ -396,11 +472,11 @@ type ChangeSettingsParamsBodyMetricsResolutions struct {
 	// High resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Hr string `json:"hr,omitempty"`
 
-	// Low resolution. Should have a suffix in JSON: 1s, 1m, 1h.
-	Lr string `json:"lr,omitempty"`
-
 	// Medium resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Mr string `json:"mr,omitempty"`
+
+	// Low resolution. Should have a suffix in JSON: 1s, 1m, 1h.
+	Lr string `json:"lr,omitempty"`
 }
 
 // Validate validates this change settings params body metrics resolutions

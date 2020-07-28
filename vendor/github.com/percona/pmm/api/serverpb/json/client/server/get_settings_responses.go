@@ -8,12 +8,12 @@ package server
 import (
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
 // GetSettingsReader is a Reader for the GetSettings structure.
@@ -84,7 +84,7 @@ func NewGetSettingsDefault(code int) *GetSettingsDefault {
 
 /*GetSettingsDefault handles this case with default header values.
 
-An error response.
+An unexpected error response
 */
 type GetSettingsDefault struct {
 	_statusCode int
@@ -117,23 +117,60 @@ func (o *GetSettingsDefault) readResponse(response runtime.ClientResponse, consu
 	return nil
 }
 
-/*GetSettingsDefaultBody ErrorResponse is a message returned on HTTP error.
+/*GetSettingsDefaultBody get settings default body
 swagger:model GetSettingsDefaultBody
 */
 type GetSettingsDefaultBody struct {
 
-	// code
-	Code int32 `json:"code,omitempty"`
-
 	// error
 	Error string `json:"error,omitempty"`
 
+	// code
+	Code int32 `json:"code,omitempty"`
+
 	// message
 	Message string `json:"message,omitempty"`
+
+	// details
+	Details []*DetailsItems0 `json:"details"`
 }
 
 // Validate validates this get settings default body
 func (o *GetSettingsDefaultBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDetails(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *GetSettingsDefaultBody) validateDetails(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Details) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Details); i++ {
+		if swag.IsZero(o.Details[i]) { // not required
+			continue
+		}
+
+		if o.Details[i] != nil {
+			if err := o.Details[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("GetSettings default" + "." + "details" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -219,17 +256,32 @@ swagger:model GetSettingsOKBodySettings
 */
 type GetSettingsOKBodySettings struct {
 
-	// data retention
-	DataRetention string `json:"data_retention,omitempty"`
-
-	// metrics resolutions
-	MetricsResolutions *GetSettingsOKBodySettingsMetricsResolutions `json:"metrics_resolutions,omitempty"`
+	// updates disabled
+	UpdatesDisabled bool `json:"updates_disabled,omitempty"`
 
 	// telemetry enabled
 	TelemetryEnabled bool `json:"telemetry_enabled,omitempty"`
 
-	// updates disabled
-	UpdatesDisabled bool `json:"updates_disabled,omitempty"`
+	// data retention
+	DataRetention string `json:"data_retention,omitempty"`
+
+	// ssh key
+	SSHKey string `json:"ssh_key,omitempty"`
+
+	// aws partitions
+	AWSPartitions []string `json:"aws_partitions"`
+
+	// Prometheus AlertManager URL (e.g., https://username:password@1.2.3.4/path).
+	AlertManagerURL string `json:"alert_manager_url,omitempty"`
+
+	// alert manager rules
+	AlertManagerRules string `json:"alert_manager_rules,omitempty"`
+
+	// Security Threat Tool enabled
+	SttEnabled bool `json:"stt_enabled,omitempty"`
+
+	// metrics resolutions
+	MetricsResolutions *GetSettingsOKBodySettingsMetricsResolutions `json:"metrics_resolutions,omitempty"`
 }
 
 // Validate validates this get settings OK body settings
@@ -290,11 +342,11 @@ type GetSettingsOKBodySettingsMetricsResolutions struct {
 	// High resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Hr string `json:"hr,omitempty"`
 
-	// Low resolution. Should have a suffix in JSON: 1s, 1m, 1h.
-	Lr string `json:"lr,omitempty"`
-
 	// Medium resolution. Should have a suffix in JSON: 1s, 1m, 1h.
 	Mr string `json:"mr,omitempty"`
+
+	// Low resolution. Should have a suffix in JSON: 1s, 1m, 1h.
+	Lr string `json:"lr,omitempty"`
 }
 
 // Validate validates this get settings OK body settings metrics resolutions
