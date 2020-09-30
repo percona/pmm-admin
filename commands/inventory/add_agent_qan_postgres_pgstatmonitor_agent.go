@@ -24,18 +24,17 @@ import (
 
 var addAgentQANPostgreSQLPgStatMonitorAgentResultT = commands.ParseTemplate(`
 PostgreSQL QAN Pg Stat Monitor Agent added.
-Agent ID               : {{ .Agent.AgentID }}
-PMM-Agent ID           : {{ .Agent.PMMAgentID }}
-Service ID             : {{ .Agent.ServiceID }}
-Username               : {{ .Agent.Username }}
-Listen port            : {{ .Agent.ListenPort }}
-TLS enabled            : {{ .Agent.TLS }}
-Skip TLS verification  : {{ .Agent.TLSSkipVerify }}
+Agent ID             : {{ .Agent.AgentID }}
+PMM-Agent ID         : {{ .Agent.PMMAgentID }}
+Service ID           : {{ .Agent.ServiceID }}
+Username             : {{ .Agent.Username }}
+TLS enabled          : {{ .Agent.TLS }}
+Skip TLS verification: {{ .Agent.TLSSkipVerify }}
 
-Status                 : {{ .Agent.Status }}
-Disabled               : {{ .Agent.Disabled }}
-Custom labels          : {{ .Agent.CustomLabels }}
-Query examples disabled: {{ .Agent.QueryExamplesDisabled }}
+Status               : {{ .Agent.Status }}
+Disabled             : {{ .Agent.Disabled }}
+Custom labels        : {{ .Agent.CustomLabels }}
+Query examples       : {{ .Agent.QueryExamplesDisabled }}
 `)
 
 type addAgentQANPostgreSQLPgStatMonitorAgentResult struct {
