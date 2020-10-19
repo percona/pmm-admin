@@ -324,7 +324,7 @@ var (
 func init() {
 	hostname, _ := os.Hostname()
 	filename := fmt.Sprintf("summary_%s_%s.zip",
-		strings.Replace(hostname, ".", "_", -1), time.Now().Format("2006_01_02_15_04_05"))
+		strings.Replace(hostname, ".", "_", -1), time.Now().Format("2006_01_02_15_04_05.999999"))
 	SummaryC.Flag("filename", "Summary archive filename").Default(filename).StringVar(&Summary.Filename)
 	SummaryC.Flag("skip-server", "Skip fetching logs.zip from PMM Server").BoolVar(&Summary.SkipServer)
 	SummaryC.Flag("pprof", "Include performance profiling data").BoolVar(&Summary.Pprof)
