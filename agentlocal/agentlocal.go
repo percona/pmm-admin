@@ -96,13 +96,19 @@ func GetRawStatus(ctx context.Context, requestNetworkInfo NetworkInfo) (*agentlo
 }
 
 // GetStatus returns local pmm-agent status.
-// As a special case, if pmm-agent is running, but not set up, ErrNotSetUp is returned.
+// As a special case, if pmm-agent is running, but not set up or not connected to PMM Server,
+// ErrNotSetUp is returned.
 func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 	p, err := GetRawStatus(context.TODO(), requestNetworkInfo)
 	if err != nil {
 		return nil, err
 	}
-	if p.AgentID == "" || p.RunsOnNodeID == "" || p.ServerInfo == nil {
+	if p.AgentID == "" {
+		// not set up
+		return nil, ErrNotSetUp
+	}
+	if p.RunsOnNodeID == "" || p.ServerInfo == nil {
+		// not connected
 		return nil, ErrNotSetUp
 	}
 
