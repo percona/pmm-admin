@@ -96,6 +96,7 @@ type addMySQLCommand struct {
 	Cluster        string
 	ReplicationSet string
 	CustomLabels   string
+	MetricsMode    string
 
 	QuerySource string
 
@@ -127,6 +128,11 @@ func (cmd *addMySQLCommand) GetSocket() string {
 
 func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
+	if err != nil {
+		return nil, err
+	}
+
+	metricsMode, err := formatMetricsModeValue(cmd.MetricsMode)
 	if err != nil {
 		return nil, err
 	}
@@ -187,6 +193,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			TLS:                       cmd.TLS,
 			TLSSkipVerify:             cmd.TLSSkipVerify,
 			TablestatsGroupTableLimit: tablestatsGroupTableLimit,
+			MetricsMode:               metricsMode,
 		},
 		Context: commands.Ctx,
 	}
@@ -242,5 +249,7 @@ func init() {
 	AddMySQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMySQL.TLS)
 	AddMySQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMySQL.TLSSkipVerify)
 	AddMySQLC.Flag("create-user", "Create pmm user").Hidden().BoolVar(&AddMySQL.CreateUser)
+	AddMySQLC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
+		" pull - server scrape metrics from agent  or auto - chosen by server.").StringVar(&AddMySQL.MetricsMode)
 	addGlobalFlags(AddMySQLC)
 }

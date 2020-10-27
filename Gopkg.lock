@@ -240,8 +240,8 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-2.0"
-  digest = "1:4289971a2e865c23bcb89b272ef5ee9f5cc14e1ca089d46ba269a71b2c4dfa96"
+  branch = "PMM-6397-metrics-model-flow"
+  digest = "1:7b42543088257b743a21ef290ff355453d35656b9ff883e87b684500a100d0da"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -270,7 +270,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "db6af09ffa6edb0ae36c25a2cc963e2a5b12625b"
+  revision = "95ca195dcdda62ebf85293bf9564dfe8de93c52d"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"

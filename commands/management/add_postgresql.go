@@ -55,6 +55,7 @@ type addPostgreSQLCommand struct {
 	Cluster        string
 	ReplicationSet string
 	CustomLabels   string
+	MetricsMode    string
 
 	QuerySource string
 
@@ -82,6 +83,11 @@ func (cmd *addPostgreSQLCommand) GetSocket() string {
 
 func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
+	if err != nil {
+		return nil, err
+	}
+
+	metricsMode, err := formatMetricsModeValue(cmd.MetricsMode)
 	if err != nil {
 		return nil, err
 	}
@@ -137,6 +143,7 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			TLS:                  cmd.TLS,
 			TLSSkipVerify:        cmd.TLSSkipVerify,
 			DisableQueryExamples: cmd.DisableQueryExamples,
+			MetricsMode:          metricsMode,
 		},
 		Context: commands.Ctx,
 	}
@@ -184,5 +191,7 @@ func init() {
 	AddPostgreSQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddPostgreSQL.TLS)
 	AddPostgreSQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddPostgreSQL.TLSSkipVerify)
 	AddPostgreSQLC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddPostgreSQL.DisableQueryExamples)
+	AddPostgreSQLC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
+		" pull - server scrape metrics from agent  or auto - chosen by server.").StringVar(&AddPostgreSQL.MetricsMode)
 	addGlobalFlags(AddPostgreSQLC)
 }
