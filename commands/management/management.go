@@ -17,9 +17,6 @@
 package management
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/percona/pmm/api/managementpb/json/client/node"
 	"github.com/percona/pmm/api/managementpb/json/client/service"
 )
@@ -41,18 +38,5 @@ var (
 
 	allServiceTypesKeys = []string{"mysql", "mongodb", "postgresql", "proxysql", "external"}
 
-	acceptableMetricsMode = []string{"AUTO", "PUSH", "PULL"}
+	metricsModes = []string{"AUTO", "PUSH", "PULL"}
 )
-
-func formatMetricsModeValue(input string) (*string, error) {
-	if input == "" {
-		return nil, nil
-	}
-	for _, v := range acceptableMetricsMode {
-		if strings.EqualFold(input, v) {
-			return &v, nil
-		}
-	}
-
-	return nil, fmt.Errorf("unexpected metrics-mode type value %q", input)
-}

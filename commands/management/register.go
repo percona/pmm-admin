@@ -70,11 +70,6 @@ func (cmd *registerCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	metricsMode, err := formatMetricsModeValue(cmd.MetricsMode)
-	if err != nil {
-		return nil, err
-	}
-
 	params := &node.RegisterNodeParams{
 		Body: node.RegisterNodeBody{
 			NodeType:      pointer.ToString(allNodeTypes[cmd.NodeType]),
@@ -90,7 +85,7 @@ func (cmd *registerCommand) Run() (commands.Result, error) {
 			Address:       cmd.Address,
 
 			Reregister:  cmd.Force,
-			MetricsMode: metricsMode,
+			MetricsMode: pointer.ToString(cmd.MetricsMode),
 		},
 		Context: commands.Ctx,
 	}

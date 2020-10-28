@@ -21,12 +21,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/AlekSi/pointer"
 	"github.com/alecthomas/units"
-	"github.com/percona/pmm/api/managementpb/json/client"
-	mysql "github.com/percona/pmm/api/managementpb/json/client/my_sql"
 
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
+	"github.com/percona/pmm/api/managementpb/json/client"
+	mysql "github.com/percona/pmm/api/managementpb/json/client/my_sql"
 )
 
 const (
@@ -132,11 +133,6 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	metricsMode, err := formatMetricsModeValue(cmd.MetricsMode)
-	if err != nil {
-		return nil, err
-	}
-
 	if cmd.CreateUser {
 		return nil, fmt.Errorf("Unrecognized option. To create a user, see " +
 			"'https://www.percona.com/doc/percona-monitoring-and-management/2.x/concepts/services-mysql.html#pmm-conf-mysql-user-account-creating'")
@@ -193,7 +189,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			TLS:                       cmd.TLS,
 			TLSSkipVerify:             cmd.TLSSkipVerify,
 			TablestatsGroupTableLimit: tablestatsGroupTableLimit,
-			MetricsMode:               metricsMode,
+			MetricsMode:               pointer.ToString(cmd.MetricsMode),
 		},
 		Context: commands.Ctx,
 	}
@@ -250,6 +246,7 @@ func init() {
 	AddMySQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMySQL.TLSSkipVerify)
 	AddMySQLC.Flag("create-user", "Create pmm user").Hidden().BoolVar(&AddMySQL.CreateUser)
 	AddMySQLC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
-		" pull - server scrape metrics from agent  or auto - chosen by server.").StringVar(&AddMySQL.MetricsMode)
+		" pull - server scrape metrics from agent  or auto - chosen by server.").
+		EnumVar(&AddMySQL.MetricsMode, metricsModes...)
 	addGlobalFlags(AddMySQLC)
 }

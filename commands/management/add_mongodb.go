@@ -20,11 +20,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/percona/pmm/api/managementpb/json/client"
-	mongodb "github.com/percona/pmm/api/managementpb/json/client/mongo_db"
+	"github.com/AlekSi/pointer"
 
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
+	"github.com/percona/pmm/api/managementpb/json/client"
+	mongodb "github.com/percona/pmm/api/managementpb/json/client/mongo_db"
 )
 
 const (
@@ -91,11 +92,6 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	metricsMode, err := formatMetricsModeValue(cmd.MetricsMode)
-	if err != nil {
-		return nil, err
-	}
-
 	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
@@ -134,7 +130,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
 			TLS:                 cmd.TLS,
 			TLSSkipVerify:       cmd.TLSSkipVerify,
-			MetricsMode:         metricsMode,
+			MetricsMode:         pointer.ToString(cmd.MetricsMode),
 		},
 		Context: commands.Ctx,
 	}
@@ -181,7 +177,8 @@ func init() {
 	AddMongoDBC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMongoDB.TLS)
 	AddMongoDBC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMongoDB.TLSSkipVerify)
 	AddMongoDBC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
-		" pull - server scrape metrics from agent  or auto - chosen by server.").StringVar(&AddMongoDB.MetricsMode)
+		" pull - server scrape metrics from agent  or auto - chosen by server.").
+		EnumVar(&AddMongoDB.MetricsMode, metricsModes...)
 	addGlobalFlags(AddMongoDBC)
 	AddMongoDBC.Flag("socket", "Path to socket").StringVar(&AddMongoDB.Socket)
 }

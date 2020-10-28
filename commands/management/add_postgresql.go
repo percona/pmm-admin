@@ -20,11 +20,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/percona/pmm/api/managementpb/json/client"
-	postgresql "github.com/percona/pmm/api/managementpb/json/client/postgre_sql"
+	"github.com/AlekSi/pointer"
 
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
+	"github.com/percona/pmm/api/managementpb/json/client"
+	postgresql "github.com/percona/pmm/api/managementpb/json/client/postgre_sql"
 )
 
 var addPostgreSQLResultT = commands.ParseTemplate(`
@@ -87,11 +88,6 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	metricsMode, err := formatMetricsModeValue(cmd.MetricsMode)
-	if err != nil {
-		return nil, err
-	}
-
 	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
@@ -143,7 +139,7 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			TLS:                  cmd.TLS,
 			TLSSkipVerify:        cmd.TLSSkipVerify,
 			DisableQueryExamples: cmd.DisableQueryExamples,
-			MetricsMode:          metricsMode,
+			MetricsMode:          pointer.ToString(cmd.MetricsMode),
 		},
 		Context: commands.Ctx,
 	}
@@ -192,6 +188,8 @@ func init() {
 	AddPostgreSQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddPostgreSQL.TLSSkipVerify)
 	AddPostgreSQLC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddPostgreSQL.DisableQueryExamples)
 	AddPostgreSQLC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
-		" pull - server scrape metrics from agent  or auto - chosen by server.").StringVar(&AddPostgreSQL.MetricsMode)
+		" pull - server scrape metrics from agent  or auto - chosen by server.").
+		EnumVar(&AddPostgreSQL.MetricsMode, metricsModes...)
+
 	addGlobalFlags(AddPostgreSQLC)
 }

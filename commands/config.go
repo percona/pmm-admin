@@ -99,6 +99,7 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 	if cmd.Force {
 		res = append(res, "--force")
 	}
+
 	if cmd.MetricsMode != "" {
 		res = append(res, fmt.Sprintf("--metrics-mode=%s", cmd.MetricsMode))
 	}
@@ -153,5 +154,5 @@ func init() {
 
 	ConfigC.Flag("force", "Remove Node with that name with all dependent Services and Agents if one exist").BoolVar(&Config.Force)
 	ConfigC.Flag("metrics-mode", "Metrics flow mode for agents node-exporter, can be push - agent will push metrics,"+
-		" pull - server scrape metrics from agent  or auto - chosen by server.").StringVar(&Config.MetricsMode)
+		" pull - server scrape metrics from agent  or auto - chosen by server.").EnumVar(&Config.MetricsMode, "AUTO", "PUSH", "PULL")
 }
