@@ -18,12 +18,18 @@ package management
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/percona/pmm/api/managementpb/json/client"
 	"github.com/percona/pmm/api/managementpb/json/client/external"
 
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
+)
+
+const (
+	defaultGroupExternalExporter = "external"
+	defaultServiceNameSuffix     = "-external"
 )
 
 var addExternalResultT = commands.ParseTemplate(`
@@ -55,6 +61,7 @@ type addExternalCommand struct {
 	Cluster        string
 	ReplicationSet string
 	CustomLabels   string
+	Group          string
 }
 
 func (cmd *addExternalCommand) Run() (commands.Result, error) {
@@ -76,6 +83,15 @@ func (cmd *addExternalCommand) Run() (commands.Result, error) {
 		}
 	}
 
+	hostname, _ := os.Hostname()
+	defaultServiceName := hostname + defaultServiceNameSuffix
+
+	if cmd.Group != defaultGroupExternalExporter && cmd.ServiceName == defaultServiceName {
+		cmd.ServiceName = fmt.Sprintf("%s-%s", strings.TrimSuffix(cmd.ServiceName, defaultServiceNameSuffix), cmd.Group)
+	}
+
+	customLabels["external_group"] = cmd.Group
+
 	params := &external.AddExternalParams{
 		Body: external.AddExternalBody{
 			RunsOnNodeID:   cmd.RunsOnNodeID,
@@ -90,6 +106,7 @@ func (cmd *addExternalCommand) Run() (commands.Result, error) {
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
 			CustomLabels:   customLabels,
+			Group:          cmd.Group,
 		},
 		Context: commands.Ctx,
 	}
@@ -111,9 +128,9 @@ var (
 
 func init() {
 	hostname, _ := os.Hostname()
-	serviceName := hostname + "-external"
-	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", serviceName)
-	AddExternalC.Flag("service-name", serviceNameHelp).Default(serviceName).StringVar(&AddExternal.ServiceName)
+	defaultServiceName := hostname + defaultServiceNameSuffix
+	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", defaultServiceName)
+	AddExternalC.Flag("service-name", serviceNameHelp).Default(defaultServiceName).StringVar(&AddExternal.ServiceName)
 
 	AddExternalC.Flag("agent-node-id", "Node ID where agent runs (default is autodetected)").StringVar(&AddExternal.RunsOnNodeID)
 
@@ -129,4 +146,7 @@ func init() {
 	AddExternalC.Flag("cluster", "Cluster name").StringVar(&AddExternal.Cluster)
 	AddExternalC.Flag("replication-set", "Replication set name").StringVar(&AddExternal.ReplicationSet)
 	AddExternalC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddExternal.CustomLabels)
+
+	groupHelp := fmt.Sprintf("Group name of external service (default: %s)", defaultGroupExternalExporter)
+	AddExternalC.Flag("group", groupHelp).Default(defaultGroupExternalExporter).StringVar(&AddExternal.Group)
 }
