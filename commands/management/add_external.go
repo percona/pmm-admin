@@ -36,6 +36,7 @@ var addExternalResultT = commands.ParseTemplate(`
 External Service added.
 Service ID  : {{ .Service.ServiceID }}
 Service name: {{ .Service.ServiceName }}
+Group       : {{ .Service.Group }}
 `)
 
 type addExternalResult struct {

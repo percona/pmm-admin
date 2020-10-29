@@ -241,7 +241,7 @@
 
 [[projects]]
   branch = "PMM-6050-external-group"
-  digest = "1:0ca8b9806fb3146fe8ba519c8dd71c0a98226f6534d5f4ff29e08079277d1437"
+  digest = "1:73c958ef8bb582acae0bf239b7189a2ee3aaade71a22e6d3018295bcecd4f230"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -270,7 +270,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "7953f93cbbf8e943b53648f4f65e1487af500228"
+  revision = "4f27aacfa0fb790d456d966d3e2b9f679f504e45"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
