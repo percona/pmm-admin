@@ -2,7 +2,9 @@
 version: '3'
 services:
   pmm-admin-server:
-    image: ${PMM_SERVER_IMAGE:-percona/pmm-server:2}
+    #image: ${PMM_SERVER_IMAGE:-percona/pmm-server:2}
+    # revert it before merge
+    image: perconalab/pmm-server-fb:PR-1185-56d436b
     container_name: pmm-admin-server
     environment:
       - PATH=/root/go/bin:$PATH
