@@ -91,8 +91,6 @@ func (cmd *addExternalCommand) Run() (commands.Result, error) {
 		cmd.ServiceName = fmt.Sprintf("%s-%s", strings.TrimSuffix(cmd.ServiceName, defaultServiceNameSuffix), cmd.Group)
 	}
 
-	customLabels["external_group"] = cmd.Group
-
 	params := &external.AddExternalParams{
 		Body: external.AddExternalBody{
 			RunsOnNodeID:   cmd.RunsOnNodeID,
