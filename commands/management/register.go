@@ -141,5 +141,5 @@ func init() {
 
 	RegisterC.Flag("force", "Remove Node with that name with all dependent Services and Agents if one exist").BoolVar(&Register.Force)
 	RegisterC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
-		" pull - server scrape metrics from agent  or auto - chosen by server.").EnumVar(&Register.MetricsMode, "auto", "pull", "push")
+		" pull - server scrape metrics from agent  or auto - chosen by server.").Default("auto").EnumVar(&Register.MetricsMode, "auto", "pull", "push")
 }

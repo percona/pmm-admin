@@ -247,6 +247,7 @@ func init() {
 	AddMySQLC.Flag("create-user", "Create pmm user").Hidden().BoolVar(&AddMySQL.CreateUser)
 	AddMySQLC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
 		" pull - server scrape metrics from agent  or auto - chosen by server.").
+		Default("auto").
 		EnumVar(&AddMySQL.MetricsMode, metricsModes...)
 	addGlobalFlags(AddMySQLC)
 }

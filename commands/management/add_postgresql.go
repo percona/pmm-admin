@@ -189,6 +189,7 @@ func init() {
 	AddPostgreSQLC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddPostgreSQL.DisableQueryExamples)
 	AddPostgreSQLC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
 		" pull - server scrape metrics from agent  or auto - chosen by server.").
+		Default("auto").
 		EnumVar(&AddPostgreSQL.MetricsMode, metricsModes...)
 
 	addGlobalFlags(AddPostgreSQLC)

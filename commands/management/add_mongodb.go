@@ -178,6 +178,7 @@ func init() {
 	AddMongoDBC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMongoDB.TLSSkipVerify)
 	AddMongoDBC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
 		" pull - server scrape metrics from agent  or auto - chosen by server.").
+		Default("auto").
 		EnumVar(&AddMongoDB.MetricsMode, metricsModes...)
 	addGlobalFlags(AddMongoDBC)
 	AddMongoDBC.Flag("socket", "Path to socket").StringVar(&AddMongoDB.Socket)
