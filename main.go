@@ -42,7 +42,9 @@ func main() {
 	kingpin.CommandLine.UsageTemplate(commands.UsageTemplate)
 
 	serverURLF := kingpin.Flag("server-url", "PMM Server URL in `https://username:password@pmm-server-host/` format").String()
-	kingpin.Flag("server-insecure-tls", "Skip PMM Server TLS certificate validation").BoolVar(&commands.GlobalFlags.ServerInsecureTLS)
+	serverUsernameF := kingpin.Flag("server-username", "Username to connect to PMM Server").String()
+	serverPasswordF := kingpin.Flag("server-password", "Password to connect to PMM Server").String()
+	serverInsecureTLS := kingpin.Flag("server-insecure-tls", "Skip PMM Server TLS certificate validation").Bool()
 	kingpin.Flag("debug", "Enable debug logging").BoolVar(&commands.GlobalFlags.Debug)
 	kingpin.Flag("trace", "Enable trace logging (implies debug)").BoolVar(&commands.GlobalFlags.Trace)
 	jsonF := kingpin.Flag("json", "Enable JSON output").Bool()
@@ -73,7 +75,7 @@ func main() {
 		cancel()
 	}()
 
-	commands.SetupClients(ctx, *serverURLF)
+	commands.SetupClients(ctx, *serverURLF, *serverUsernameF, *serverPasswordF, *serverInsecureTLS)
 
 	allCommands := map[string]commands.Command{
 		management.RegisterC.FullCommand(): management.Register,
