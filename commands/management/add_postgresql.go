@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"github.com/AlekSi/pointer"
-
 	"github.com/percona/pmm/api/managementpb/json/client"
 	postgresql "github.com/percona/pmm/api/managementpb/json/client/postgre_sql"
 
@@ -140,7 +139,7 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			TLS:                  cmd.TLS,
 			TLSSkipVerify:        cmd.TLSSkipVerify,
 			DisableQueryExamples: cmd.DisableQueryExamples,
-			MetricsMode:          pointer.ToString(cmd.MetricsMode),
+			MetricsMode:          pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
 		},
 		Context: commands.Ctx,
 	}

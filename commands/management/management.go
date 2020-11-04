@@ -38,5 +38,5 @@ var (
 
 	allServiceTypesKeys = []string{"mysql", "mongodb", "postgresql", "proxysql", "external"}
 
-	metricsModes = []string{"AUTO", "PUSH", "PULL"}
+	metricsModes = []string{"auto", "push", "pull"}
 )

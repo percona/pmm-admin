@@ -85,7 +85,7 @@ func (cmd *registerCommand) Run() (commands.Result, error) {
 			Address:       cmd.Address,
 
 			Reregister:  cmd.Force,
-			MetricsMode: pointer.ToString(cmd.MetricsMode),
+			MetricsMode: pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
 		},
 		Context: commands.Ctx,
 	}
@@ -141,5 +141,5 @@ func init() {
 
 	RegisterC.Flag("force", "Remove Node with that name with all dependent Services and Agents if one exist").BoolVar(&Register.Force)
 	RegisterC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
-		" pull - server scrape metrics from agent  or auto - chosen by server.").StringVar(&Register.MetricsMode)
+		" pull - server scrape metrics from agent  or auto - chosen by server.").EnumVar(&Register.MetricsMode, "auto", "pull", "push")
 }

@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"github.com/AlekSi/pointer"
-
 	"github.com/percona/pmm/api/managementpb/json/client"
 	mongodb "github.com/percona/pmm/api/managementpb/json/client/mongo_db"
 
@@ -131,7 +130,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
 			TLS:                 cmd.TLS,
 			TLSSkipVerify:       cmd.TLSSkipVerify,
-			MetricsMode:         pointer.ToString(cmd.MetricsMode),
+			MetricsMode:         pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
 		},
 		Context: commands.Ctx,
 	}

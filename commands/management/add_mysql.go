@@ -23,7 +23,6 @@ import (
 
 	"github.com/AlekSi/pointer"
 	"github.com/alecthomas/units"
-
 	"github.com/percona/pmm/api/managementpb/json/client"
 	mysql "github.com/percona/pmm/api/managementpb/json/client/my_sql"
 
@@ -190,7 +189,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			TLS:                       cmd.TLS,
 			TLSSkipVerify:             cmd.TLSSkipVerify,
 			TablestatsGroupTableLimit: tablestatsGroupTableLimit,
-			MetricsMode:               pointer.ToString(cmd.MetricsMode),
+			MetricsMode:               pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
 		},
 		Context: commands.Ctx,
 	}
