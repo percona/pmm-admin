@@ -55,6 +55,7 @@ const (
 
 // ErrNotSetUp is returned by GetStatus when pmm-agent is running, but not set up.
 var ErrNotSetUp = fmt.Errorf("pmm-agent is running, but not set up")
+var ErrNotConnected = fmt.Errorf("pmm-agent is not connected to PMM server")
 
 // Status represents pmm-agent status.
 type Status struct {
@@ -97,13 +98,18 @@ func GetRawStatus(ctx context.Context, requestNetworkInfo NetworkInfo) (*agentlo
 
 // GetStatus returns local pmm-agent status.
 // As a special case, if pmm-agent is running, but not set up, ErrNotSetUp is returned.
+// If pmm-agent is set up, but not connected ErrNotConnected is returned.
 func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 	p, err := GetRawStatus(context.TODO(), requestNetworkInfo)
 	if err != nil {
 		return nil, err
 	}
-	if p.AgentID == "" || p.RunsOnNodeID == "" || p.ServerInfo == nil {
+	if p.AgentID == "" || p.ServerInfo == nil {
 		return nil, ErrNotSetUp
+	}
+
+	if p.RunsOnNodeID == "" {
+		return nil, ErrNotConnected
 	}
 
 	u, err := url.Parse(p.ServerInfo.URL)
