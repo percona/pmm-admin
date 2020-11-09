@@ -122,5 +122,5 @@ var (
 )
 
 func init() {
-	StatusC.Flag("wait", "Timeout to get success response from pmm-agent").DurationVar(&Status.timeout)
+	StatusC.Flag("wait", "Time to wait for a successful response from pmm-agent").DurationVar(&Status.timeout)
 }
