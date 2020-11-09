@@ -56,7 +56,7 @@ const (
 // ErrNotSetUp is returned by GetStatus when pmm-agent is running, but not set up.
 var ErrNotSetUp = fmt.Errorf("pmm-agent is running, but not set up")
 
-// ErrNotConnected is returned by GetStatus when pmm-agent is running and set up, but not connected to PMM Server
+// ErrNotConnected is returned by GetStatus when pmm-agent is running and set up, but not connected to PMM Server.
 var ErrNotConnected = fmt.Errorf("pmm-agent is not connected to PMM Server")
 
 // Status represents pmm-agent status.
