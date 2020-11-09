@@ -95,7 +95,9 @@ func (cmd *statusCommand) Run() (Result, error) {
 	defer cancel()
 
 	var status *agentlocal.Status
+
 	var err error
+
 	for {
 		status, err = agentlocal.GetStatus(agentlocal.RequestNetworkInfo)
 		if err == nil {
