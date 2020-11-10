@@ -177,6 +177,7 @@ func (cmd *listCommand) Run() (Result, error) {
 		if s {
 			return "push"
 		}
+
 		return "pull"
 	}
 	pmmAgentIDs := map[string]struct{}{}
