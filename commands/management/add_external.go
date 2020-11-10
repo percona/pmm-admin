@@ -18,6 +18,7 @@ package management
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/AlekSi/pointer"
 	"github.com/percona/pmm/api/managementpb/json/client"
@@ -92,7 +93,7 @@ func (cmd *addExternalCommand) Run() (commands.Result, error) {
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
 			CustomLabels:   customLabels,
-			MetricsMode:    pointer.ToString(cmd.MetricsMode),
+			MetricsMode:    pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
 		},
 		Context: commands.Ctx,
 	}
