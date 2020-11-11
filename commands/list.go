@@ -342,12 +342,14 @@ func (cmd *listCommand) Run() (Result, error) {
 		})
 	}
 	for _, a := range agentsRes.Payload.VMAgent {
-		agentsList = append(agentsList, listResultAgent{
-			AgentType:   types.AgentTypeVMAgent,
-			AgentID:     a.AgentID,
-			Status:      getStatus(a.Status),
-			MetricsMode: getMetricsMode(true),
-		})
+		if _, ok := pmmAgentIDs[a.PMMAgentID]; ok {
+			agentsList = append(agentsList, listResultAgent{
+				AgentType:   types.AgentTypeVMAgent,
+				AgentID:     a.AgentID,
+				Status:      getStatus(a.Status),
+				MetricsMode: getMetricsMode(true),
+			})
+		}
 	}
 
 	return &listResult{
