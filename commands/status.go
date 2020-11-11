@@ -23,6 +23,7 @@ import (
 
 	"github.com/percona/pmm/api/inventorypb/types"
 	"github.com/percona/pmm/version"
+	"github.com/pkg/errors"
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/agentlocal"
@@ -106,7 +107,12 @@ func (cmd *statusCommand) Run() (Result, error) {
 
 		select {
 		case <-timeoutCtx.Done():
-			return nil, err
+			if err == agentlocal.ErrNotSetUp { //nolint:errorlint,goerr113
+				return nil, errors.Errorf("Failed to get PMM Agent status from local pmm-agent: %s.\n"+
+					"Please run `pmm-admin config` with --server-url flag.", err)
+			}
+
+			return nil, errors.Errorf("Failed to get PMM Agent status from local pmm-agent: %s.", err) //nolint:golint
 		default:
 			time.Sleep(1 * time.Second)
 		}
