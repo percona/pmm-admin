@@ -196,7 +196,7 @@ type ListAgentsBody struct {
 	ServiceID string `json:"service_id,omitempty"`
 
 	// AgentType describes supported Agent types.
-	// Enum: [AGENT_TYPE_INVALID PMM_AGENT NODE_EXPORTER MYSQLD_EXPORTER MONGODB_EXPORTER POSTGRES_EXPORTER PROXYSQL_EXPORTER QAN_MYSQL_PERFSCHEMA_AGENT QAN_MYSQL_SLOWLOG_AGENT QAN_MONGODB_PROFILER_AGENT QAN_POSTGRESQL_PGSTATEMENTS_AGENT QAN_POSTGRESQL_PGSTATMONITOR_AGENT RDS_EXPORTER EXTERNAL_EXPORTER VM_AGENT]
+	// Enum: [AGENT_TYPE_INVALID PMM_AGENT VM_AGENT NODE_EXPORTER MYSQLD_EXPORTER MONGODB_EXPORTER POSTGRES_EXPORTER PROXYSQL_EXPORTER QAN_MYSQL_PERFSCHEMA_AGENT QAN_MYSQL_SLOWLOG_AGENT QAN_MONGODB_PROFILER_AGENT QAN_POSTGRESQL_PGSTATEMENTS_AGENT QAN_POSTGRESQL_PGSTATMONITOR_AGENT RDS_EXPORTER EXTERNAL_EXPORTER]
 	AgentType *string `json:"agent_type,omitempty"`
 }
 
@@ -218,7 +218,7 @@ var listAgentsBodyTypeAgentTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["AGENT_TYPE_INVALID","PMM_AGENT","NODE_EXPORTER","MYSQLD_EXPORTER","MONGODB_EXPORTER","POSTGRES_EXPORTER","PROXYSQL_EXPORTER","QAN_MYSQL_PERFSCHEMA_AGENT","QAN_MYSQL_SLOWLOG_AGENT","QAN_MONGODB_PROFILER_AGENT","QAN_POSTGRESQL_PGSTATEMENTS_AGENT","QAN_POSTGRESQL_PGSTATMONITOR_AGENT","RDS_EXPORTER","EXTERNAL_EXPORTER","VM_AGENT"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["AGENT_TYPE_INVALID","PMM_AGENT","VM_AGENT","NODE_EXPORTER","MYSQLD_EXPORTER","MONGODB_EXPORTER","POSTGRES_EXPORTER","PROXYSQL_EXPORTER","QAN_MYSQL_PERFSCHEMA_AGENT","QAN_MYSQL_SLOWLOG_AGENT","QAN_MONGODB_PROFILER_AGENT","QAN_POSTGRESQL_PGSTATEMENTS_AGENT","QAN_POSTGRESQL_PGSTATMONITOR_AGENT","RDS_EXPORTER","EXTERNAL_EXPORTER"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -233,6 +233,9 @@ const (
 
 	// ListAgentsBodyAgentTypePMMAGENT captures enum value "PMM_AGENT"
 	ListAgentsBodyAgentTypePMMAGENT string = "PMM_AGENT"
+
+	// ListAgentsBodyAgentTypeVMAGENT captures enum value "VM_AGENT"
+	ListAgentsBodyAgentTypeVMAGENT string = "VM_AGENT"
 
 	// ListAgentsBodyAgentTypeNODEEXPORTER captures enum value "NODE_EXPORTER"
 	ListAgentsBodyAgentTypeNODEEXPORTER string = "NODE_EXPORTER"
@@ -269,9 +272,6 @@ const (
 
 	// ListAgentsBodyAgentTypeEXTERNALEXPORTER captures enum value "EXTERNAL_EXPORTER"
 	ListAgentsBodyAgentTypeEXTERNALEXPORTER string = "EXTERNAL_EXPORTER"
-
-	// ListAgentsBodyAgentTypeVMAGENT captures enum value "VM_AGENT"
-	ListAgentsBodyAgentTypeVMAGENT string = "VM_AGENT"
 )
 
 // prop value enum
@@ -397,6 +397,9 @@ type ListAgentsOKBody struct {
 	// pmm agent
 	PMMAgent []*PMMAgentItems0 `json:"pmm_agent"`
 
+	// vm agent
+	VMAgent []*VMAgentItems0 `json:"vm_agent"`
+
 	// node exporter
 	NodeExporter []*NodeExporterItems0 `json:"node_exporter"`
 
@@ -432,9 +435,6 @@ type ListAgentsOKBody struct {
 
 	// external exporter
 	ExternalExporter []*ExternalExporterItems0 `json:"external_exporter"`
-
-	// vm agent
-	VMAgent []*VMAgentItems0 `json:"vm_agent"`
 }
 
 // Validate validates this list agents OK body
@@ -442,6 +442,10 @@ func (o *ListAgentsOKBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.validatePMMAgent(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateVMAgent(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -493,10 +497,6 @@ func (o *ListAgentsOKBody) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := o.validateVMAgent(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -518,6 +518,31 @@ func (o *ListAgentsOKBody) validatePMMAgent(formats strfmt.Registry) error {
 			if err := o.PMMAgent[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("listAgentsOk" + "." + "pmm_agent" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (o *ListAgentsOKBody) validateVMAgent(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.VMAgent) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.VMAgent); i++ {
+		if swag.IsZero(o.VMAgent[i]) { // not required
+			continue
+		}
+
+		if o.VMAgent[i] != nil {
+			if err := o.VMAgent[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("listAgentsOk" + "." + "vm_agent" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -818,31 +843,6 @@ func (o *ListAgentsOKBody) validateExternalExporter(formats strfmt.Registry) err
 			if err := o.ExternalExporter[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("listAgentsOk" + "." + "external_exporter" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (o *ListAgentsOKBody) validateVMAgent(formats strfmt.Registry) error {
-
-	if swag.IsZero(o.VMAgent) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(o.VMAgent); i++ {
-		if swag.IsZero(o.VMAgent[i]) { // not required
-			continue
-		}
-
-		if o.VMAgent[i] != nil {
-			if err := o.VMAgent[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("listAgentsOk" + "." + "vm_agent" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -2353,7 +2353,9 @@ func (o *RDSExporterItems0) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*VMAgentItems0 VMAgent runs on Generic or Container Node.
+/*VMAgentItems0 VMAgent runs on Generic or Container Node alongside pmm-agent.
+// It scrapes other exporter Agents that are configured with push_metrics_enabled
+// and uses Prometheus remote write protocol to push metrics to PMM Server.
 swagger:model VMAgentItems0
 */
 type VMAgentItems0 struct {
