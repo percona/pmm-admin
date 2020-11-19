@@ -142,6 +142,15 @@ type AddMongoDBExporterBody struct {
 	// Skip TLS certificate and hostname validation.
 	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
 
+	// Certificate file.
+	TLSCertificateKeyFile string `json:"tls_certificate_key_file,omitempty"`
+
+	// Certificate password.
+	TLSCertificateKeyFilePassword string `json:"tls_certificate_key_file_password,omitempty"`
+
+	// Certificate authority file.
+	TLSCaFile string `json:"tls_ca_file,omitempty"`
+
 	// Custom user-assigned labels.
 	CustomLabels map[string]string `json:"custom_labels,omitempty"`
 
