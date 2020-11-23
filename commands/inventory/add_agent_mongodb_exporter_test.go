@@ -53,6 +53,6 @@ func Test_loadCertificates(t *testing.T) {
 
 	err = cmd.loadCertificates()
 	assert.NoError(t, err)
-	assert.Equal(t, "cert", cmd.TLSCertificateKeyFile)
-	assert.Equal(t, "CAcert", cmd.TLSCaFile)
+	assert.Equal(t, "cert", cmd.TLSCertificateKey)
+	assert.Equal(t, "CAcert", cmd.TLSCa)
 }
