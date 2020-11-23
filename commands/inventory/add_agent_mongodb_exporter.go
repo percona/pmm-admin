@@ -63,8 +63,10 @@ type addAgentMongodbExporterCommand struct {
 	SkipConnectionCheck           bool
 	TLS                           bool
 	TLSSkipVerify                 bool
+	TLSCertificateKey             string
 	TLSCertificateKeyFile         string
 	TLSCertificateKeyFilePassword string
+	TLSCa                         string
 	TLSCaFile                     string
 	PushMetrics                   bool
 }
@@ -72,15 +74,15 @@ type addAgentMongodbExporterCommand struct {
 func (cmd *addAgentMongodbExporterCommand) loadCertificates() error {
 	certificate, err := ioutil.ReadFile(cmd.TLSCertificateKeyFile)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("cannot load TLS certificate on path %s", cmd.TLSCertificateKeyFile))
+		return errors.Wrap(err, fmt.Sprintf("cannot load TLS certificate in path %s", cmd.TLSCertificateKeyFile))
 	}
-	cmd.TLSCertificateKeyFile = string(certificate)
+	cmd.TLSCertificateKey = string(certificate)
 
 	certificate, err = ioutil.ReadFile(cmd.TLSCaFile)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("cannot load TLS CA certificate on path %s", cmd.TLSCaFile))
+		return errors.Wrap(err, fmt.Sprintf("cannot load TLS CA certificate in path %s", cmd.TLSCaFile))
 	}
-	cmd.TLSCaFile = string(certificate)
+	cmd.TLSCa = string(certificate)
 
 	return nil
 }
@@ -106,9 +108,9 @@ func (cmd *addAgentMongodbExporterCommand) Run() (commands.Result, error) {
 			SkipConnectionCheck:           cmd.SkipConnectionCheck,
 			TLS:                           cmd.TLS,
 			TLSSkipVerify:                 cmd.TLSSkipVerify,
-			TLSCertificateKeyFile:         cmd.TLSCertificateKeyFile,
+			TLSCertificateKeyFile:         cmd.TLSCertificateKey,
 			TLSCertificateKeyFilePassword: cmd.TLSCertificateKeyFilePassword,
-			TLSCaFile:                     cmd.TLSCaFile,
+			TLSCaFile:                     cmd.TLSCa,
 			PushMetrics:                   cmd.PushMetrics,
 		},
 		Context: commands.Ctx,
