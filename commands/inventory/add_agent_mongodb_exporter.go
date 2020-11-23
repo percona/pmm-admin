@@ -16,6 +16,9 @@
 package inventory
 
 import (
+	"fmt"
+	"io/ioutil"
+
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
 
@@ -24,17 +27,20 @@ import (
 
 var addAgentMongodbExporterResultT = commands.ParseTemplate(`
 MongoDB Exporter added.
-Agent ID              : {{ .Agent.AgentID }}
-PMM-Agent ID          : {{ .Agent.PMMAgentID }}
-Service ID            : {{ .Agent.ServiceID }}
-Username              : {{ .Agent.Username }}
-Listen port           : {{ .Agent.ListenPort }}
-TLS enabled           : {{ .Agent.TLS }}
-Skip TLS verification : {{ .Agent.TLSSkipVerify }}
+Agent ID              		      : {{ .Agent.AgentID }}
+PMM-Agent ID                      : {{ .Agent.PMMAgentID }}
+Service ID                        : {{ .Agent.ServiceID }}
+Username                          : {{ .Agent.Username }}
+Listen port                       : {{ .Agent.ListenPort }}
+TLS enabled                       : {{ .Agent.TLS }}
+Skip TLS verification             : {{ .Agent.TLSSkipVerify }}
+TLS certificate key file          : {{ .Agent.TLSCertificateKeyFile }}
+TLS certificate key file password : {{ .Agent.TLSCertificateKeyFilePassword }}
+TLS CA file                       : {{ .Agent.TLSCaFile }}
 
-Status                : {{ .Agent.Status }}
-Disabled              : {{ .Agent.Disabled }}
-Custom labels         : {{ .Agent.CustomLabels }}
+Status                            : {{ .Agent.Status }}
+Disabled                          : {{ .Agent.Disabled }}
+Custom labels                     : {{ .Agent.CustomLabels }}
 `)
 
 type addAgentMongodbExporterResult struct {
@@ -62,11 +68,33 @@ type addAgentMongodbExporterCommand struct {
 	PushMetrics                   bool
 }
 
+func (cmd *addAgentMongodbExporterCommand) loadCertificates() error {
+	certificate, err := ioutil.ReadFile(cmd.TLSCertificateKeyFile)
+	if err != nil {
+		return fmt.Errorf("cannot load TLS certificate key file on path %s", cmd.TLSCertificateKeyFile)
+	}
+	cmd.TLSCertificateKeyFile = string(certificate)
+
+	certificate, err = ioutil.ReadFile(cmd.TLSCaFile)
+	if err != nil {
+		return fmt.Errorf("cannot load TLS CA file on path %s", cmd.TLSCaFile)
+	}
+	cmd.TLSCaFile = string(certificate)
+
+	return nil
+}
+
 func (cmd *addAgentMongodbExporterCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
 	}
+
+	err = cmd.loadCertificates()
+	if err != nil {
+		return nil, err
+	}
+
 	params := &agents.AddMongoDBExporterParams{
 		Body: agents.AddMongoDBExporterBody{
 			PMMAgentID:                    cmd.PMMAgentID,
