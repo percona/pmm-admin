@@ -21,6 +21,7 @@ import (
 
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
+	"github.com/pkg/errors"
 
 	"github.com/percona/pmm-admin/commands"
 )
@@ -71,13 +72,13 @@ type addAgentMongodbExporterCommand struct {
 func (cmd *addAgentMongodbExporterCommand) loadCertificates() error {
 	certificate, err := ioutil.ReadFile(cmd.TLSCertificateKeyFile)
 	if err != nil {
-		return fmt.Errorf("cannot load TLS certificate key file on path %s", cmd.TLSCertificateKeyFile)
+		return errors.Wrap(err, fmt.Sprintf("cannot load TLS certificate on path %s", cmd.TLSCertificateKeyFile))
 	}
 	cmd.TLSCertificateKeyFile = string(certificate)
 
 	certificate, err = ioutil.ReadFile(cmd.TLSCaFile)
 	if err != nil {
-		return fmt.Errorf("cannot load TLS CA file on path %s", cmd.TLSCaFile)
+		return errors.Wrap(err, fmt.Sprintf("cannot load TLS CA certificate on path %s", cmd.TLSCaFile))
 	}
 	cmd.TLSCaFile = string(certificate)
 

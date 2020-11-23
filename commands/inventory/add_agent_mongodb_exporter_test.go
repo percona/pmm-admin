@@ -25,7 +25,10 @@ import (
 
 func Test_loadCertificates(t *testing.T) {
 	cert, err := ioutil.TempFile("", "cert")
-	defer os.Remove(cert.Name())
+	defer func() {
+		err = os.Remove(cert.Name())
+		assert.NoError(t, err)
+	}()
 	assert.NoError(t, err)
 	_, err = cert.Write([]byte("cert"))
 	assert.NoError(t, err)
@@ -33,7 +36,10 @@ func Test_loadCertificates(t *testing.T) {
 	assert.NoError(t, err)
 
 	caCert, err := ioutil.TempFile("", "CAcert")
-	defer os.Remove(caCert.Name())
+	defer func() {
+		err = os.Remove(caCert.Name())
+		assert.NoError(t, err)
+	}()
 	assert.NoError(t, err)
 	_, err = caCert.Write([]byte("CAcert"))
 	assert.NoError(t, err)
