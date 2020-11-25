@@ -28,20 +28,17 @@ import (
 
 var addAgentMongodbExporterResultT = commands.ParseTemplate(`
 MongoDB Exporter added.
-Agent ID              		      : {{ .Agent.AgentID }}
-PMM-Agent ID                      : {{ .Agent.PMMAgentID }}
-Service ID                        : {{ .Agent.ServiceID }}
-Username                          : {{ .Agent.Username }}
-Listen port                       : {{ .Agent.ListenPort }}
-TLS enabled                       : {{ .Agent.TLS }}
-Skip TLS verification             : {{ .Agent.TLSSkipVerify }}
-TLS certificate key file          : {{ .Agent.TLSCertificateKeyFile }}
-TLS certificate key file password : {{ .Agent.TLSCertificateKeyFilePassword }}
-TLS CA file                       : {{ .Agent.TLSCaFile }}
+Agent ID             : {{ .Agent.AgentID }}
+PMM-Agent ID         : {{ .Agent.PMMAgentID }}
+Service ID           : {{ .Agent.ServiceID }}
+Username             : {{ .Agent.Username }}
+Listen port          : {{ .Agent.ListenPort }}
+TLS enabled          : {{ .Agent.TLS }}
+Skip TLS verification: {{ .Agent.TLSSkipVerify }}
 
-Status                            : {{ .Agent.Status }}
-Disabled                          : {{ .Agent.Disabled }}
-Custom labels                     : {{ .Agent.CustomLabels }}
+Status               : {{ .Agent.Status }}
+Disabled             : {{ .Agent.Disabled }}
+Custom labels        : {{ .Agent.CustomLabels }}
 `)
 
 type addAgentMongodbExporterResult struct {

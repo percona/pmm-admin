@@ -16,8 +16,12 @@
 package inventory
 
 import (
+	"fmt"
+	"io/ioutil"
+
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
+	"github.com/pkg/errors"
 
 	"github.com/percona/pmm-admin/commands"
 )
@@ -47,14 +51,35 @@ func (res *addAgentQANMongoDBProfilerAgentResult) String() string {
 }
 
 type addAgentQANMongoDBProfilerAgentCommand struct {
-	PMMAgentID          string
-	ServiceID           string
-	Username            string
-	Password            string
-	CustomLabels        string
-	SkipConnectionCheck bool
-	TLS                 bool
-	TLSSkipVerify       bool
+	PMMAgentID                    string
+	ServiceID                     string
+	Username                      string
+	Password                      string
+	CustomLabels                  string
+	SkipConnectionCheck           bool
+	TLS                           bool
+	TLSSkipVerify                 bool
+	TLSCertificateKey             string
+	TLSCertificateKeyFile         string
+	TLSCertificateKeyFilePassword string
+	TLSCa                         string
+	TLSCaFile                     string
+}
+
+func (cmd *addAgentQANMongoDBProfilerAgentCommand) loadCertificates() error {
+	certificate, err := ioutil.ReadFile(cmd.TLSCertificateKeyFile)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("cannot load TLS certificate in path %s", cmd.TLSCertificateKeyFile))
+	}
+	cmd.TLSCertificateKey = string(certificate)
+
+	certificate, err = ioutil.ReadFile(cmd.TLSCaFile)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("cannot load TLS CA certificate in path %s", cmd.TLSCaFile))
+	}
+	cmd.TLSCa = string(certificate)
+
+	return nil
 }
 
 func (cmd *addAgentQANMongoDBProfilerAgentCommand) Run() (commands.Result, error) {
@@ -62,16 +87,25 @@ func (cmd *addAgentQANMongoDBProfilerAgentCommand) Run() (commands.Result, error
 	if err != nil {
 		return nil, err
 	}
+
+	err = cmd.loadCertificates()
+	if err != nil {
+		return nil, err
+	}
+
 	params := &agents.AddQANMongoDBProfilerAgentParams{
 		Body: agents.AddQANMongoDBProfilerAgentBody{
-			PMMAgentID:          cmd.PMMAgentID,
-			ServiceID:           cmd.ServiceID,
-			Username:            cmd.Username,
-			Password:            cmd.Password,
-			CustomLabels:        customLabels,
-			SkipConnectionCheck: cmd.SkipConnectionCheck,
-			TLS:                 cmd.TLS,
-			TLSSkipVerify:       cmd.TLSSkipVerify,
+			PMMAgentID:                    cmd.PMMAgentID,
+			ServiceID:                     cmd.ServiceID,
+			Username:                      cmd.Username,
+			Password:                      cmd.Password,
+			CustomLabels:                  customLabels,
+			SkipConnectionCheck:           cmd.SkipConnectionCheck,
+			TLS:                           cmd.TLS,
+			TLSSkipVerify:                 cmd.TLSSkipVerify,
+			TLSCertificateKey:             cmd.TLSCertificateKey,
+			TLSCertificateKeyFilePassword: cmd.TLSCertificateKeyFilePassword,
+			TLSCa:                         cmd.TLSCa,
 		},
 		Context: commands.Ctx,
 	}
@@ -100,4 +134,7 @@ func init() {
 	AddAgentQANMongoDBProfilerAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMongoDBProfilerAgent.SkipConnectionCheck)
 	AddAgentQANMongoDBProfilerAgentC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentQANMongoDBProfilerAgent.TLS)
 	AddAgentQANMongoDBProfilerAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANMongoDBProfilerAgent.TLSSkipVerify)
+	AddAgentQANMongoDBProfilerAgentC.Flag("tls-certificate-key-file", "Define certificate").StringVar(&AddAgentQANMongoDBProfilerAgent.TLSCertificateKeyFile)
+	AddAgentQANMongoDBProfilerAgentC.Flag("tls-certificate-key-file-password", "Define certificate password").StringVar(&AddAgentQANMongoDBProfilerAgent.TLSCertificateKeyFilePassword)
+	AddAgentQANMongoDBProfilerAgentC.Flag("tls-ca-file", "Certificate authority file").StringVar(&AddAgentQANMongoDBProfilerAgent.TLSCaFile)
 }
