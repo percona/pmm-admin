@@ -16,12 +16,8 @@
 package inventory
 
 import (
-	"fmt"
-	"io/ioutil"
-
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
-	"github.com/pkg/errors"
 
 	"github.com/percona/pmm-admin/commands"
 )
@@ -66,29 +62,17 @@ type addAgentQANMongoDBProfilerAgentCommand struct {
 	TLSCaFile                     string
 }
 
-func (cmd *addAgentQANMongoDBProfilerAgentCommand) loadCertificates() error {
-	certificate, err := ioutil.ReadFile(cmd.TLSCertificateKeyFile)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("cannot load TLS certificate in path %s", cmd.TLSCertificateKeyFile))
-	}
-	cmd.TLSCertificateKey = string(certificate)
-
-	certificate, err = ioutil.ReadFile(cmd.TLSCaFile)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("cannot load TLS CA certificate in path %s", cmd.TLSCaFile))
-	}
-	cmd.TLSCa = string(certificate)
-
-	return nil
-}
-
 func (cmd *addAgentQANMongoDBProfilerAgentCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
 	}
 
-	err = cmd.loadCertificates()
+	cmd.TLSCertificateKey, err = loadCertificate(cmd.TLSCertificateKeyFile)
+	if err != nil {
+		return nil, err
+	}
+	cmd.TLSCa, err = loadCertificate(cmd.TLSCaFile)
 	if err != nil {
 		return nil, err
 	}

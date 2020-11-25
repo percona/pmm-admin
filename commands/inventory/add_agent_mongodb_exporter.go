@@ -68,20 +68,13 @@ type addAgentMongodbExporterCommand struct {
 	PushMetrics                   bool
 }
 
-func (cmd *addAgentMongodbExporterCommand) loadCertificates() error {
-	certificate, err := ioutil.ReadFile(cmd.TLSCertificateKeyFile)
+func loadCertificate(file string) (string, error) {
+	certificate, err := ioutil.ReadFile(file)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("cannot load TLS certificate in path %s", cmd.TLSCertificateKeyFile))
+		return "", errors.Wrap(err, fmt.Sprintf("cannot load TLS certificate in path %s", file))
 	}
-	cmd.TLSCertificateKey = string(certificate)
 
-	certificate, err = ioutil.ReadFile(cmd.TLSCaFile)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("cannot load TLS CA certificate in path %s", cmd.TLSCaFile))
-	}
-	cmd.TLSCa = string(certificate)
-
-	return nil
+	return string(certificate), nil
 }
 
 func (cmd *addAgentMongodbExporterCommand) Run() (commands.Result, error) {
@@ -90,7 +83,11 @@ func (cmd *addAgentMongodbExporterCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	err = cmd.loadCertificates()
+	cmd.TLSCertificateKey, err = loadCertificate(cmd.TLSCertificateKeyFile)
+	if err != nil {
+		return nil, err
+	}
+	cmd.TLSCa, err = loadCertificate(cmd.TLSCaFile)
 	if err != nil {
 		return nil, err
 	}
