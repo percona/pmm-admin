@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_loadCertificates(t *testing.T) {
+func Test_loadCertificate(t *testing.T) {
 	cert, err := ioutil.TempFile("", "cert")
 	defer func() {
 		err = os.Remove(cert.Name())
@@ -35,24 +35,7 @@ func Test_loadCertificates(t *testing.T) {
 	err = cert.Close()
 	assert.NoError(t, err)
 
-	caCert, err := ioutil.TempFile("", "CAcert")
-	defer func() {
-		err = os.Remove(caCert.Name())
-		assert.NoError(t, err)
-	}()
+	certificate, err := loadCertificate(cert.Name())
 	assert.NoError(t, err)
-	_, err = caCert.Write([]byte("CAcert"))
-	assert.NoError(t, err)
-	err = caCert.Close()
-	assert.NoError(t, err)
-
-	cmd := addAgentMongodbExporterCommand{
-		TLSCertificateKeyFile: cert.Name(),
-		TLSCaFile:             caCert.Name(),
-	}
-
-	err = cmd.loadCertificates()
-	assert.NoError(t, err)
-	assert.Equal(t, "cert", cmd.TLSCertificateKey)
-	assert.Equal(t, "CAcert", cmd.TLSCa)
+	assert.Equal(t, "cert", certificate)
 }
