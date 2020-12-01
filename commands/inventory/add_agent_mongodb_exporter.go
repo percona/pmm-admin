@@ -72,6 +72,10 @@ type addAgentMongodbExporterCommand struct {
 }
 
 func loadCertificate(file string) (string, error) {
+	if file == "" {
+		return "", nil
+	}
+
 	certificate, err := ioutil.ReadFile(file)
 	if err != nil {
 		return "", errors.Wrap(err, fmt.Sprintf("cannot load TLS certificate in path %s", file))
