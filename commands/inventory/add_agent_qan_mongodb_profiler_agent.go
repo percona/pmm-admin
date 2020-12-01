@@ -56,10 +56,8 @@ type addAgentQANMongoDBProfilerAgentCommand struct {
 	TLS                           bool
 	TLSSkipVerify                 bool
 	TLSCertificateKey             string
-	TLSCertificateKeyFile         string
 	TLSCertificateKeyFilePassword string
 	TLSCa                         string
-	TLSCaFile                     string
 }
 
 func (cmd *addAgentQANMongoDBProfilerAgentCommand) Run() (commands.Result, error) {
@@ -68,11 +66,11 @@ func (cmd *addAgentQANMongoDBProfilerAgentCommand) Run() (commands.Result, error
 		return nil, err
 	}
 
-	cmd.TLSCertificateKey, err = loadCertificate(cmd.TLSCertificateKeyFile)
+	cmd.TLSCertificateKey, err = loadCertificate(tlsCertificateKeyFile)
 	if err != nil {
 		return nil, err
 	}
-	cmd.TLSCa, err = loadCertificate(cmd.TLSCaFile)
+	cmd.TLSCa, err = loadCertificate(tlsCaFile)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +116,7 @@ func init() {
 	AddAgentQANMongoDBProfilerAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMongoDBProfilerAgent.SkipConnectionCheck)
 	AddAgentQANMongoDBProfilerAgentC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentQANMongoDBProfilerAgent.TLS)
 	AddAgentQANMongoDBProfilerAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANMongoDBProfilerAgent.TLSSkipVerify)
-	AddAgentQANMongoDBProfilerAgentC.Flag("tls-certificate-key-file", "Define certificate").StringVar(&AddAgentQANMongoDBProfilerAgent.TLSCertificateKeyFile)
-	AddAgentQANMongoDBProfilerAgentC.Flag("tls-certificate-key-file-password", "Define certificate password").StringVar(&AddAgentQANMongoDBProfilerAgent.TLSCertificateKeyFilePassword)
-	AddAgentQANMongoDBProfilerAgentC.Flag("tls-ca-file", "Certificate authority file").StringVar(&AddAgentQANMongoDBProfilerAgent.TLSCaFile)
+	AddAgentQANMongoDBProfilerAgentC.Flag("tls-certificate-key-file", "Path to TLS certificate PEM file").StringVar(&tlsCertificateKeyFile)
+	AddAgentQANMongoDBProfilerAgentC.Flag("tls-certificate-key-file-password", "Password for certificate").StringVar(&AddAgentQANMongoDBProfilerAgent.TLSCertificateKeyFilePassword)
+	AddAgentQANMongoDBProfilerAgentC.Flag("tls-ca-file", "Path to certificate authority file").StringVar(&tlsCaFile)
 }

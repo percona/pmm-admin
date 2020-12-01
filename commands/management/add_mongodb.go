@@ -17,12 +17,14 @@ package management
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 
 	"github.com/AlekSi/pointer"
 	"github.com/percona/pmm/api/managementpb/json/client"
 	mongodb "github.com/percona/pmm/api/managementpb/json/client/mongo_db"
+	"github.com/pkg/errors"
 
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
@@ -38,6 +40,11 @@ MongoDB Service added.
 Service ID  : {{ .Service.ServiceID }}
 Service name: {{ .Service.ServiceName }}
 `)
+
+var (
+	tlsCertificateKeyFile string
+	tlsCaFile             string
+)
 
 type addMongoDBResult struct {
 	Service *mongodb.AddMongoDBOKBodyService `json:"service"`
@@ -65,9 +72,12 @@ type addMongoDBCommand struct {
 
 	QuerySource string
 
-	SkipConnectionCheck bool
-	TLS                 bool
-	TLSSkipVerify       bool
+	SkipConnectionCheck           bool
+	TLS                           bool
+	TLSSkipVerify                 bool
+	TLSCertificateKey             string
+	TLSCertificateKeyFilePassword string
+	TLSCa                         string
 }
 
 func (cmd *addMongoDBCommand) GetServiceName() string {
@@ -86,8 +96,26 @@ func (cmd *addMongoDBCommand) GetSocket() string {
 	return cmd.Socket
 }
 
+func loadCertificate(file string) (string, error) {
+	certificate, err := ioutil.ReadFile(file)
+	if err != nil {
+		return "", errors.Wrap(err, fmt.Sprintf("cannot load TLS certificate in path %s", file))
+	}
+
+	return string(certificate), nil
+}
+
 func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
+	if err != nil {
+		return nil, err
+	}
+
+	cmd.TLSCertificateKey, err = loadCertificate(tlsCertificateKeyFile)
+	if err != nil {
+		return nil, err
+	}
+	cmd.TLSCa, err = loadCertificate(tlsCaFile)
 	if err != nil {
 		return nil, err
 	}
@@ -176,6 +204,9 @@ func init() {
 	AddMongoDBC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddMongoDB.SkipConnectionCheck)
 	AddMongoDBC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMongoDB.TLS)
 	AddMongoDBC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMongoDB.TLSSkipVerify)
+	AddMongoDBC.Flag("tls-certificate-key-file", "Path to TLS certificate PEM file").StringVar(&tlsCertificateKeyFile)
+	AddMongoDBC.Flag("tls-certificate-key-file-password", "Password for certificate").StringVar(&AddMongoDB.TLSCertificateKeyFilePassword)
+	AddMongoDBC.Flag("tls-ca-file", "Path to certificate authority file").StringVar(&tlsCaFile)
 	AddMongoDBC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
 		" pull - server scrape metrics from agent  or auto - chosen by server.").
 		Default("auto").

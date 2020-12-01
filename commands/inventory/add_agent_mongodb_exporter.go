@@ -137,9 +137,9 @@ func init() {
 	AddAgentMongodbExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentMongodbExporter.SkipConnectionCheck)
 	AddAgentMongodbExporterC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentMongodbExporter.TLS)
 	AddAgentMongodbExporterC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentMongodbExporter.TLSSkipVerify)
-	AddAgentMongodbExporterC.Flag("tls-certificate-key-file", "Define certificate").StringVar(&tlsCertificateKeyFile)
-	AddAgentMongodbExporterC.Flag("tls-certificate-key-file-password", "Define certificate password").StringVar(&AddAgentMongodbExporter.TLSCertificateKeyFilePassword)
-	AddAgentMongodbExporterC.Flag("tls-ca-file", "Certificate authority file").StringVar(&tlsCertificateKeyFile)
+	AddAgentMongodbExporterC.Flag("tls-certificate-key-file", "Path to TLS certificate PEM file").StringVar(&tlsCertificateKeyFile)
+	AddAgentMongodbExporterC.Flag("tls-certificate-key-file-password", "Password for certificate").StringVar(&AddAgentMongodbExporter.TLSCertificateKeyFilePassword)
+	AddAgentMongodbExporterC.Flag("tls-ca-file", "Path to certificate authority file").StringVar(&tlsCertificateKeyFile)
 	AddAgentMongodbExporterC.Flag("push-metrics", "Enables push metrics model flow,"+
 		" it will be sent to the server by an agent").BoolVar(&AddAgentMongodbExporter.PushMetrics)
 }
