@@ -158,11 +158,14 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 
 			QANMongodbProfiler: cmd.QuerySource == mongodbQuerySourceProfiler,
 
-			CustomLabels:        customLabels,
-			SkipConnectionCheck: cmd.SkipConnectionCheck,
-			TLS:                 cmd.TLS,
-			TLSSkipVerify:       cmd.TLSSkipVerify,
-			MetricsMode:         pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
+			CustomLabels:                  customLabels,
+			SkipConnectionCheck:           cmd.SkipConnectionCheck,
+			TLS:                           cmd.TLS,
+			TLSSkipVerify:                 cmd.TLSSkipVerify,
+			TLSCertificateKey:             cmd.TLSCertificateKey,
+			TLSCertificateKeyFilePassword: cmd.TLSCertificateKeyFilePassword,
+			TLSCa:                         cmd.TLSCa,
+			MetricsMode:                   pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
 		},
 		Context: commands.Ctx,
 	}
