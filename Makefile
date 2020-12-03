@@ -19,8 +19,20 @@ LD_FLAGS = -ldflags " \
 			-X 'github.com/percona/pmm-admin/vendor/github.com/percona/pmm/version.Branch=$(PMM_RELEASE_BRANCH)' \
 			"
 
+GOMOD_LD_FLAGS = -ldflags " \
+			-X 'github.com/percona/pmm/version.ProjectName=pmm-admin' \
+			-X 'github.com/percona/pmm/version.Version=$(PMM_RELEASE_VERSION)' \
+			-X 'github.com/percona/pmm/version.PMMVersion=$(PMM_RELEASE_VERSION)' \
+			-X 'github.com/percona/pmm/version.Timestamp=$(PMM_RELEASE_TIMESTAMP)' \
+			-X 'github.com/percona/pmm/version.FullCommit=$(PMM_RELEASE_FULLCOMMIT)' \
+			-X 'github.com/percona/pmm/version.Branch=$(PMM_RELEASE_BRANCH)' \
+			"
+
 release:                        ## Build pmm-admin release binary.
 	env CGO_ENABLED=0 go build -v $(LD_FLAGS) -o $(PMM_RELEASE_PATH)/pmm-admin
+
+release-gomod:                        ## Build pmm-admin release binary for docker.
+	env CGO_ENABLED=0 go build -v $(GOMOD_LD_FLAGS) -o $(PMM_RELEASE_PATH)/pmm-admin
 
 init:                           ## Installs tools to $GOPATH/bin (which is expected to be in $PATH).
 	curl https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin

@@ -1,6 +1,14 @@
 ---
 version: '3'
 services:
+
+  pmm-admin:
+    image: percona/pmm-admin:2
+    container_name: pmm-admin
+    build:
+      context: .
+      dockerfile: Dockerfile    
+
   pmm-admin-server:
     image: ${PMM_SERVER_IMAGE:-percona/pmm-server:2}
     container_name: pmm-admin-server

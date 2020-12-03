@@ -45,4 +45,5 @@ require (
 	gopkg.in/yaml.v2 v2.2.5
 )
 
-replace gopkg.in/alecthomas/kingpin.v2 33f03abf8b596e750f3cc9d66a2555d6cc3daa78 => github.com/Percona-Lab/kingpin v2.2.7-0.20190911101335-33f03abf8b59+incompatible
+// replace gopkg.in/alecthomas/kingpin.v2 33f03abf8b596e750f3cc9d66a2555d6cc3daa78 => github.com/Percona-Lab/kingpin v2.2.7-0.20190911101335-33f03abf8b59+incompatible
+replace gopkg.in/alecthomas/kingpin.v2 => github.com/Percona-Lab/kingpin v2.2.6-percona
