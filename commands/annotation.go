@@ -18,6 +18,8 @@ package commands
 import (
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/nodes"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
@@ -31,6 +33,10 @@ import (
 var annotationResultT = ParseTemplate(`
 Annotation added.
 `)
+
+var (
+	ErrNoNode = errors.New("no node available")
+)
 
 // annotationResult is a result of annotation command.
 type annotationResult struct{}
@@ -53,20 +59,34 @@ type annotationCommand struct {
 }
 
 func (cmd *annotationCommand) nodeName() (string, error) {
-	switch {
-	case cmd.NodeName != "":
+	if cmd.NodeName != "" {
 		return cmd.NodeName, nil
-	case cmd.Node:
-		return cmd.getCurrentNode()
-	default:
+	}
+	if !cmd.Node {
 		return "", nil
 	}
-}
-
-func (cmd *annotationCommand) getCurrentNode() (string, error) {
-	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+	node, err := cmd.getCurrentNode()
 	if err != nil {
 		return "", err
+	}
+
+	switch {
+	case node.Generic != nil:
+		return node.Generic.NodeName, nil
+	case node.Container != nil:
+		return node.Container.NodeName, nil
+	case node.Remote != nil:
+		return node.Remote.NodeName, nil
+	case node.RemoteRDS != nil:
+		return node.RemoteRDS.NodeName, nil
+	}
+	return "", ErrNoNode
+}
+
+func (cmd *annotationCommand) getCurrentNode() (*nodes.GetNodeOKBody, error) {
+	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+	if err != nil {
+		return nil, err
 	}
 
 	params := &nodes.GetNodeParams{
@@ -78,10 +98,9 @@ func (cmd *annotationCommand) getCurrentNode() (string, error) {
 
 	result, err := client.Default.Nodes.GetNode(params)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-
-	return result.Payload.Generic.NodeName, nil
+	return result.GetPayload(), nil
 }
 
 func (cmd *annotationCommand) serviceNames() ([]string, error) {
