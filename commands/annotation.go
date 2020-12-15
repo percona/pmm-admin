@@ -18,25 +18,21 @@ package commands
 import (
 	"strings"
 
-	"github.com/pkg/errors"
-
+	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/nodes"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
 	managementClient "github.com/percona/pmm/api/managementpb/json/client"
 	"github.com/percona/pmm/api/managementpb/json/client/annotation"
+	"github.com/pkg/errors"
 	"gopkg.in/alecthomas/kingpin.v2"
-
-	"github.com/percona/pmm-admin/agentlocal"
 )
 
 var annotationResultT = ParseTemplate(`
 Annotation added.
 `)
 
-var (
-	ErrNoNode = errors.New("no node available")
-)
+var errNoNode = errors.New("no node available")
 
 // annotationResult is a result of annotation command.
 type annotationResult struct{}
@@ -62,9 +58,11 @@ func (cmd *annotationCommand) nodeName() (string, error) {
 	if cmd.NodeName != "" {
 		return cmd.NodeName, nil
 	}
+
 	if !cmd.Node {
 		return "", nil
 	}
+
 	node, err := cmd.getCurrentNode()
 	if err != nil {
 		return "", err
@@ -80,7 +78,8 @@ func (cmd *annotationCommand) nodeName() (string, error) {
 	case node.RemoteRDS != nil:
 		return node.RemoteRDS.NodeName, nil
 	}
-	return "", ErrNoNode
+
+	return "", errors.Wrap(errNoNode, "nodeName")
 }
 
 func (cmd *annotationCommand) getCurrentNode() (*nodes.GetNodeOKBody, error) {
@@ -98,8 +97,9 @@ func (cmd *annotationCommand) getCurrentNode() (*nodes.GetNodeOKBody, error) {
 
 	result, err := client.Default.Nodes.GetNode(params)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "default get node")
 	}
+
 	return result.GetPayload(), nil
 }
 
