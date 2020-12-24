@@ -17,17 +17,14 @@ package management
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
 	"github.com/AlekSi/pointer"
-	"github.com/percona/pmm/api/managementpb/json/client"
-	mongodb "github.com/percona/pmm/api/managementpb/json/client/mongo_db"
-	"github.com/pkg/errors"
-
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
+	"github.com/percona/pmm/api/managementpb/json/client"
+	mongodb "github.com/percona/pmm/api/managementpb/json/client/mongo_db"
 )
 
 const (
@@ -91,30 +88,17 @@ func (cmd *addMongoDBCommand) GetSocket() string {
 	return cmd.Socket
 }
 
-func loadCertificate(file string) (string, error) {
-	if file == "" {
-		return "", nil
-	}
-
-	certificate, err := ioutil.ReadFile(file)
-	if err != nil {
-		return "", errors.Wrap(err, fmt.Sprintf("cannot load TLS certificate in path %s", file))
-	}
-
-	return string(certificate), nil
-}
-
 func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
 	}
 
-	tlsCertificateKey, err := loadCertificate(cmd.TLSCertificateKeyFile)
+	tlsCertificateKey, err := commands.ReadFile(cmd.TLSCertificateKeyFile)
 	if err != nil {
 		return nil, err
 	}
-	tlsCa, err := loadCertificate(cmd.TLSCaFile)
+	tlsCa, err := commands.ReadFile(cmd.TLSCaFile)
 	if err != nil {
 		return nil, err
 	}

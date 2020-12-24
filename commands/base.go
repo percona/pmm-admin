@@ -21,6 +21,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -141,6 +142,20 @@ func ParseCustomLabels(labels string) (map[string]string, error) {
 		result[submatches[1]] = submatches[2]
 	}
 	return result, nil
+}
+
+// ReadFile reads file from filepath if filepath is not empty.
+func ReadFile(filepath string) (string, error) {
+	if filepath == "" {
+		return "", nil
+	}
+
+	certificate, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return "", errors.Wrap(err, fmt.Sprintf("cannot load file in path %q", filepath))
+	}
+
+	return string(certificate), nil
 }
 
 type errFromNginx string

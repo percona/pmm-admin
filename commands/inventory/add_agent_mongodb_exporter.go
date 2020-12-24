@@ -16,14 +16,9 @@
 package inventory
 
 import (
-	"fmt"
-	"io/ioutil"
-
+	"github.com/percona/pmm-admin/commands"
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
-	"github.com/pkg/errors"
-
-	"github.com/percona/pmm-admin/commands"
 )
 
 var addAgentMongodbExporterResultT = commands.ParseTemplate(`
@@ -40,11 +35,6 @@ Status                : {{ .Agent.Status }}
 Disabled              : {{ .Agent.Disabled }}
 Custom labels         : {{ .Agent.CustomLabels }}
 `)
-
-var (
-	tlsCertificateKeyFile string
-	tlsCaFile             string
-)
 
 type addAgentMongodbExporterResult struct {
 	Agent *agents.AddMongoDBExporterOKBodyMongodbExporter `json:"mongodb_exporter"`
@@ -71,30 +61,17 @@ type addAgentMongodbExporterCommand struct {
 	PushMetrics                   bool
 }
 
-func loadCertificate(file string) (string, error) {
-	if file == "" {
-		return "", nil
-	}
-
-	certificate, err := ioutil.ReadFile(file)
-	if err != nil {
-		return "", errors.Wrap(err, fmt.Sprintf("cannot load TLS certificate in path %s", file))
-	}
-
-	return string(certificate), nil
-}
-
 func (cmd *addAgentMongodbExporterCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
 	}
 
-	tlsCertificateKey, err := loadCertificate(cmd.TLSCertificateKeyFile)
+	tlsCertificateKey, err := commands.ReadFile(cmd.TLSCertificateKeyFile)
 	if err != nil {
 		return nil, err
 	}
-	tlsCa, err := loadCertificate(cmd.TLSCaFile)
+	tlsCa, err := commands.ReadFile(cmd.TLSCaFile)
 	if err != nil {
 		return nil, err
 	}

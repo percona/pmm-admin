@@ -66,11 +66,11 @@ func (cmd *addAgentQANMongoDBProfilerAgentCommand) Run() (commands.Result, error
 		return nil, err
 	}
 
-	tlsCertificateKey, err := loadCertificate(cmd.TLSCertificateKeyFile)
+	tlsCertificateKey, err := commands.ReadFile(cmd.TLSCertificateKeyFile)
 	if err != nil {
 		return nil, err
 	}
-	tlsCa, err := loadCertificate(cmd.TLSCaFile)
+	tlsCa, err := commands.ReadFile(cmd.TLSCaFile)
 	if err != nil {
 		return nil, err
 	}
