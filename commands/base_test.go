@@ -82,15 +82,16 @@ func TestParseCustomLabel(t *testing.T) {
 func TestReadFile(t *testing.T) {
 	t.Run("Normal", func(t *testing.T) {
 		cert, err := ioutil.TempFile("", "cert")
+		require.NoError(t, err)
 		defer func() {
+			err = cert.Close()
+			assert.NoError(t, err)
 			err = os.Remove(cert.Name())
 			assert.NoError(t, err)
 		}()
-		assert.NoError(t, err)
 		_, err = cert.Write([]byte("cert"))
-		assert.NoError(t, err)
-		err = cert.Close()
-		assert.NoError(t, err)
+		require.NoError(t, err)
+
 		certificate, err := ReadFile(cert.Name())
 		assert.NoError(t, err)
 		assert.Equal(t, "cert", certificate)
