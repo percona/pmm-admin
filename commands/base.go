@@ -21,7 +21,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -37,6 +36,7 @@ import (
 	managementpb "github.com/percona/pmm/api/managementpb/json/client"
 	serverpb "github.com/percona/pmm/api/serverpb/json/client"
 	"github.com/percona/pmm/utils/tlsconfig"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/percona/pmm-admin/agentlocal"
@@ -152,7 +152,7 @@ func ReadFile(filepath string) (string, error) {
 
 	certificate, err := ioutil.ReadFile(filepath)
 	if err != nil {
-		return "", errors.Wrap(err, fmt.Sprintf("cannot load file in path %q", filepath))
+		return "", errors.Wrapf(err, "cannot load file in path %q", filepath)
 	}
 
 	return string(certificate), nil

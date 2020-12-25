@@ -109,5 +109,4 @@ func TestReadFile(t *testing.T) {
 		require.NoError(t, err)
 		require.Empty(t, certificate)
 	})
-
 }
