@@ -78,9 +78,9 @@ func (cmd *annotationCommand) nodeName() (string, error) {
 		return node.Remote.NodeName, nil
 	case node.RemoteRDS != nil:
 		return node.RemoteRDS.NodeName, nil
+	default:
+		return "", errors.Wrap(errNoNode, "unknown node type")
 	}
-
-	return "", errors.Wrap(errNoNode, "nodeName")
 }
 
 func (cmd *annotationCommand) getCurrentNode() (*nodes.GetNodeOKBody, error) {
