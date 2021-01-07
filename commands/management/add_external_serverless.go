@@ -86,7 +86,7 @@ func (cmd *addExternalServerlessCommand) Run() (commands.Result, error) {
 	params := &external.AddExternalParams{
 		Body: external.AddExternalBody{
 			AddNode: &external.AddExternalParamsBodyAddNode{
-				NodeType:      pointer.ToString("REMOTE_NODE"),
+				NodeType:      pointer.ToString(external.AddExternalParamsBodyAddNodeNodeTypeREMOTENODE),
 				NodeName:      cmd.Name,
 				MachineID:     cmd.MachineID,
 				Distro:        cmd.Distro,
@@ -108,7 +108,7 @@ func (cmd *addExternalServerlessCommand) Run() (commands.Result, error) {
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
 			CustomLabels:   customLabels,
-			MetricsMode:    pointer.ToString("PULL"),
+			MetricsMode:    pointer.ToString(external.AddExternalBodyMetricsModePULL),
 			Group:          cmd.Group,
 		},
 		Context: commands.Ctx,
