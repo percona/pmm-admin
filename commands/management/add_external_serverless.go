@@ -165,7 +165,7 @@ func (cmd *addExternalServerlessCommand) processURLFlags() (scheme, metricsPath,
 // register command
 var (
 	AddExternalServerless  = new(addExternalServerlessCommand)
-	AddExternalServerlessC = AddC.Command("external", "Add External to monitoring")
+	AddExternalServerlessC = AddC.Command("external-serverless", "Add External Service on Remote node to monitoring")
 )
 
 func init() {
