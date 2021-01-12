@@ -83,11 +83,16 @@ func (cmd *addExternalServerlessCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
+	serviceName := cmd.Name
+	if serviceName == "" {
+		serviceName = fmt.Sprintf("%s-external", address)
+	}
+
 	params := &external.AddExternalParams{
 		Body: external.AddExternalBody{
 			AddNode: &external.AddExternalParamsBodyAddNode{
 				NodeType:      pointer.ToString(external.AddExternalParamsBodyAddNodeNodeTypeREMOTENODE),
-				NodeName:      cmd.Name,
+				NodeName:      serviceName,
 				MachineID:     cmd.MachineID,
 				Distro:        cmd.Distro,
 				ContainerID:   cmd.ContainerID,
@@ -98,7 +103,7 @@ func (cmd *addExternalServerlessCommand) Run() (commands.Result, error) {
 				CustomLabels:  customLabels,
 			},
 			Address:        address,
-			ServiceName:    cmd.Name,
+			ServiceName:    serviceName,
 			Username:       cmd.Username,
 			Password:       cmd.Password,
 			Scheme:         scheme,
@@ -169,7 +174,7 @@ var (
 )
 
 func init() {
-	AddExternalServerlessC.Flag("external-name", "Service name").Default("external-serverless").StringVar(&AddExternalServerless.Name)
+	AddExternalServerlessC.Flag("external-name", "Service name").StringVar(&AddExternalServerless.Name)
 
 	AddExternalServerlessC.Flag("username", "External username").StringVar(&AddExternalServerless.Username)
 	AddExternalServerlessC.Flag("password", "External password").StringVar(&AddExternalServerless.Password)
