@@ -144,6 +144,21 @@ func ParseCustomLabels(labels string) (map[string]string, error) {
 	return result, nil
 }
 
+func GetDisableCollectors(collectors string) []string {
+	var disableCollectors []string
+
+	if collectors != "" {
+		for _, v := range strings.Split(collectors, ",") {
+			disableCollector := strings.TrimSpace(v)
+			if disableCollector != "" {
+				disableCollectors = append(disableCollectors, disableCollector)
+			}
+		}
+	}
+
+	return disableCollectors
+}
+
 // ReadFile reads file from filepath if filepath is not empty.
 func ReadFile(filepath string) (string, error) {
 	if filepath == "" {
