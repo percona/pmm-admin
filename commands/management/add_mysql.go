@@ -191,7 +191,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			TLSSkipVerify:             cmd.TLSSkipVerify,
 			TablestatsGroupTableLimit: tablestatsGroupTableLimit,
 			MetricsMode:               pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
-			DisableCollectors:         commands.GetDisableCollectors(cmd.DisableCollectors),
+			DisableCollectors:         commands.ParseDisableCollectors(cmd.DisableCollectors),
 		},
 		Context: commands.Ctx,
 	}

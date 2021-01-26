@@ -144,7 +144,8 @@ func ParseCustomLabels(labels string) (map[string]string, error) {
 	return result, nil
 }
 
-func GetDisableCollectors(collectors string) []string {
+// ParseDisableCollectors parses --disable-collectors flag value.
+func ParseDisableCollectors(collectors string) []string {
 	var disableCollectors []string
 
 	if collectors != "" {

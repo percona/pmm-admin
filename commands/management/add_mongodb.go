@@ -147,7 +147,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 			TLSCertificateKeyFilePassword: cmd.TLSCertificateKeyFilePassword,
 			TLSCa:                         tlsCa,
 			MetricsMode:                   pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
-			DisableCollectors:             commands.GetDisableCollectors(cmd.DisableCollectors),
+			DisableCollectors:             commands.ParseDisableCollectors(cmd.DisableCollectors),
 		},
 		Context: commands.Ctx,
 	}

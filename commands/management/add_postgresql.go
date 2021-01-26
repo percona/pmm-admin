@@ -141,7 +141,7 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			TLSSkipVerify:        cmd.TLSSkipVerify,
 			DisableQueryExamples: cmd.DisableQueryExamples,
 			MetricsMode:          pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
-			DisableCollectors:    commands.GetDisableCollectors(cmd.DisableCollectors),
+			DisableCollectors:    commands.ParseDisableCollectors(cmd.DisableCollectors),
 		},
 		Context: commands.Ctx,
 	}

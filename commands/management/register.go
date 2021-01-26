@@ -87,7 +87,7 @@ func (cmd *registerCommand) Run() (commands.Result, error) {
 
 			Reregister:        cmd.Force,
 			MetricsMode:       pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
-			DisableCollectors: commands.GetDisableCollectors(cmd.DisableCollectors),
+			DisableCollectors: commands.ParseDisableCollectors(cmd.DisableCollectors),
 		},
 		Context: commands.Ctx,
 	}
