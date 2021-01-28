@@ -16,6 +16,9 @@
 package inventory
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
 
@@ -63,6 +66,11 @@ func (cmd *addAgentExternalExporterCommand) Run() (commands.Result, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if !strings.HasPrefix(cmd.MetricsPath, "/") {
+		cmd.MetricsPath = fmt.Sprintf("/%s", cmd.MetricsPath)
+	}
+
 	params := &agents.AddExternalExporterParams{
 		Body: agents.AddExternalExporterBody{
 			RunsOnNodeID: cmd.RunsOnNodeID,
