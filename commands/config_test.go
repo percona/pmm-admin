@@ -70,9 +70,9 @@ func TestConfigCommandArgs(t *testing.T) {
 	})
 	t.Run("DisableCollectors", func(t *testing.T) {
 		cmd := &configCommand{
-			NodeAddress: "1.2.3.4",
-			NodeType:    "generic",
-			NodeName:    "node1",
+			NodeAddress:       "1.2.3.4",
+			NodeType:          "generic",
+			NodeName:          "node1",
 			DisableCollectors: "cpu,diskstats",
 		}
 		u, err := url.Parse("http://admin:admin@127.0.0.1")
