@@ -106,7 +106,7 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 	}
 
 	if cmd.DisableCollectors != "" {
-		res = append(res, fmt.Sprintf("--disable-collectors=%q", cmd.DisableCollectors))
+		res = append(res, fmt.Sprintf("--disable-collectors=%s", cmd.DisableCollectors))
 	}
 
 	res = append(res, cmd.NodeAddress, cmd.NodeType, cmd.NodeName)

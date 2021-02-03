@@ -87,7 +87,7 @@ func TestConfigCommandArgs(t *testing.T) {
 			"--server-password=admin",
 			"--server-insecure-tls",
 			"setup",
-			"--disable-collectors=\"cpu,diskstats\"",
+			"--disable-collectors=cpu,diskstats",
 			"1.2.3.4", "generic", "node1",
 		}
 		assert.Equal(t, expected, args)
