@@ -240,8 +240,8 @@
   version = "v1.1.2"
 
 [[projects]]
-  branch = "PMM-6711-folter-external-group"
-  digest = "1:f06a897f0258bfbb142eb3adaa72a06ae2f8eac6acd25a40d2585cd7a5cde987"
+  branch = "release/2.15"
+  digest = "1:1383afefec3da77ed7d602099f1d56653eb674741d29e26dc621579ea3ebf773"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -270,7 +270,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "81211a03e99069f87b1926f1123922d8232abf06"
+  revision = "92a5626ee0bc8b349ff4049fcc013e24aa43f5bc"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
