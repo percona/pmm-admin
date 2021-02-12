@@ -241,7 +241,7 @@
 
 [[projects]]
   branch = "PMM-7405-check-conn-external-exporter"
-  digest = "1:03477881aca1a47c5f60e02c5071d7f3498ff2ab00e8adad235a7dd6263c4a81"
+  digest = "1:45932c87caf1e1d62092b0968ed18662d30811162a5f0da72f8232c2bee5cda6"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -255,6 +255,7 @@
     "api/managementpb/json/client/actions",
     "api/managementpb/json/client/annotation",
     "api/managementpb/json/client/external",
+    "api/managementpb/json/client/ha_proxy",
     "api/managementpb/json/client/mongo_db",
     "api/managementpb/json/client/my_sql",
     "api/managementpb/json/client/node",
@@ -270,7 +271,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "3bea3de51115de1c74cea0d818efc1eada09f98e"
+  revision = "ff710a4e21fba295c574e10aec573dcd3856f114"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
