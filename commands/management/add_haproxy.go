@@ -57,7 +57,6 @@ type addHAProxyCommand struct {
 	ReplicationSet string
 	CustomLabels   string
 	MetricsMode    string
-	Group          string
 }
 
 func (cmd *addHAProxyCommand) Run() (commands.Result, error) {

@@ -50,7 +50,6 @@ type addHAProxyServiceCommand struct {
 	Cluster        string
 	ReplicationSet string
 	CustomLabels   string
-	Group          string
 }
 
 func (cmd *addHAProxyServiceCommand) Run() (commands.Result, error) {
