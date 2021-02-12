@@ -119,8 +119,8 @@ func init() {
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", defaultServiceName)
 	AddHAProxyC.Flag("service-name", serviceNameHelp).Default(defaultServiceName).StringVar(&AddHAProxy.ServiceName)
 
-	AddHAProxyC.Flag("username", "External username").StringVar(&AddHAProxy.Username)
-	AddHAProxyC.Flag("password", "External password").StringVar(&AddHAProxy.Password)
+	AddHAProxyC.Flag("username", "HAProxy username").StringVar(&AddHAProxy.Username)
+	AddHAProxyC.Flag("password", "HAProxy password").StringVar(&AddHAProxy.Password)
 
 	AddHAProxyC.Flag("scheme", "Scheme to generate URI to exporter metrics endpoints (http, https)").StringVar(&AddHAProxy.Scheme)
 	AddHAProxyC.Flag("metrics-path", "Path under which metrics are exposed, used to generate URI.").StringVar(&AddHAProxy.MetricsPath)
