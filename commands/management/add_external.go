@@ -51,20 +51,21 @@ func (res *addExternalResult) String() string {
 }
 
 type addExternalCommand struct {
-	RunsOnNodeID   string
-	ServiceName    string
-	Username       string
-	Password       string
-	Scheme         string
-	MetricsPath    string
-	ListenPort     uint16
-	NodeID         string
-	Environment    string
-	Cluster        string
-	ReplicationSet string
-	CustomLabels   string
-	MetricsMode    string
-	Group          string
+	RunsOnNodeID         string
+	ServiceName          string
+	Username             string
+	Password             string
+	Scheme               string
+	MetricsPath          string
+	ListenPort           uint16
+	NodeID               string
+	Environment          string
+	Cluster              string
+	ReplicationSet       string
+	CustomLabels         string
+	MetricsMode          string
+	Group                string
+	SkipConnectionChecks bool
 }
 
 func (cmd *addExternalCommand) Run() (commands.Result, error) {
@@ -95,20 +96,21 @@ func (cmd *addExternalCommand) Run() (commands.Result, error) {
 
 	params := &external.AddExternalParams{
 		Body: external.AddExternalBody{
-			RunsOnNodeID:   cmd.RunsOnNodeID,
-			ServiceName:    cmd.ServiceName,
-			Username:       cmd.Username,
-			Password:       cmd.Password,
-			Scheme:         cmd.Scheme,
-			MetricsPath:    cmd.MetricsPath,
-			ListenPort:     int64(cmd.ListenPort),
-			NodeID:         cmd.NodeID,
-			Environment:    cmd.Environment,
-			Cluster:        cmd.Cluster,
-			ReplicationSet: cmd.ReplicationSet,
-			CustomLabels:   customLabels,
-			MetricsMode:    pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
-			Group:          cmd.Group,
+			RunsOnNodeID:         cmd.RunsOnNodeID,
+			ServiceName:          cmd.ServiceName,
+			Username:             cmd.Username,
+			Password:             cmd.Password,
+			Scheme:               cmd.Scheme,
+			MetricsPath:          cmd.MetricsPath,
+			ListenPort:           int64(cmd.ListenPort),
+			NodeID:               cmd.NodeID,
+			Environment:          cmd.Environment,
+			Cluster:              cmd.Cluster,
+			ReplicationSet:       cmd.ReplicationSet,
+			CustomLabels:         customLabels,
+			MetricsMode:          pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
+			Group:                cmd.Group,
+			SkipConnectionChecks: cmd.SkipConnectionChecks,
 		},
 		Context: commands.Ctx,
 	}
@@ -154,4 +156,5 @@ func init() {
 		EnumVar(&AddExternal.MetricsMode, metricsModes...)
 	groupHelp := fmt.Sprintf("Group name of external service (default: %s)", defaultGroupExternalExporter)
 	AddExternalC.Flag("group", groupHelp).Default(defaultGroupExternalExporter).StringVar(&AddExternal.Group)
+	AddExternalC.Flag("skip-connection-checks", "Skip checks connection to exporter").BoolVar(&AddExternal.SkipConnectionChecks)
 }
