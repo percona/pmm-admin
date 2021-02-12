@@ -45,18 +45,19 @@ func (res *addHAProxyResult) String() string {
 }
 
 type addHAProxyCommand struct {
-	ServiceName    string
-	Username       string
-	Password       string
-	Scheme         string
-	MetricsPath    string
-	ListenPort     uint16
-	NodeID         string
-	Environment    string
-	Cluster        string
-	ReplicationSet string
-	CustomLabels   string
-	MetricsMode    string
+	ServiceName         string
+	Username            string
+	Password            string
+	Scheme              string
+	MetricsPath         string
+	ListenPort          uint16
+	NodeID              string
+	Environment         string
+	Cluster             string
+	ReplicationSet      string
+	CustomLabels        string
+	MetricsMode         string
+	SkipConnectionCheck bool
 }
 
 func (cmd *addHAProxyCommand) Run() (commands.Result, error) {
@@ -81,18 +82,19 @@ func (cmd *addHAProxyCommand) Run() (commands.Result, error) {
 
 	params := &ha_proxy.AddHAProxyParams{
 		Body: ha_proxy.AddHAProxyBody{
-			ServiceName:    cmd.ServiceName,
-			Username:       cmd.Username,
-			Password:       cmd.Password,
-			Scheme:         cmd.Scheme,
-			MetricsPath:    cmd.MetricsPath,
-			ListenPort:     int64(cmd.ListenPort),
-			NodeID:         cmd.NodeID,
-			Environment:    cmd.Environment,
-			Cluster:        cmd.Cluster,
-			ReplicationSet: cmd.ReplicationSet,
-			CustomLabels:   customLabels,
-			MetricsMode:    pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
+			ServiceName:         cmd.ServiceName,
+			Username:            cmd.Username,
+			Password:            cmd.Password,
+			Scheme:              cmd.Scheme,
+			MetricsPath:         cmd.MetricsPath,
+			ListenPort:          int64(cmd.ListenPort),
+			NodeID:              cmd.NodeID,
+			Environment:         cmd.Environment,
+			Cluster:             cmd.Cluster,
+			ReplicationSet:      cmd.ReplicationSet,
+			CustomLabels:        customLabels,
+			MetricsMode:         pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
+			SkipConnectionCheck: cmd.SkipConnectionCheck,
 		},
 		Context: commands.Ctx,
 	}
@@ -134,4 +136,5 @@ func init() {
 		" pull - server scrape metrics from agent  or auto - chosen by server.").
 		Default("auto").
 		EnumVar(&AddHAProxy.MetricsMode, metricsModes...)
+	AddHAProxyC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddHAProxy.SkipConnectionCheck)
 }
