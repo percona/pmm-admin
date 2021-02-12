@@ -75,7 +75,7 @@ func (cmd *addHAProxyCommand) Run() (commands.Result, error) {
 		}
 	}
 
-	if !strings.HasPrefix(cmd.MetricsPath, "/") {
+	if cmd.MetricsPath != "" && !strings.HasPrefix(cmd.MetricsPath, "/") {
 		cmd.MetricsPath = fmt.Sprintf("/%s", cmd.MetricsPath)
 	}
 
