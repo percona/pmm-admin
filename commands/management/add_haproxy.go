@@ -41,7 +41,7 @@ type addHAProxyResult struct {
 func (res *addHAProxyResult) Result() {}
 
 func (res *addHAProxyResult) String() string {
-	return commands.RenderTemplate(addExternalResultT, res)
+	return commands.RenderTemplate(addHAProxyResultT, res)
 }
 
 type addHAProxyCommand struct {
@@ -109,7 +109,7 @@ func (cmd *addHAProxyCommand) Run() (commands.Result, error) {
 
 // register command
 var (
-	AddHAProxy  = new(addExternalCommand)
+	AddHAProxy  = new(addHAProxyCommand)
 	AddHAProxyC = AddC.Command("haproxy", "Add HAProxy to monitoring")
 )
 
