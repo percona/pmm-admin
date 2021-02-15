@@ -20,7 +20,6 @@ import (
 	"net"
 	"net/url"
 	"strconv"
-	"strings"
 
 	"github.com/AlekSi/pointer"
 	"github.com/percona/pmm/api/managementpb/json/client"
@@ -184,7 +183,7 @@ func init() {
 	AddExternalServerlessC.Flag("username", "External username").StringVar(&AddExternalServerless.Username)
 	AddExternalServerlessC.Flag("password", "External password").StringVar(&AddExternalServerless.Password)
 
-	AddExternalServerlessC.Flag("scheme", "Scheme to generate URL to exporter metrics endpoints (http, https)").StringVar(&AddExternalServerless.Scheme)
+	AddExternalServerlessC.Flag("scheme", "Scheme to generate URL to exporter metrics endpoints").StringVar(&AddExternalServerless.Scheme)
 	AddExternalServerlessC.Flag("url", "Full URL to exporter metrics endpoints").StringVar(&AddExternalServerless.URL)
 	AddExternalServerlessC.Flag("address", "External exporter address and port").StringVar(&AddExternalServerless.Address)
 	AddExternalServerlessC.Flag("host", "External exporters hostname or IP address").StringVar(&AddExternalServerless.Host)

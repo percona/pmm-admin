@@ -143,7 +143,7 @@ func init() {
 	AddExternalC.Flag("username", "External username").StringVar(&AddExternal.Username)
 	AddExternalC.Flag("password", "External password").StringVar(&AddExternal.Password)
 
-	AddExternalC.Flag("scheme", "Scheme to generate URI to exporter metrics endpoints (http, https)").StringVar(&AddExternal.Scheme)
+	AddExternalC.Flag("scheme", "Scheme to generate URI to exporter metrics endpoints").StringVar(&AddExternal.Scheme)
 	AddExternalC.Flag("metrics-path", "Path under which metrics are exposed, used to generate URI.").StringVar(&AddExternal.MetricsPath)
 	AddExternalC.Flag("listen-port", "Listen port of external exporter for scraping metrics.").Required().Uint16Var(&AddExternal.ListenPort)
 
