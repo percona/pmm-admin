@@ -127,15 +127,16 @@ func init() {
 		PlaceHolder("http or https").StringVar(&AddHAProxy.Scheme)
 	AddHAProxyC.Flag("metrics-path", "Path under which metrics are exposed, used to generate URI.").
 		PlaceHolder("/metrics").StringVar(&AddHAProxy.MetricsPath)
-	AddHAProxyC.Flag("listen-port", "Listen port of external exporter for scraping metrics.").Required().Uint16Var(&AddHAProxy.ListenPort)
+	AddHAProxyC.Flag("listen-port", "Listen port of external exporter for scraping metrics. (Required)").Required().Uint16Var(&AddHAProxy.ListenPort)
 
 	AddHAProxyC.Flag("service-node-id", "Node ID where service runs (default is autodetected)").StringVar(&AddHAProxy.NodeID)
 	AddHAProxyC.Flag("environment", "Environment name like 'production' or 'qa'").
 		PlaceHolder("prod").StringVar(&AddHAProxy.Environment)
-	AddHAProxyC.Flag("cluster", "Cluster name").StringVar(&AddHAProxy.Cluster)
+	AddHAProxyC.Flag("cluster", "Cluster name").
+		PlaceHolder("east-cluster").StringVar(&AddHAProxy.Cluster)
 	AddHAProxyC.Flag("replication-set", "Replication set name").
 		PlaceHolder("rs1").StringVar(&AddHAProxy.ReplicationSet)
-	AddHAProxyC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddHAProxy.CustomLabels)
+	AddHAProxyC.Flag("custom-labels", "Custom user-assigned labels. Example: region=east,app=app1").StringVar(&AddHAProxy.CustomLabels)
 	AddHAProxyC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
 		" pull - server scrape metrics from agent  or auto - chosen by server.").
 		Default("auto").
