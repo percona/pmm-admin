@@ -117,6 +117,38 @@ func (o *ListTunnelsDefault) readResponse(response runtime.ClientResponse, consu
 	return nil
 }
 
+/*ListTunnelsBody list tunnels body
+swagger:model ListTunnelsBody
+*/
+type ListTunnelsBody struct {
+
+	// Return only Tunnels where one (or both) pmm-agent has this ID.
+	AgentID string `json:"agent_id,omitempty"`
+}
+
+// Validate validates this list tunnels body
+func (o *ListTunnelsBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *ListTunnelsBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *ListTunnelsBody) UnmarshalBinary(b []byte) error {
+	var res ListTunnelsBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
 /*ListTunnelsDefaultBody list tunnels default body
 swagger:model ListTunnelsDefaultBody
 */

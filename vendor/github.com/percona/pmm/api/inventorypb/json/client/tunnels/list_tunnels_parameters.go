@@ -61,7 +61,7 @@ for the list tunnels operation typically these are written to a http.Request
 type ListTunnelsParams struct {
 
 	/*Body*/
-	Body interface{}
+	Body ListTunnelsBody
 
 	timeout    time.Duration
 	Context    context.Context
@@ -102,13 +102,13 @@ func (o *ListTunnelsParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the list tunnels params
-func (o *ListTunnelsParams) WithBody(body interface{}) *ListTunnelsParams {
+func (o *ListTunnelsParams) WithBody(body ListTunnelsBody) *ListTunnelsParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the list tunnels params
-func (o *ListTunnelsParams) SetBody(body interface{}) {
+func (o *ListTunnelsParams) SetBody(body ListTunnelsBody) {
 	o.Body = body
 }
 
@@ -120,10 +120,8 @@ func (o *ListTunnelsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.R
 	}
 	var res []error
 
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Body); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {
