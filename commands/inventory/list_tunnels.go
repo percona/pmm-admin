@@ -18,6 +18,8 @@ package inventory
 import (
 	"bytes"
 	"fmt"
+	"strconv"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/percona/pmm/api/inventorypb/json/client"
@@ -25,15 +27,6 @@ import (
 
 	"github.com/percona/pmm-admin/commands"
 )
-
-var listTunnelsResultT = commands.ParseTemplate(`
-Agents list.
-
-{{ printf "%-27s" "Agent type" }} {{ printf "%-15s" "Status" }} {{ printf "%-47s" "Agent ID" }} {{ printf "%-47s" "PMM-Agent ID" }} {{ printf "%-47s" "Service ID" }}
-{{ range .Agents }}
-{{- printf "%-27s" .HumanReadableAgentType }} {{ printf "%-15s" .NiceAgentStatus }} {{ .AgentID }}  {{ .PMMAgentID }}  {{ .ServiceID }}
-{{ end }}
-`)
 
 type listResultTunnel struct {
 	TunnelID       string `json:"tunnel_id"`
@@ -55,12 +48,24 @@ func (res *listTunnelsResult) String() string {
 	}
 
 	var buf bytes.Buffer
-	buf.WriteString("Tunnels list.\n")
-
-	w := tabwriter.NewWriter(&buf, 0, 0, 1, ' ', 0)
-	fmt.Fprintf(w, "ID\tInfo\n")
+	w := tabwriter.NewWriter(&buf, 0, 0, 3, ' ', 0)
+	header := strings.Join([]string{
+		"ID",
+		"Listen Agent ID",
+		"Listen port",
+		"Connect Agent ID",
+		"Connect port",
+	}, "\t")
+	fmt.Fprintln(w, header)
 	for _, t := range res.Tunnels {
-		fmt.Fprintf(w, "%s\tlala\n", t.TunnelID)
+		line := strings.Join([]string{
+			t.TunnelID,
+			t.ListenAgentID,
+			strconv.Itoa(int(t.ListenPort)),
+			t.ConnectAgentID,
+			strconv.Itoa(int(t.ConnectPort)),
+		}, "\t")
+		fmt.Fprintln(w, line)
 	}
 	w.Flush()
 	return buf.String()
