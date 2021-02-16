@@ -16,6 +16,10 @@
 package inventory
 
 import (
+	"bytes"
+	"fmt"
+	"text/tabwriter"
+
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/tunnels"
 
@@ -32,6 +36,7 @@ Agents list.
 `)
 
 type listResultTunnel struct {
+	TunnelID       string `json:"tunnel_id"`
 	ListenAgentID  string `json:"listen_agent_id"`
 	ListenPort     uint16 `json:"listen_port"`
 	ConnectAgentID string `json:"connect_agent_id"`
@@ -45,7 +50,20 @@ type listTunnelsResult struct {
 func (res *listTunnelsResult) Result() {}
 
 func (res *listTunnelsResult) String() string {
-	return commands.RenderTemplate(listTunnelsResultT, res)
+	if len(res.Tunnels) == 0 {
+		return "No tunnels."
+	}
+
+	var buf bytes.Buffer
+	buf.WriteString("Tunnels list.\n")
+
+	w := tabwriter.NewWriter(&buf, 0, 0, 1, ' ', 0)
+	fmt.Fprintf(w, "ID\tInfo\n")
+	for _, t := range res.Tunnels {
+		fmt.Fprintf(w, "%s\tlala\n", t.TunnelID)
+	}
+	w.Flush()
+	return buf.String()
 }
 
 type listTunnelsCommand struct {
@@ -65,6 +83,7 @@ func (cmd *listTunnelsCommand) Run() (commands.Result, error) {
 	tunnelsList := make([]listResultTunnel, len(tunnelsRes.Payload.Tunnel))
 	for i, t := range tunnelsRes.Payload.Tunnel {
 		tunnelsList[i] = listResultTunnel{
+			TunnelID:       t.TunnelID,
 			ListenAgentID:  t.ListenAgentID,
 			ListenPort:     uint16(t.ListenPort),
 			ConnectAgentID: t.ConnectAgentID,

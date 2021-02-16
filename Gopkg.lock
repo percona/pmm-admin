@@ -241,7 +241,7 @@
 
 [[projects]]
   branch = "PMM-5194-tunnels"
-  digest = "1:1a3ba45c64fbce713016027a2ea66b0e7b1618281628747aa29e027190e80310"
+  digest = "1:93a415f64d72a40206397a167c36f1d50f903b17e2df61eb0b3603f67618186a"
   name = "github.com/percona/pmm"
   packages = [
     "api/agentlocalpb/json/client",
@@ -272,7 +272,7 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "2d1598848a2de465e700e1d1cda39d4999402b76"
+  revision = "5066f213ed715ea82bf2a5f1757c0ac0c2a9a94e"
 
 [[projects]]
   digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
@@ -427,6 +427,7 @@
     "github.com/percona/pmm/api/inventorypb/json/client/agents",
     "github.com/percona/pmm/api/inventorypb/json/client/nodes",
     "github.com/percona/pmm/api/inventorypb/json/client/services",
+    "github.com/percona/pmm/api/inventorypb/json/client/tunnels",
     "github.com/percona/pmm/api/inventorypb/types",
     "github.com/percona/pmm/api/managementpb/json/client",
     "github.com/percona/pmm/api/managementpb/json/client/annotation",

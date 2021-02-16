@@ -295,6 +295,9 @@ swagger:model TunnelItems0
 */
 type TunnelItems0 struct {
 
+	// Tunnel ID.
+	TunnelID string `json:"tunnel_id,omitempty"`
+
 	// Agent ID of the listening pmm-agent.
 	ListenAgentID string `json:"listen_agent_id,omitempty"`
 
