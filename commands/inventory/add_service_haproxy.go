@@ -94,5 +94,5 @@ func init() {
 		PlaceHolder("east-cluster").StringVar(&AddHAProxyService.Cluster)
 	AddHAProxyServiceC.Flag("replication-set", "Replication set name").
 		PlaceHolder("rs1").StringVar(&AddHAProxyService.ReplicationSet)
-	AddHAProxyServiceC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddHAProxyService.CustomLabels)
+	AddHAProxyServiceC.Flag("custom-labels", "Custom user-assigned labels. Example: region=east,app=app1").StringVar(&AddHAProxyService.CustomLabels)
 }
