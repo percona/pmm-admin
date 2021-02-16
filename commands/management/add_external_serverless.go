@@ -20,6 +20,7 @@ import (
 	"net"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/AlekSi/pointer"
 	"github.com/percona/pmm/api/managementpb/json/client"
@@ -86,6 +87,10 @@ func (cmd *addExternalServerlessCommand) Run() (commands.Result, error) {
 	serviceName := cmd.Name
 	if serviceName == "" {
 		serviceName = fmt.Sprintf("%s-external", address)
+	}
+
+	if !strings.HasPrefix(cmd.MetricsPath, "/") {
+		cmd.MetricsPath = fmt.Sprintf("/%s", cmd.MetricsPath)
 	}
 
 	params := &external.AddExternalParams{
