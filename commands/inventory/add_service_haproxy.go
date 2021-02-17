@@ -86,8 +86,8 @@ var (
 )
 
 func init() {
-	AddHAProxyServiceC.Flag("name", "HAProxy service name. (Required)").Required().StringVar(&AddHAProxyService.ServiceName)
-	AddHAProxyServiceC.Flag("node-id", "HAProxy service node ID. (Required)").Required().StringVar(&AddHAProxyService.NodeID)
+	AddHAProxyServiceC.Arg("name", "HAProxy service name").StringVar(&AddHAProxyService.ServiceName)
+	AddHAProxyServiceC.Arg("node-id", "HAProxy service node ID").StringVar(&AddHAProxyService.NodeID)
 	AddHAProxyServiceC.Flag("environment", "Environment name like 'production' or 'qa'").
 		PlaceHolder("prod").StringVar(&AddHAProxyService.Environment)
 	AddHAProxyServiceC.Flag("cluster", "Cluster name").

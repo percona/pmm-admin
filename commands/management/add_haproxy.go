@@ -118,7 +118,7 @@ func init() {
 	hostname, _ := os.Hostname()
 	defaultServiceName := hostname + "-haproxy"
 	serviceNameHelp := fmt.Sprintf("Service name (autodetected default: %s)", defaultServiceName)
-	AddHAProxyC.Flag("service-name", serviceNameHelp).Default(defaultServiceName).StringVar(&AddHAProxy.ServiceName)
+	AddHAProxyC.Arg("name", serviceNameHelp).Default(defaultServiceName).StringVar(&AddHAProxy.ServiceName)
 
 	AddHAProxyC.Flag("username", "HAProxy username").StringVar(&AddHAProxy.Username)
 	AddHAProxyC.Flag("password", "HAProxy password").StringVar(&AddHAProxy.Password)
