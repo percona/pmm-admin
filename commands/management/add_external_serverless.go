@@ -183,7 +183,8 @@ sudo pmm-admin add external-serverless --scheme=http --host=1.2.3.4 --listen-por
 
 Notice that some parameters are mandatory depending on the context. 
 For example, if you specify --url, --schema and other related parameters are not mandatory but,
-if you specify --host you must provide all other parameters needed to build the destination URL.
+if you specify --host you must provide all other parameters needed to build the destination URL 
+or even you can specify --address instead of host and port as individual parameters.
 `
 )
 
