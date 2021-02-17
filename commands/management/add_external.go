@@ -160,5 +160,5 @@ func init() {
 		EnumVar(&AddExternal.MetricsMode, metricsModes...)
 	groupHelp := fmt.Sprintf("Group name of external service (default: %s)", defaultGroupExternalExporter)
 	AddExternalC.Flag("group", groupHelp).Default(defaultGroupExternalExporter).StringVar(&AddExternal.Group)
-	AddExternalC.Flag("skip-connection-check", "Skip checks connection to exporter").BoolVar(&AddExternal.SkipConnectionCheck)
+	AddExternalC.Flag("skip-connection-check", "Skip exporter connection checks").BoolVar(&AddExternal.SkipConnectionCheck)
 }
