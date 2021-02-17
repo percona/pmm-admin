@@ -159,19 +159,19 @@ func (cmd *listCommand) Run() (Result, error) {
 			AddressPort: getAddressPort(s.Socket, s.Address, s.Port),
 		})
 	}
+	for _, s := range servicesRes.Payload.Haproxy {
+		servicesList = append(servicesList, listResultService{
+			ServiceType: types.ServiceTypeHAProxyService,
+			ServiceID:   s.ServiceID,
+			ServiceName: s.ServiceName,
+		})
+	}
 	for _, s := range servicesRes.Payload.External {
 		servicesList = append(servicesList, listResultService{
 			ServiceType: types.ServiceTypeExternalService,
 			ServiceID:   s.ServiceID,
 			ServiceName: s.ServiceName,
 			Group:       s.Group,
-		})
-	}
-	for _, s := range servicesRes.Payload.Haproxy {
-		servicesList = append(servicesList, listResultService{
-			ServiceType: types.ServiceTypeHAProxyService,
-			ServiceID:   s.ServiceID,
-			ServiceName: s.ServiceName,
 		})
 	}
 
