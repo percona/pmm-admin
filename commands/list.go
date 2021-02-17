@@ -16,16 +16,20 @@
 package commands
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"net"
 	"strconv"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/AlekSi/pointer"
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
 	"github.com/percona/pmm/api/inventorypb/types"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/agentlocal"
@@ -93,7 +97,24 @@ type listResult struct {
 func (res *listResult) Result() {}
 
 func (res *listResult) String() string {
-	return RenderTemplate(listResultT, res)
+	template := RenderTemplate(listResultT, res)
+	formattedTemplate, err := convertTabs(template)
+	if err != nil {
+		logrus.Errorf("%s", err)
+	}
+	return formattedTemplate
+}
+
+func convertTabs(template string) (string, error) {
+	var buf bytes.Buffer
+	w := tabwriter.NewWriter(&buf, 4, 4, 8, ' ', tabwriter.TabIndent)
+	if _, err := io.WriteString(w, template); err != nil {
+		return "", err
+	}
+	if err := w.Flush(); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
 
 type listCommand struct {
