@@ -106,6 +106,7 @@ func RenderTemplate(t *template.Template, data interface{}) string {
 	if err := t.Execute(&buf, data); err != nil {
 		logrus.Panicf("Failed to render response.\n%s.\nTemplate data: %#v.\nPlease report this bug.", err, data)
 	}
+
 	return strings.TrimSpace(buf.String()) + "\n"
 }
 
