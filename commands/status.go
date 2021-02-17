@@ -16,9 +16,13 @@
 package commands
 
 import (
+	"bytes"
 	"context"
+	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
+	"text/tabwriter"
 	"time"
 
 	"github.com/percona/pmm/api/inventorypb/types"
@@ -64,7 +68,33 @@ func (res *statusResult) NiceAgentStatus(status string) string {
 func (res *statusResult) Result() {}
 
 func (res *statusResult) String() string {
-	return RenderTemplate(statusResultT, res)
+	s := RenderTemplate(statusResultT, res)
+
+	if len(res.PMMAgentStatus.Tunnels) == 0 {
+		return s + "\n" + "No tunnels."
+	}
+
+	var buf bytes.Buffer
+	w := tabwriter.NewWriter(&buf, 0, 0, 3, ' ', 0)
+	header := strings.Join([]string{
+		"ID",
+		"Listen port",
+		"Connect port",
+		"Current connections",
+	}, "\t")
+	fmt.Fprintln(w, header)
+	for _, t := range res.PMMAgentStatus.Tunnels {
+		line := strings.Join([]string{
+			t.TunnelID,
+			strconv.Itoa(int(t.ListenPort)),
+			strconv.Itoa(int(t.ConnectPort)),
+			strconv.Itoa(int(t.CurrentConnections)),
+		}, "\t")
+		fmt.Fprintln(w, line)
+	}
+	_ = w.Flush()
+
+	return s + "\n" + buf.String()
 }
 
 func newStatusResult(status *agentlocal.Status) *statusResult {

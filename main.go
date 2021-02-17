@@ -122,6 +122,8 @@ func main() {
 
 		inventory.RemoveAgentC.FullCommand(): inventory.RemoveAgent,
 
+		inventory.ListTunnelsC.FullCommand(): inventory.ListTunnels,
+
 		commands.ListC.FullCommand():       commands.List,
 		commands.AnnotationC.FullCommand(): commands.Annotation,
 		commands.StatusC.FullCommand():     commands.Status,
