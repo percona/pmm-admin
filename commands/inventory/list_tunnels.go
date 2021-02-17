@@ -67,7 +67,8 @@ func (res *listTunnelsResult) String() string {
 		}, "\t")
 		fmt.Fprintln(w, line)
 	}
-	w.Flush()
+	_ = w.Flush()
+
 	return buf.String()
 }
 

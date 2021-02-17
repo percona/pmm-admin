@@ -69,7 +69,8 @@ type Status struct {
 	ServerVersion     string `json:"server_version"`
 	AgentVersion      string `json:"agent_version"`
 
-	Agents []AgentStatus `json:"agents"`
+	Agents  []AgentStatus  `json:"agents"`
+	Tunnels []TunnelStatus `json:"tunnels"`
 
 	Connected        bool          `json:"connected"`
 	ServerClockDrift time.Duration `json:"server_clock_drift,omitempty"`
@@ -77,9 +78,17 @@ type Status struct {
 }
 
 type AgentStatus struct {
-	AgentID   string `json:"agent_id"`
-	AgentType string `json:"agent_type"`
-	Status    string `json:"status"`
+	AgentID    string `json:"agent_id"`
+	AgentType  string `json:"agent_type"`
+	Status     string `json:"status"`
+	ListenPort uint16 `json:"listen_port"`
+}
+
+type TunnelStatus struct {
+	TunnelID           string `json:"tunnel_id"`
+	ListenPort         uint16 `json:"listen_port"`
+	ConnectPort        uint16 `json:"connect_port"`
+	CurrentConnections uint   `json:"current_connections"`
 }
 
 // GetRawStatus returns raw local pmm-agent status. No special cases.
@@ -123,11 +132,23 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 	agents := make([]AgentStatus, len(p.AgentsInfo))
 	for i, a := range p.AgentsInfo {
 		agents[i] = AgentStatus{
-			AgentID:   a.AgentID,
-			AgentType: pointer.GetString(a.AgentType),
-			Status:    pointer.GetString(a.Status),
+			AgentID:    a.AgentID,
+			AgentType:  pointer.GetString(a.AgentType),
+			Status:     pointer.GetString(a.Status),
+			ListenPort: uint16(a.ListenPort),
 		}
 	}
+
+	tunnels := make([]TunnelStatus, len(p.TunnelsInfo))
+	for i, t := range p.TunnelsInfo {
+		tunnels[i] = TunnelStatus{
+			TunnelID:           t.TunnelID,
+			ListenPort:         uint16(t.ListenPort),
+			ConnectPort:        uint16(t.ConnectPort),
+			CurrentConnections: uint(t.CurrentConnections),
+		}
+	}
+
 	var clockDrift time.Duration
 	var latency time.Duration
 	if bool(requestNetworkInfo) && p.ServerInfo.Connected {
@@ -155,7 +176,8 @@ func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
 		ServerVersion:     p.ServerInfo.Version,
 		AgentVersion:      agentVersion,
 
-		Agents: agents,
+		Agents:  agents,
+		Tunnels: tunnels,
 
 		Connected:        p.ServerInfo.Connected,
 		ServerClockDrift: clockDrift,
