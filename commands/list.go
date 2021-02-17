@@ -32,13 +32,13 @@ import (
 )
 
 var listResultT = ParseTemplate(`
-Service type                Service name                        Address and port       Service ID
+Service type{{"\t"}}Service name{{"\t"}}Address and port{{"\t"}}Service ID
 {{ range .Services }}
-{{- printf "%-27s" .HumanReadableServiceType }} {{ printf "%-35s" .ServiceName }} {{ printf "%-22s" .AddressPort }} {{ .ServiceID }}
+{{- printf "%-27s" .HumanReadableServiceType }}{{"\t"}}{{ printf "%-35s" .ServiceName }}{{"\t"}}{{ printf "%-22s" .AddressPort }}{{"\t"}}{{ .ServiceID }}
 {{ end }}
-Agent type                  Status     Metrics Mode   Agent ID                                      Service ID
+Agent type{{"\t"}}Status{{"\t"}}Metrics Mode{{"\t"}}Agent ID{{"\t"}}Service ID
 {{ range .Agents }}
-{{- printf "%-27s" .HumanReadableAgentType }} {{ printf "%-10s" .NiceAgentStatus }} {{ .MetricsMode }}  {{ .AgentID }} {{ .ServiceID }} 
+{{- printf "%-27s" .HumanReadableAgentType }}{{"\t"}}{{ printf "%-10s" .NiceAgentStatus }}{{"\t"}}{{ .MetricsMode }}{{"\t"}}{{ .AgentID }}{{"\t"}}{{ .ServiceID }} 
 {{ end }}
 `)
 

@@ -28,6 +28,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"text/tabwriter"
 	"text/template"
 
 	"github.com/go-openapi/runtime"
@@ -103,10 +104,11 @@ func ParseTemplate(text string) *template.Template {
 // RenderTemplate renders given template with given data and returns result as string.
 func RenderTemplate(t *template.Template, data interface{}) string {
 	var buf bytes.Buffer
-	if err := t.Execute(&buf, data); err != nil {
+	w := tabwriter.NewWriter(&buf, 4, 4, 8, ' ', tabwriter.TabIndent)
+	if err := t.Execute(w, data); err != nil {
 		logrus.Panicf("Failed to render response.\n%s.\nTemplate data: %#v.\nPlease report this bug.", err, data)
 	}
-
+	_ = w.Flush()
 	return strings.TrimSpace(buf.String()) + "\n"
 }
 
