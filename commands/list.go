@@ -167,6 +167,13 @@ func (cmd *listCommand) Run() (Result, error) {
 			Group:       s.Group,
 		})
 	}
+	for _, s := range servicesRes.Payload.Haproxy {
+		servicesList = append(servicesList, listResultService{
+			ServiceType: types.ServiceTypeHAProxyService,
+			ServiceID:   s.ServiceID,
+			ServiceName: s.ServiceName,
+		})
+	}
 
 	agentsRes, err := client.Default.Agents.ListAgents(&agents.ListAgentsParams{
 		Context: Ctx,
