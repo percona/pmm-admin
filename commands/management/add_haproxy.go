@@ -129,7 +129,7 @@ func init() {
 		PlaceHolder("/metrics").StringVar(&AddHAProxy.MetricsPath)
 	AddHAProxyC.Flag("listen-port", "Listen port of haproxy exposing the metrics for scraping metrics (Required)").Required().Uint16Var(&AddHAProxy.ListenPort)
 
-	AddHAProxyC.Flag("service-node-id", "Node ID where service runs (default is autodetected)").StringVar(&AddHAProxy.NodeID)
+	AddHAProxyC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddHAProxy.NodeID)
 	AddHAProxyC.Flag("environment", "Environment name like 'production' or 'qa'").
 		PlaceHolder("prod").StringVar(&AddHAProxy.Environment)
 	AddHAProxyC.Flag("cluster", "Cluster name").
