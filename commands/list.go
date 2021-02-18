@@ -100,7 +100,7 @@ func (res *listResult) String() string {
 	template := RenderTemplate(listResultT, res)
 	formattedTemplate, err := convertTabs(template)
 	if err != nil {
-		logrus.Errorf("%s", err)
+		logrus.Panicf("Failed to render response: %s", err)
 	}
 	return formattedTemplate
 }
