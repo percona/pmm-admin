@@ -2,7 +2,7 @@ module github.com/percona/pmm-admin
 
 go 1.16
 
-replace gopkg.in/alecthomas/kingpin.v2 v2.2.7-0.20190911101335-33f03abf8b59+incompatible => github.com/Percona-Lab/kingpin v2.2.7-0.20190911101335-33f03abf8b59+incompatible
+replace gopkg.in/alecthomas/kingpin.v2 => github.com/Percona-Lab/kingpin v2.2.6-percona+incompatible
 
 require (
 	github.com/AlekSi/pointer v1.1.0
@@ -14,5 +14,5 @@ require (
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd
-	gopkg.in/alecthomas/kingpin.v2 v2.2.7-0.20190911101335-33f03abf8b59+incompatible
+	gopkg.in/alecthomas/kingpin.v2 v2.0.0-00010101000000-000000000000
 )

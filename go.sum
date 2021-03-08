@@ -1,8 +1,8 @@
 github.com/AlekSi/pointer v1.1.0 h1:SSDMPcXD9jSl8FPy9cRzoRaMJtm9g9ggGTxecRUbQoI=
 github.com/AlekSi/pointer v1.1.0/go.mod h1:y7BvfRI3wXPWKXEBhU71nbnIEEZX0QTSB2Bj48UJIZE=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/Percona-Lab/kingpin v2.2.7-0.20190911101335-33f03abf8b59+incompatible h1:/ucCtOyNErC4XfEic54pu3cr/ek1tX2Mj3Iiy3gHE8w=
-github.com/Percona-Lab/kingpin v2.2.7-0.20190911101335-33f03abf8b59+incompatible/go.mod h1:UC6j/e2eqpHBB/vn+5214ExsoDLiEo6BfUGBhbtf+x0=
+github.com/Percona-Lab/kingpin v2.2.6-percona+incompatible h1:N5oM40aAatvf8bCYjv69YsVdxJLIUhY/MerUG1jRL9Y=
+github.com/Percona-Lab/kingpin v2.2.6-percona+incompatible/go.mod h1:UC6j/e2eqpHBB/vn+5214ExsoDLiEo6BfUGBhbtf+x0=
 github.com/PuerkitoBio/purell v1.1.0/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
 github.com/PuerkitoBio/purell v1.1.1 h1:WEQqlqaGbrPkxLJWfBwQmfEAE1Z7ONdDLqrN38tNFfI=
 github.com/PuerkitoBio/purell v1.1.1/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
