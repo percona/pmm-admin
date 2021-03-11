@@ -44,10 +44,7 @@ env:
 before_install:
   - docker-compose up -d
 
-install:
-  # install reviewdog and golangci-lin
-  - curl https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh| sh -s
-
+install: skip
 before_script:
   # ensure that files are not changed
   - make init
