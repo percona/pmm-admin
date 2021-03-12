@@ -11,12 +11,12 @@ PMM_RELEASE_FULLCOMMIT ?= $(shell git rev-parse HEAD)
 PMM_RELEASE_BRANCH ?= $(shell git describe --always --contains --all)
 
 LD_FLAGS = -ldflags " \
-			-X 'github.com/percona/pmm-admin/vendor/github.com/percona/pmm/version.ProjectName=pmm-admin' \
-			-X 'github.com/percona/pmm-admin/vendor/github.com/percona/pmm/version.Version=$(PMM_RELEASE_VERSION)' \
-			-X 'github.com/percona/pmm-admin/vendor/github.com/percona/pmm/version.PMMVersion=$(PMM_RELEASE_VERSION)' \
-			-X 'github.com/percona/pmm-admin/vendor/github.com/percona/pmm/version.Timestamp=$(PMM_RELEASE_TIMESTAMP)' \
-			-X 'github.com/percona/pmm-admin/vendor/github.com/percona/pmm/version.FullCommit=$(PMM_RELEASE_FULLCOMMIT)' \
-			-X 'github.com/percona/pmm-admin/vendor/github.com/percona/pmm/version.Branch=$(PMM_RELEASE_BRANCH)' \
+			-X 'github.com/percona/pmm/version.ProjectName=pmm-admin' \
+			-X 'github.com/percona/pmm/version.Version=$(PMM_RELEASE_VERSION)' \
+			-X 'github.com/percona/pmm/version.PMMVersion=$(PMM_RELEASE_VERSION)' \
+			-X 'github.com/percona/pmm/version.Timestamp=$(PMM_RELEASE_TIMESTAMP)' \
+			-X 'github.com/percona/pmm/version.FullCommit=$(PMM_RELEASE_FULLCOMMIT)' \
+			-X 'github.com/percona/pmm/version.Branch=$(PMM_RELEASE_BRANCH)' \
 			"
 
 release:                        ## Build pmm-admin release binary.
@@ -27,9 +27,6 @@ init:                           ## Installs development tools
 	go build -modfile=tools/go.mod -o bin/golangci-lint github.com/golangci/golangci-lint/cmd/golangci-lint
 	go build -modfile=tools/go.mod -o bin/reviewdog github.com/reviewdog/reviewdog/cmd/reviewdog
 	go build -modfile=tools/go.mod -o bin/goimports golang.org/x/tools/cmd/goimports
-
-	go install ./...
-	go test -race ./...
 
 install:                        ## Install pmm-admin binary.
 	go install $(LD_FLAGS) ./...
@@ -60,7 +57,7 @@ check-style:                    ## Run style checkers and linters.
 
 check-all: check check-style    ## Run all linters for new code..
 
-FILES = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
+FILES = $(shell find . -type f -name '*.go')
 
 format:                         ## Format source code.
 	gofmt -w -s $(FILES)
