@@ -74,13 +74,23 @@ type addAgentQANMySQLSlowlogAgentCommand struct {
 	MaxSlowlogFileSize   units.Base2Bytes
 	TLS                  bool
 	TLSSkipVerify        bool
-	TLSCa                string
-	TLSCert              string
+	TLSCaFile            string
+	TLSCertFile          string
 	TLSKey               string
 }
 
 func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
+	if err != nil {
+		return nil, err
+	}
+
+	tlsCa, err := commands.ReadFile(cmd.TLSCaFile)
+	if err != nil {
+		return nil, err
+	}
+
+	tlsCert, err := commands.ReadFile(cmd.TLSCertFile)
 	if err != nil {
 		return nil, err
 	}
@@ -97,8 +107,8 @@ func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
 			MaxSlowlogFileSize:   strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
 			TLS:                  cmd.TLS,
 			TLSSkipVerify:        cmd.TLSSkipVerify,
-			TLSCa:                cmd.TLSCa,
-			TLSCert:              cmd.TLSCert,
+			TLSCa:                tlsCa,
+			TLSCert:              tlsCert,
 			TLSKey:               cmd.TLSKey,
 		},
 		Context: commands.Ctx,
@@ -131,7 +141,7 @@ func init() {
 		BytesVar(&AddAgentQANMySQLSlowlogAgent.MaxSlowlogFileSize)
 	AddAgentQANMySQLSlowlogAgentC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLS)
 	AddAgentQANMySQLSlowlogAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLSSkipVerify)
-	AddAgentQANMySQLSlowlogAgentC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSCa)
-	AddAgentQANMySQLSlowlogAgentC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSCert)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSCaFile)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSCertFile)
 	AddAgentQANMySQLSlowlogAgentC.Flag("tls-key", "Password for client certificate").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSKey)
 }

@@ -64,8 +64,8 @@ type addAgentQANMySQLPerfSchemaAgentCommand struct {
 	DisableQueryExamples bool
 	TLS                  bool
 	TLSSkipVerify        bool
-	TLSCa                string
-	TLSCert              string
+	TLSCaFile            string
+	TLSCertFile          string
 	TLSKey               string
 }
 
@@ -74,6 +74,17 @@ func (cmd *addAgentQANMySQLPerfSchemaAgentCommand) Run() (commands.Result, error
 	if err != nil {
 		return nil, err
 	}
+
+	tlsCa, err := commands.ReadFile(cmd.TLSCaFile)
+	if err != nil {
+		return nil, err
+	}
+
+	tlsCert, err := commands.ReadFile(cmd.TLSCertFile)
+	if err != nil {
+		return nil, err
+	}
+
 	params := &agents.AddQANMySQLPerfSchemaAgentParams{
 		Body: agents.AddQANMySQLPerfSchemaAgentBody{
 			PMMAgentID:           cmd.PMMAgentID,
@@ -85,8 +96,8 @@ func (cmd *addAgentQANMySQLPerfSchemaAgentCommand) Run() (commands.Result, error
 			DisableQueryExamples: cmd.DisableQueryExamples,
 			TLS:                  cmd.TLS,
 			TLSSkipVerify:        cmd.TLSSkipVerify,
-			TLSCa:                cmd.TLSCa,
-			TLSCert:              cmd.TLSCert,
+			TLSCa:                tlsCa,
+			TLSCert:              tlsCert,
 			TLSKey:               cmd.TLSKey,
 		},
 		Context: commands.Ctx,
@@ -117,7 +128,7 @@ func init() {
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.DisableQueryExamples)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.TLS)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.TLSSkipVerify)
-	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddAgentQANMySQLPerfSchemaAgent.TLSCa)
-	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddAgentQANMySQLPerfSchemaAgent.TLSCert)
+	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddAgentQANMySQLPerfSchemaAgent.TLSCaFile)
+	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddAgentQANMySQLPerfSchemaAgent.TLSCertFile)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-key", "Password for client certificate").StringVar(&AddAgentQANMySQLPerfSchemaAgent.TLSKey)
 }

@@ -107,8 +107,8 @@ type addMySQLCommand struct {
 	MaxSlowlogFileSize     units.Base2Bytes
 	TLS                    bool
 	TLSSkipVerify          bool
-	TLSCa                  string
-	TLSCert                string
+	TLSCaFile              string
+	TLSCertFile            string
 	TLSKey                 string
 	DisableTablestats      bool
 	DisableTablestatsLimit uint16
@@ -140,6 +140,16 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 	if cmd.CreateUser {
 		return nil, fmt.Errorf("Unrecognized option. To create a user, see " +
 			"'https://www.percona.com/doc/percona-monitoring-and-management/2.x/concepts/services-mysql.html#pmm-conf-mysql-user-account-creating'")
+	}
+
+	tlsCa, err := commands.ReadFile(cmd.TLSCaFile)
+	if err != nil {
+		return nil, err
+	}
+
+	tlsCert, err := commands.ReadFile(cmd.TLSCertFile)
+	if err != nil {
+		return nil, err
 	}
 
 	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
@@ -192,8 +202,8 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			MaxSlowlogFileSize:        strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
 			TLS:                       cmd.TLS,
 			TLSSkipVerify:             cmd.TLSSkipVerify,
-			TLSCa:                     cmd.TLSCa,
-			TLSCert:                   cmd.TLSCert,
+			TLSCa:                     tlsCa,
+			TLSCert:                   tlsCert,
 			TLSKey:                    cmd.TLSKey,
 			TablestatsGroupTableLimit: tablestatsGroupTableLimit,
 			MetricsMode:               pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
@@ -252,8 +262,8 @@ func init() {
 	AddMySQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddMySQL.SkipConnectionCheck)
 	AddMySQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMySQL.TLS)
 	AddMySQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMySQL.TLSSkipVerify)
-	AddMySQLC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddMySQL.TLSCa)
-	AddMySQLC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddMySQL.TLSCert)
+	AddMySQLC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddMySQL.TLSCaFile)
+	AddMySQLC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddMySQL.TLSCertFile)
 	AddMySQLC.Flag("tls-key", "Password for client certificate").StringVar(&AddMySQL.TLSKey)
 	AddMySQLC.Flag("create-user", "Create pmm user").Hidden().BoolVar(&AddMySQL.CreateUser)
 	AddMySQLC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
