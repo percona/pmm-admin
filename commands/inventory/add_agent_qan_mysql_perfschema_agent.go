@@ -64,6 +64,9 @@ type addAgentQANMySQLPerfSchemaAgentCommand struct {
 	DisableQueryExamples bool
 	TLS                  bool
 	TLSSkipVerify        bool
+	TLSCa                string
+	TLSCert              string
+	TLSKey               string
 }
 
 func (cmd *addAgentQANMySQLPerfSchemaAgentCommand) Run() (commands.Result, error) {
@@ -82,6 +85,9 @@ func (cmd *addAgentQANMySQLPerfSchemaAgentCommand) Run() (commands.Result, error
 			DisableQueryExamples: cmd.DisableQueryExamples,
 			TLS:                  cmd.TLS,
 			TLSSkipVerify:        cmd.TLSSkipVerify,
+			TLSCa:                cmd.TLSCa,
+			TLSCert:              cmd.TLSCert,
+			TLSKey:               cmd.TLSKey,
 		},
 		Context: commands.Ctx,
 	}
@@ -111,4 +117,7 @@ func init() {
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.DisableQueryExamples)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.TLS)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.TLSSkipVerify)
+	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddAgentQANMySQLPerfSchemaAgent.TLSCa)
+	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddAgentQANMySQLPerfSchemaAgent.TLSCert)
+	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-key", "Password for client certificate").StringVar(&AddAgentQANMySQLPerfSchemaAgent.TLSKey)
 }

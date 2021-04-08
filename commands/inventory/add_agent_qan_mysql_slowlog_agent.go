@@ -74,6 +74,9 @@ type addAgentQANMySQLSlowlogAgentCommand struct {
 	MaxSlowlogFileSize   units.Base2Bytes
 	TLS                  bool
 	TLSSkipVerify        bool
+	TLSCa                string
+	TLSCert              string
+	TLSKey               string
 }
 
 func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
@@ -94,6 +97,9 @@ func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
 			MaxSlowlogFileSize:   strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
 			TLS:                  cmd.TLS,
 			TLSSkipVerify:        cmd.TLSSkipVerify,
+			TLSCa:                cmd.TLSCa,
+			TLSCert:              cmd.TLSCert,
+			TLSKey:               cmd.TLSKey,
 		},
 		Context: commands.Ctx,
 	}
@@ -125,4 +131,7 @@ func init() {
 		BytesVar(&AddAgentQANMySQLSlowlogAgent.MaxSlowlogFileSize)
 	AddAgentQANMySQLSlowlogAgentC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLS)
 	AddAgentQANMySQLSlowlogAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLSSkipVerify)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSCa)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSCert)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls-key", "Password for client certificate").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSKey)
 }

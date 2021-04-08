@@ -107,6 +107,9 @@ type addMySQLCommand struct {
 	MaxSlowlogFileSize     units.Base2Bytes
 	TLS                    bool
 	TLSSkipVerify          bool
+	TLSCa                  string
+	TLSCert                string
+	TLSKey                 string
 	DisableTablestats      bool
 	DisableTablestatsLimit uint16
 	CreateUser             bool
@@ -189,6 +192,9 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			MaxSlowlogFileSize:        strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
 			TLS:                       cmd.TLS,
 			TLSSkipVerify:             cmd.TLSSkipVerify,
+			TLSCa:                     cmd.TLSCa,
+			TLSCert:                   cmd.TLSCert,
+			TLSKey:                    cmd.TLSKey,
 			TablestatsGroupTableLimit: tablestatsGroupTableLimit,
 			MetricsMode:               pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
 			DisableCollectors:         commands.ParseDisableCollectors(cmd.DisableCollectors),
@@ -246,6 +252,9 @@ func init() {
 	AddMySQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddMySQL.SkipConnectionCheck)
 	AddMySQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMySQL.TLS)
 	AddMySQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMySQL.TLSSkipVerify)
+	AddMySQLC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddMySQL.TLSCa)
+	AddMySQLC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddMySQL.TLSCert)
+	AddMySQLC.Flag("tls-key", "Password for client certificate").StringVar(&AddMySQL.TLSKey)
 	AddMySQLC.Flag("create-user", "Create pmm user").Hidden().BoolVar(&AddMySQL.CreateUser)
 	AddMySQLC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
 		" pull - server scrape metrics from agent  or auto - chosen by server.").

@@ -89,6 +89,9 @@ type addAgentMysqldExporterCommand struct {
 	SkipConnectionCheck       bool
 	TLS                       bool
 	TLSSkipVerify             bool
+	TLSCa                     string
+	TLSCert                   string
+	TLSKey                    string
 	TablestatsGroupTableLimit int32
 	PushMetrics               bool
 	DisableCollectors         string
@@ -109,6 +112,9 @@ func (cmd *addAgentMysqldExporterCommand) Run() (commands.Result, error) {
 			SkipConnectionCheck:       cmd.SkipConnectionCheck,
 			TLS:                       cmd.TLS,
 			TLSSkipVerify:             cmd.TLSSkipVerify,
+			TLSCa:                     cmd.TLSCa,
+			TLSCert:                   cmd.TLSCert,
+			TLSKey:                    cmd.TLSKey,
 			TablestatsGroupTableLimit: cmd.TablestatsGroupTableLimit,
 			PushMetrics:               cmd.PushMetrics,
 			DisableCollectors:         commands.ParseDisableCollectors(cmd.DisableCollectors),
@@ -141,7 +147,9 @@ func init() {
 	AddAgentMysqldExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentMysqldExporter.SkipConnectionCheck)
 	AddAgentMysqldExporterC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentMysqldExporter.TLS)
 	AddAgentMysqldExporterC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentMysqldExporter.TLSSkipVerify)
-
+	AddAgentMysqldExporterC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddAgentMysqldExporter.TLSCa)
+	AddAgentMysqldExporterC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddAgentMysqldExporter.TLSCert)
+	AddAgentMysqldExporterC.Flag("tls-key", "Password for client certificate").StringVar(&AddAgentMysqldExporter.TLSKey)
 	AddAgentMysqldExporterC.Flag("tablestats-group-table-limit",
 		"Tablestats group collectors will be disabled if there are more than that number of tables (default: 0 - always enabled; negative value - always disabled)").
 		Int32Var(&AddAgentMysqldExporter.TablestatsGroupTableLimit)
