@@ -66,7 +66,7 @@ type addAgentQANMySQLPerfSchemaAgentCommand struct {
 	TLSSkipVerify        bool
 	TLSCaFile            string
 	TLSCertFile          string
-	TLSKey               string
+	TLSKeyFile           string
 }
 
 func (cmd *addAgentQANMySQLPerfSchemaAgentCommand) Run() (commands.Result, error) {
@@ -85,6 +85,11 @@ func (cmd *addAgentQANMySQLPerfSchemaAgentCommand) Run() (commands.Result, error
 		return nil, err
 	}
 
+	tlsKey, err := commands.ReadFile(cmd.TLSKeyFile)
+	if err != nil {
+		return nil, err
+	}
+
 	params := &agents.AddQANMySQLPerfSchemaAgentParams{
 		Body: agents.AddQANMySQLPerfSchemaAgentBody{
 			PMMAgentID:           cmd.PMMAgentID,
@@ -98,7 +103,7 @@ func (cmd *addAgentQANMySQLPerfSchemaAgentCommand) Run() (commands.Result, error
 			TLSSkipVerify:        cmd.TLSSkipVerify,
 			TLSCa:                tlsCa,
 			TLSCert:              tlsCert,
-			TLSKey:               cmd.TLSKey,
+			TLSKey:               tlsKey,
 		},
 		Context: commands.Ctx,
 	}
@@ -130,5 +135,5 @@ func init() {
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANMySQLPerfSchemaAgent.TLSSkipVerify)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddAgentQANMySQLPerfSchemaAgent.TLSCaFile)
 	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddAgentQANMySQLPerfSchemaAgent.TLSCertFile)
-	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-key", "Password for client certificate").StringVar(&AddAgentQANMySQLPerfSchemaAgent.TLSKey)
+	AddAgentQANMySQLPerfSchemaAgentC.Flag("tls-key", "Path to client key file").StringVar(&AddAgentQANMySQLPerfSchemaAgent.TLSKeyFile)
 }

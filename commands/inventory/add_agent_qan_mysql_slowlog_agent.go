@@ -76,7 +76,7 @@ type addAgentQANMySQLSlowlogAgentCommand struct {
 	TLSSkipVerify        bool
 	TLSCaFile            string
 	TLSCertFile          string
-	TLSKey               string
+	TLSKeyFile           string
 }
 
 func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
@@ -95,6 +95,11 @@ func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
+	tlsKey, err := commands.ReadFile(cmd.TLSKeyFile)
+	if err != nil {
+		return nil, err
+	}
+
 	params := &agents.AddQANMySQLSlowlogAgentParams{
 		Body: agents.AddQANMySQLSlowlogAgentBody{
 			PMMAgentID:           cmd.PMMAgentID,
@@ -109,7 +114,7 @@ func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
 			TLSSkipVerify:        cmd.TLSSkipVerify,
 			TLSCa:                tlsCa,
 			TLSCert:              tlsCert,
-			TLSKey:               cmd.TLSKey,
+			TLSKey:               tlsKey,
 		},
 		Context: commands.Ctx,
 	}
@@ -143,5 +148,5 @@ func init() {
 	AddAgentQANMySQLSlowlogAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLSSkipVerify)
 	AddAgentQANMySQLSlowlogAgentC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSCaFile)
 	AddAgentQANMySQLSlowlogAgentC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSCertFile)
-	AddAgentQANMySQLSlowlogAgentC.Flag("tls-key", "Password for client certificate").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSKey)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls-key", "Path to client key file").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSKeyFile)
 }
