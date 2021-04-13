@@ -59,6 +59,7 @@ type addAgentMongodbExporterCommand struct {
 	TLSCertificateKeyFile         string
 	TLSCertificateKeyFilePassword string
 	TLSCaFile                     string
+	AuthenticationMechanism       string
 	PushMetrics                   bool
 	DisableCollectors             string
 }
@@ -91,6 +92,7 @@ func (cmd *addAgentMongodbExporterCommand) Run() (commands.Result, error) {
 			TLSCertificateKey:             tlsCertificateKey,
 			TLSCertificateKeyFilePassword: cmd.TLSCertificateKeyFilePassword,
 			TLSCa:                         tlsCa,
+			AuthenticationMechanism:       cmd.AuthenticationMechanism,
 			PushMetrics:                   cmd.PushMetrics,
 			DisableCollectors:             commands.ParseDisableCollectors(cmd.DisableCollectors),
 		},
@@ -124,6 +126,8 @@ func init() {
 	AddAgentMongodbExporterC.Flag("tls-certificate-key-file", "Path to TLS certificate PEM file").StringVar(&AddAgentMongodbExporter.TLSCertificateKeyFile)
 	AddAgentMongodbExporterC.Flag("tls-certificate-key-file-password", "Password for certificate").StringVar(&AddAgentMongodbExporter.TLSCertificateKeyFilePassword)
 	AddAgentMongodbExporterC.Flag("tls-ca-file", "Path to certificate authority file").StringVar(&AddAgentMongodbExporter.TLSCaFile)
+	AddAgentMongodbExporterC.Flag("authentication-mechanism", "Authentication mechanism. Default is empty. Use MONGODB-X509 for ssl certificates").
+		StringVar(&AddAgentMongodbExporter.AuthenticationMechanism)
 	AddAgentMongodbExporterC.Flag("push-metrics", "Enables push metrics model flow,"+
 		" it will be sent to the server by an agent").BoolVar(&AddAgentMongodbExporter.PushMetrics)
 	AddAgentMongodbExporterC.Flag("disable-collectors",
