@@ -9,7 +9,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d
 	github.com/go-openapi/runtime v0.19.19
-	github.com/percona/pmm v2.15.2-0.20210413151443-76318446e36e+incompatible
+	github.com/percona/pmm v2.15.2-0.20210414102907-f5da205ef38e+incompatible
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.6.1
