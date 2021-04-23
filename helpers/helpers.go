@@ -24,6 +24,7 @@ import (
 	"github.com/percona/pmm-admin/agentlocal"
 )
 
+// HAProxyMinPMMServerVersion contains minimum version for running HAProxy.
 const HAProxyMinPMMServerVersion = 2.15
 
 // GetServerVersion return version of PMM Server.
