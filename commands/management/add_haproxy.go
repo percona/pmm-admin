@@ -61,15 +61,13 @@ type addHAProxyCommand struct {
 	SkipConnectionCheck bool
 }
 
-const haProxyMinPMMServerVersion = 2.15
-
 func (cmd *addHAProxyCommand) Run() (commands.Result, error) {
 	version, err := helpers.GetServerVersion()
 	if err != nil {
 		return nil, err
 	}
 
-	if version < haProxyMinPMMServerVersion {
+	if version < helpers.HAProxyMinPMMServerVersion {
 		return nil, fmt.Errorf("haproxy is not supported in this version, please update your pmm-server to 2.15 or higher")
 	}
 
