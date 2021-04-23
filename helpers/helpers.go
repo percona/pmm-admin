@@ -8,6 +8,7 @@ import (
 	"github.com/percona/pmm-admin/agentlocal"
 )
 
+// GetServerVersion return version of PMM Server.
 func GetServerVersion() (float64, error) {
 	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 	if err != nil {

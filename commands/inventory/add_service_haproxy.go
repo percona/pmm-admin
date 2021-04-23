@@ -55,13 +55,15 @@ type addHAProxyServiceCommand struct {
 	CustomLabels   string
 }
 
+const haProxyMinPMMServerVersion = 2.15
+
 func (cmd *addHAProxyServiceCommand) Run() (commands.Result, error) {
 	version, err := helpers.GetServerVersion()
 	if err != nil {
 		return nil, err
 	}
 
-	if version < 2.15 {
+	if version < haProxyMinPMMServerVersion {
 		return nil, fmt.Errorf("haproxy is not supported in this version, please update your pmm-server to 2.15 or higher")
 	}
 
