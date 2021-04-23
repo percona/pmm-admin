@@ -26,6 +26,7 @@ import (
 
 	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
+	"github.com/percona/pmm-admin/helpers"
 )
 
 var addHAProxyResultT = commands.ParseTemplate(`
@@ -61,6 +62,15 @@ type addHAProxyCommand struct {
 }
 
 func (cmd *addHAProxyCommand) Run() (commands.Result, error) {
+	version, err := helpers.GetServerVersion()
+	if err != nil {
+		return nil, err
+	}
+
+	if version < 2.15 {
+		return nil, fmt.Errorf("haproxy is not supported in this version, please update your pmm-server to 2.15 or higher")
+	}
+
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err

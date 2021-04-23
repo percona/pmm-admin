@@ -16,10 +16,13 @@
 package inventory
 
 import (
+	"fmt"
+
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
 
 	"github.com/percona/pmm-admin/commands"
+	"github.com/percona/pmm-admin/helpers"
 )
 
 var addHAProxyServiceResultT = commands.ParseTemplate(`
@@ -53,6 +56,15 @@ type addHAProxyServiceCommand struct {
 }
 
 func (cmd *addHAProxyServiceCommand) Run() (commands.Result, error) {
+	version, err := helpers.GetServerVersion()
+	if err != nil {
+		return nil, err
+	}
+
+	if version < 2.15 {
+		return nil, fmt.Errorf("haproxy is not supported in this version, please update your pmm-server to 2.15 or higher")
+	}
+
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
