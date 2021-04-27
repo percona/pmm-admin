@@ -17,33 +17,31 @@
 package helpers
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
-
 	"github.com/percona/pmm-admin/agentlocal"
+	"github.com/percona/pmm/version"
 )
 
 // HAProxyMinPMMServerVersion contains minimum version for running HAProxy.
-const HAProxyMinPMMServerVersion = 2.15
+const HAProxyMinPMMServerVersion = "2.15.0"
 
-// GetServerVersion return version of PMM Server.
-func GetServerVersion() (float64, error) {
+// ServerVersionLessThan return if provided version is lower than server version.
+func ServerVersionLessThan(currentVersion string) (bool, error) {
 	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 	if err != nil {
-		return 0, err
+		return false, err
 	}
 
-	split := strings.Split(status.ServerVersion, "-")
-	split = strings.Split(split[0], ".")
-	if len(split) < 3 {
-		return 0, fmt.Errorf("failed to parse server version %s", status.ServerVersion)
-	}
-
-	f, err := strconv.ParseFloat(fmt.Sprintf("%s.%s%s", split[0], split[1], split[2]), 64)
+	v, err := version.Parse(status.ServerVersion)
 	if err != nil {
-		return 0, err
+		return false, err
+	}
+	v.Rest = ""
+
+	// Check if version meets the conditions
+	minVersion, err := version.Parse(currentVersion)
+	if err != nil {
+		return false, err
 	}
 
-	return f, nil
+	return v.Less(minVersion), nil
 }

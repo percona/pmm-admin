@@ -62,13 +62,13 @@ type addHAProxyCommand struct {
 }
 
 func (cmd *addHAProxyCommand) Run() (commands.Result, error) {
-	version, err := helpers.GetServerVersion()
+	minVersion := helpers.HAProxyMinPMMServerVersion
+	lessThanMinVersion, err := helpers.ServerVersionLessThan(minVersion)
 	if err != nil {
 		return nil, err
 	}
-
-	if version < helpers.HAProxyMinPMMServerVersion {
-		return nil, fmt.Errorf("haproxy is not supported in this version, please update your pmm-server to 2.15 or higher")
+	if lessThanMinVersion {
+		return nil, fmt.Errorf("haproxy is not supported in this version, please update your pmm-server to %s or higher", minVersion)
 	}
 
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
