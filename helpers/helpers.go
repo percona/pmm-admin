@@ -17,8 +17,9 @@
 package helpers
 
 import (
-	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm/version"
+
+	"github.com/percona/pmm-admin/agentlocal"
 )
 
 // HAProxyMinPMMServerVersion contains minimum version for running HAProxy.
