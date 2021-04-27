@@ -49,6 +49,7 @@ func ServerVersionLessThan(currentVersion string) (bool, error) {
 	return v.Less(minVersion), nil
 }
 
+// IsHAProxySupported return if is HAProxy supported on running PMM server.
 func IsHAProxySupported() (bool, error) {
 	minVersion := HAProxyMinPMMServerVersion
 	lessThanMinVersion, err := ServerVersionLessThan(minVersion)
