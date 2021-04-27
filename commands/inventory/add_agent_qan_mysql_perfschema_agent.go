@@ -16,6 +16,8 @@
 package inventory
 
 import (
+	"fmt"
+
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
 
@@ -75,19 +77,26 @@ func (cmd *addAgentQANMySQLPerfSchemaAgentCommand) Run() (commands.Result, error
 		return nil, err
 	}
 
-	tlsCa, err := commands.ReadFile(cmd.TLSCaFile)
-	if err != nil {
-		return nil, err
-	}
+	var tlsCa, tlsCert, tlsKey string
+	if cmd.TLS {
+		if cmd.TLSCaFile == "" || cmd.TLSCertFile == "" || cmd.TLSKeyFile == "" {
+			return nil, fmt.Errorf("TLS is on. You need define also tls-ca, tls-cert and tls-key flag.")
+		}
 
-	tlsCert, err := commands.ReadFile(cmd.TLSCertFile)
-	if err != nil {
-		return nil, err
-	}
+		tlsCa, err = commands.ReadFile(cmd.TLSCaFile)
+		if err != nil {
+			return nil, err
+		}
 
-	tlsKey, err := commands.ReadFile(cmd.TLSKeyFile)
-	if err != nil {
-		return nil, err
+		tlsCert, err = commands.ReadFile(cmd.TLSCertFile)
+		if err != nil {
+			return nil, err
+		}
+
+		tlsKey, err = commands.ReadFile(cmd.TLSKeyFile)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	params := &agents.AddQANMySQLPerfSchemaAgentParams{
