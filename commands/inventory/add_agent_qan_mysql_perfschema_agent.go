@@ -80,7 +80,7 @@ func (cmd *addAgentQANMySQLPerfSchemaAgentCommand) Run() (commands.Result, error
 	var tlsCa, tlsCert, tlsKey string
 	if cmd.TLS {
 		if cmd.TLSCaFile == "" || cmd.TLSCertFile == "" || cmd.TLSKeyFile == "" {
-			return nil, fmt.Errorf("TLS is on. You need define also tls-ca, tls-cert and tls-key flag.")
+			return nil, fmt.Errorf("TLS is on. You must also define tls-ca, tls-cert and tls-key flags.")
 		}
 
 		tlsCa, err = commands.ReadFile(cmd.TLSCaFile)
