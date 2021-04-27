@@ -17,6 +17,8 @@
 package helpers
 
 import (
+	"fmt"
+
 	"github.com/percona/pmm/version"
 
 	"github.com/percona/pmm-admin/agentlocal"
@@ -45,4 +47,17 @@ func ServerVersionLessThan(currentVersion string) (bool, error) {
 	}
 
 	return v.Less(minVersion), nil
+}
+
+func IsHAProxySupported() (bool, error) {
+	minVersion := HAProxyMinPMMServerVersion
+	lessThanMinVersion, err := ServerVersionLessThan(minVersion)
+	if err != nil {
+		return false, err
+	}
+	if lessThanMinVersion {
+		return false, fmt.Errorf("haproxy is not supported in this version, please update your pmm-server to %s or higher", minVersion)
+	}
+
+	return true, nil
 }
