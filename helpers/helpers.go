@@ -25,7 +25,7 @@ import (
 )
 
 // HAProxyMinPMMServerVersion contains minimum version for running HAProxy.
-const HAProxyMinPMMServerVersion = "2.15.0"
+const haProxyMinPMMServerVersion = "2.15.0"
 
 // ServerVersionLessThan return if provided version is lower than server version.
 func ServerVersionLessThan(currentVersion string) (bool, error) {
@@ -51,7 +51,7 @@ func ServerVersionLessThan(currentVersion string) (bool, error) {
 
 // IsHAProxySupported return if is HAProxy supported on running PMM server.
 func IsHAProxySupported() (bool, error) {
-	minVersion := HAProxyMinPMMServerVersion
+	minVersion := haProxyMinPMMServerVersion
 	lessThanMinVersion, err := ServerVersionLessThan(minVersion)
 	if err != nil {
 		return false, err
