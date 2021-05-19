@@ -111,7 +111,7 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 	}
 
 	if cmd.CustomLabels != "" {
-		res = append(res, fmt.Sprintf("--custom-labels='%s'", cmd.CustomLabels))
+		res = append(res, fmt.Sprintf("--custom-labels=%s", cmd.CustomLabels))
 	}
 
 	res = append(res, cmd.NodeAddress, cmd.NodeType, cmd.NodeName)
