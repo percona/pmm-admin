@@ -85,6 +85,7 @@ func main() {
 
 	allCommands := map[string]commands.Command{
 		management.RegisterC.FullCommand(): management.Register,
+		management.DeregisterC.FullCommand(): management.Deregister,
 
 		management.AddMySQLC.FullCommand():              management.AddMySQL,
 		management.AddMongoDBC.FullCommand():            management.AddMongoDB,
