@@ -68,5 +68,5 @@ var (
 )
 
 func init() {
-	DeregisterC.Flag("force", "Remove thisnode with all dependencies").BoolVar(&Deregister.Force)
+	DeregisterC.Flag("force", "Remove this node with all dependencies").BoolVar(&Deregister.Force)
 }
