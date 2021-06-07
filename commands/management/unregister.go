@@ -40,11 +40,11 @@ func (res *unregisterResult) String() string {
 }
 
 func (cmd *unregisterCommand) Run() (commands.Result, error) {
-	agentlocalstatus, queryErr := agentlocal.GetStatus(agentlocal.RequestNetworkInfo)
-	if queryErr != nil {
-		return nil, queryErr
+	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+	if err != nil {
+		return nil, err
 	}
-	nodeID := agentlocalstatus.NodeID
+	nodeID := status.NodeID
 
 	params := &nodes.RemoveNodeParams{
 		Body: nodes.RemoveNodeBody{
@@ -54,9 +54,9 @@ func (cmd *unregisterCommand) Run() (commands.Result, error) {
 		Context: commands.Ctx,
 	}
 
-	_, clientErr := client.Default.Nodes.RemoveNode(params)
-	if clientErr != nil {
-		return nil, clientErr
+	_, err = client.Default.Nodes.RemoveNode(params)
+	if err != nil {
+		return nil, err
 	}
 
 	return new(unregisterResult), nil
