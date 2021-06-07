@@ -44,11 +44,10 @@ func (cmd *unregisterCommand) Run() (commands.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	nodeID := status.NodeID
 
 	params := &nodes.RemoveNodeParams{
 		Body: nodes.RemoveNodeBody{
-			NodeID: nodeID,
+			NodeID: status.NodeID,
 			Force:  cmd.Force,
 		},
 		Context: commands.Ctx,
