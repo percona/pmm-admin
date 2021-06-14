@@ -64,7 +64,7 @@ func (cmd *unregisterCommand) Run() (commands.Result, error) {
 // unregister command
 var (
 	Unregister  = new(unregisterCommand)
-	UnregisterC = kingpin.Command("unregister", "Register current Node at PMM Server")
+	UnregisterC = kingpin.Command("unregister", "Unregister current Node from PMM Server")
 )
 
 func init() {
