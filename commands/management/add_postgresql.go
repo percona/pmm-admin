@@ -125,25 +125,19 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 
 	var tlsCa, tlsCert, tlsKey string
 
-	if cmd.TLS {
-		if cmd.TLSCAFile == "" || cmd.TLSCertFile == "" || cmd.TLSKeyFile == "" {
-			return nil, fmt.Errorf("TLS is on. You must also define tls-ca, tls-cert and tls-key flags.")
-		}
+	tlsCa, err = commands.ReadFile(cmd.TLSCAFile)
+	if err != nil {
+		return nil, err
+	}
 
-		tlsCa, err = commands.ReadFile(cmd.TLSCAFile)
-		if err != nil {
-			return nil, err
-		}
+	tlsCert, err = commands.ReadFile(cmd.TLSCertFile)
+	if err != nil {
+		return nil, err
+	}
 
-		tlsCert, err = commands.ReadFile(cmd.TLSCertFile)
-		if err != nil {
-			return nil, err
-		}
-
-		tlsKey, err = commands.ReadFile(cmd.TLSKeyFile)
-		if err != nil {
-			return nil, err
-		}
+	tlsKey, err = commands.ReadFile(cmd.TLSKeyFile)
+	if err != nil {
+		return nil, err
 	}
 
 	params := &postgresql.AddPostgreSQLParams{

@@ -16,8 +16,6 @@
 package inventory
 
 import (
-	"fmt"
-
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/services"
 
@@ -61,40 +59,12 @@ type addServicePostgreSQLCommand struct {
 	Cluster        string
 	ReplicationSet string
 	CustomLabels   string
-	// TLS parameters
-	TLS           bool
-	TLSSkipVerify bool
-	TLSCAFile     string
-	TLSCertFile   string
-	TLSKeyFile    string
 }
 
 func (cmd *addServicePostgreSQLCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
-	}
-
-	var tlsCa, tlsCert, tlsKey string
-	if cmd.TLS {
-		if cmd.TLSCAFile == "" || cmd.TLSCertFile == "" || cmd.TLSKeyFile == "" {
-			return nil, fmt.Errorf("TLS is on. You must also define tls-ca, tls-cert and tls-key flags.")
-		}
-
-		tlsCa, err = commands.ReadFile(cmd.TLSCAFile)
-		if err != nil {
-			return nil, err
-		}
-
-		tlsCert, err = commands.ReadFile(cmd.TLSCertFile)
-		if err != nil {
-			return nil, err
-		}
-
-		tlsKey, err = commands.ReadFile(cmd.TLSKeyFile)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	params := &services.AddPostgreSQLServiceParams{
@@ -108,12 +78,6 @@ func (cmd *addServicePostgreSQLCommand) Run() (commands.Result, error) {
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
 			CustomLabels:   customLabels,
-
-			TLS:           cmd.TLS,
-			TLSCa:         tlsCa,
-			TLSCert:       tlsCert,
-			TLSKey:        tlsKey,
-			TLSSkipVerify: cmd.TLSSkipVerify,
 		},
 		Context: commands.Ctx,
 	}
@@ -144,10 +108,4 @@ func init() {
 	AddServicePostgreSQLC.Flag("cluster", "Cluster name").StringVar(&AddServicePostgreSQL.Cluster)
 	AddServicePostgreSQLC.Flag("replication-set", "Replication set name").StringVar(&AddServicePostgreSQL.ReplicationSet)
 	AddServicePostgreSQLC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddServicePostgreSQL.CustomLabels)
-
-	AddServicePostgreSQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddServicePostgreSQL.TLS)
-	AddServicePostgreSQLC.Flag("tls-ca-file", "TLS CA certificate file").StringVar(&AddServicePostgreSQL.TLSCAFile)
-	AddServicePostgreSQLC.Flag("tls-cert-file", "TLS certificate file").StringVar(&AddServicePostgreSQL.TLSCertFile)
-	AddServicePostgreSQLC.Flag("tls-key-file", "TLS certificate key file").StringVar(&AddServicePostgreSQL.TLSKeyFile)
-	AddServicePostgreSQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddServicePostgreSQL.TLSSkipVerify)
 }
