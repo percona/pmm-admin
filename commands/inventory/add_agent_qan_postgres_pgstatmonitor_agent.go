@@ -16,8 +16,6 @@
 package inventory
 
 import (
-	"fmt"
-
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
 
@@ -72,23 +70,21 @@ func (cmd *addAgentQANPostgreSQLPgStatMonitorAgentCommand) Run() (commands.Resul
 	}
 
 	var tlsCa, tlsCert, tlsKey string
-	if cmd.TLSCAFile == "" || cmd.TLSCertFile == "" || cmd.TLSKeyFile == "" {
-		return nil, fmt.Errorf("TLS is on. You must also define tls-ca, tls-cert and tls-key flags.")
-	}
+	if cmd.TLS {
+		tlsCa, err = commands.ReadFile(cmd.TLSCAFile)
+		if err != nil {
+			return nil, err
+		}
 
-	tlsCa, err = commands.ReadFile(cmd.TLSCAFile)
-	if err != nil {
-		return nil, err
-	}
+		tlsCert, err = commands.ReadFile(cmd.TLSCertFile)
+		if err != nil {
+			return nil, err
+		}
 
-	tlsCert, err = commands.ReadFile(cmd.TLSCertFile)
-	if err != nil {
-		return nil, err
-	}
-
-	tlsKey, err = commands.ReadFile(cmd.TLSKeyFile)
-	if err != nil {
-		return nil, err
+		tlsKey, err = commands.ReadFile(cmd.TLSKeyFile)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	params := &agents.AddQANPostgreSQLPgStatMonitorAgentParams{
