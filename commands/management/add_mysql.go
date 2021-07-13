@@ -107,6 +107,9 @@ type addMySQLCommand struct {
 	MaxSlowlogFileSize     units.Base2Bytes
 	TLS                    bool
 	TLSSkipVerify          bool
+	TLSCaFile              string
+	TLSCertFile            string
+	TLSKeyFile             string
 	DisableTablestats      bool
 	DisableTablestatsLimit uint16
 	CreateUser             bool
@@ -137,6 +140,24 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 	if cmd.CreateUser {
 		return nil, fmt.Errorf("Unrecognized option. To create a user, see " +
 			"'https://www.percona.com/doc/percona-monitoring-and-management/2.x/concepts/services-mysql.html#pmm-conf-mysql-user-account-creating'")
+	}
+
+	var tlsCa, tlsCert, tlsKey string
+	if cmd.TLS {
+		tlsCa, err = commands.ReadFile(cmd.TLSCaFile)
+		if err != nil {
+			return nil, err
+		}
+
+		tlsCert, err = commands.ReadFile(cmd.TLSCertFile)
+		if err != nil {
+			return nil, err
+		}
+
+		tlsKey, err = commands.ReadFile(cmd.TLSKeyFile)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
@@ -189,6 +210,9 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			MaxSlowlogFileSize:        strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
 			TLS:                       cmd.TLS,
 			TLSSkipVerify:             cmd.TLSSkipVerify,
+			TLSCa:                     tlsCa,
+			TLSCert:                   tlsCert,
+			TLSKey:                    tlsKey,
 			TablestatsGroupTableLimit: tablestatsGroupTableLimit,
 			MetricsMode:               pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
 			DisableCollectors:         commands.ParseDisableCollectors(cmd.DisableCollectors),
@@ -232,7 +256,7 @@ func init() {
 	querySourceHelp := fmt.Sprintf("Source of SQL queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
 	AddMySQLC.Flag("query-source", querySourceHelp).Default(querySources[0]).EnumVar(&AddMySQL.QuerySource, querySources...)
 	AddMySQLC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddMySQL.DisableQueryExamples)
-	AddMySQLC.Flag("size-slow-logs", "Rotate slow log file at this size (default: server-defined; negative value disables rotation)").
+	AddMySQLC.Flag("size-slow-logs", `Rotate slow log file at this size (default: server-defined; negative value disables rotation). Ex.: 1GiB`).
 		BytesVar(&AddMySQL.MaxSlowlogFileSize)
 	AddMySQLC.Flag("disable-tablestats", "Disable table statistics collection").BoolVar(&AddMySQL.DisableTablestats)
 	AddMySQLC.Flag("disable-tablestats-limit", "Table statistics collection will be disabled if there are more than specified number of tables (default: server-defined)").
@@ -246,6 +270,9 @@ func init() {
 	AddMySQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddMySQL.SkipConnectionCheck)
 	AddMySQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddMySQL.TLS)
 	AddMySQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddMySQL.TLSSkipVerify)
+	AddMySQLC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddMySQL.TLSCaFile)
+	AddMySQLC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddMySQL.TLSCertFile)
+	AddMySQLC.Flag("tls-key", "Path to client key file").StringVar(&AddMySQL.TLSKeyFile)
 	AddMySQLC.Flag("create-user", "Create pmm user").Hidden().BoolVar(&AddMySQL.CreateUser)
 	AddMySQLC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
 		" pull - server scrape metrics from agent  or auto - chosen by server.").

@@ -74,12 +74,33 @@ type addAgentQANMySQLSlowlogAgentCommand struct {
 	MaxSlowlogFileSize   units.Base2Bytes
 	TLS                  bool
 	TLSSkipVerify        bool
+	TLSCaFile            string
+	TLSCertFile          string
+	TLSKeyFile           string
 }
 
 func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
+	}
+
+	var tlsCa, tlsCert, tlsKey string
+	if cmd.TLS {
+		tlsCa, err = commands.ReadFile(cmd.TLSCaFile)
+		if err != nil {
+			return nil, err
+		}
+
+		tlsCert, err = commands.ReadFile(cmd.TLSCertFile)
+		if err != nil {
+			return nil, err
+		}
+
+		tlsKey, err = commands.ReadFile(cmd.TLSKeyFile)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	params := &agents.AddQANMySQLSlowlogAgentParams{
@@ -94,6 +115,9 @@ func (cmd *addAgentQANMySQLSlowlogAgentCommand) Run() (commands.Result, error) {
 			MaxSlowlogFileSize:   strconv.FormatInt(int64(cmd.MaxSlowlogFileSize), 10),
 			TLS:                  cmd.TLS,
 			TLSSkipVerify:        cmd.TLSSkipVerify,
+			TLSCa:                tlsCa,
+			TLSCert:              tlsCert,
+			TLSKey:               tlsKey,
 		},
 		Context: commands.Ctx,
 	}
@@ -121,8 +145,11 @@ func init() {
 	AddAgentQANMySQLSlowlogAgentC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentQANMySQLSlowlogAgent.CustomLabels)
 	AddAgentQANMySQLSlowlogAgentC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentQANMySQLSlowlogAgent.SkipConnectionCheck)
 	AddAgentQANMySQLSlowlogAgentC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddAgentQANMySQLSlowlogAgent.DisableQueryExamples)
-	AddAgentQANMySQLSlowlogAgentC.Flag("size-slow-logs", "Rotate slow log file at this size (default: 0; 0 or negative value disables rotation)").
+	AddAgentQANMySQLSlowlogAgentC.Flag("size-slow-logs", "Rotate slow log file at this size (default: 0; 0 or negative value disables rotation). Ex.: 1GiB").
 		BytesVar(&AddAgentQANMySQLSlowlogAgent.MaxSlowlogFileSize)
 	AddAgentQANMySQLSlowlogAgentC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLS)
 	AddAgentQANMySQLSlowlogAgentC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentQANMySQLSlowlogAgent.TLSSkipVerify)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls-ca", "Path to certificate authority certificate file").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSCaFile)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls-cert", "Path to client certificate file").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSCertFile)
+	AddAgentQANMySQLSlowlogAgentC.Flag("tls-key", "Path to client key file").StringVar(&AddAgentQANMySQLSlowlogAgent.TLSKeyFile)
 }
