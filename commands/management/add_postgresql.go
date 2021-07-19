@@ -217,7 +217,7 @@ func init() {
 
 	AddPostgreSQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddPostgreSQL.TLS)
 	AddPostgreSQLC.Flag("tls-ca-file", "TLS CA certificate file").StringVar(&AddPostgreSQL.TLSCAFile)
-	AddPostgreSQLC.Flag("tls-cert-file", "TLS certificatr file").StringVar(&AddPostgreSQL.TLSCertFile)
+	AddPostgreSQLC.Flag("tls-cert-file", "TLS certificate file").StringVar(&AddPostgreSQL.TLSCertFile)
 	AddPostgreSQLC.Flag("tls-key-file", "TLS certificate key file").StringVar(&AddPostgreSQL.TLSKeyFile)
 	AddPostgreSQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddPostgreSQL.TLSSkipVerify)
 
