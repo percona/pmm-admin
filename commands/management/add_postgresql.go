@@ -52,6 +52,7 @@ type addPostgreSQLCommand struct {
 	ServiceName       string
 	Username          string
 	Password          string
+	AgentPassword     string
 	Environment       string
 	Cluster           string
 	ReplicationSet    string
@@ -131,6 +132,7 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			ReplicationSet: cmd.ReplicationSet,
 			Username:       cmd.Username,
 			Password:       cmd.Password,
+			AgentPassword:  cmd.AgentPassword,
 			CustomLabels:   customLabels,
 
 			QANPostgresqlPgstatementsAgent:  usePgStatements,
@@ -175,6 +177,7 @@ func init() {
 
 	AddPostgreSQLC.Flag("username", "PostgreSQL username").Default("postgres").StringVar(&AddPostgreSQL.Username)
 	AddPostgreSQLC.Flag("password", "PostgreSQL password").StringVar(&AddPostgreSQL.Password)
+	AddPostgreSQLC.Flag("agent-password", "Custom password for /metrics endpoint").StringVar(&AddPostgreSQL.AgentPassword)
 
 	querySources := []string{"pgstatements", "pgstatmonitor", "none"} // TODO add "auto"
 	querySourceHelp := fmt.Sprintf("Source of SQL queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
