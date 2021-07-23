@@ -11,7 +11,7 @@ require (
 	github.com/go-openapi/runtime v0.19.20
 	github.com/go-openapi/spec v0.19.8 // indirect
 	github.com/go-openapi/strfmt v0.19.5 // indirect
-	github.com/percona/pmm v0.0.0-20210722061959-453ecd1343e0
+	github.com/percona/pmm v0.0.0-20210723112106-a68b7874b109
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.6.1
