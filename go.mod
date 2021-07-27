@@ -6,7 +6,6 @@ replace gopkg.in/alecthomas/kingpin.v2 => github.com/Percona-Lab/kingpin v2.2.6-
 
 require (
 	github.com/AlekSi/pointer v1.1.0
-	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d
 	github.com/go-openapi/runtime v0.19.20
 	github.com/go-openapi/spec v0.19.8 // indirect

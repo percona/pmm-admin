@@ -45,8 +45,12 @@ func (res *addPostgreSQLResult) String() string {
 }
 
 type addPostgreSQLCommand struct {
-	Address           string
-	Socket            string
+	Address             string
+	Socket              string
+	Username            string
+	Password            string
+	SkipConnectionCheck bool
+
 	NodeID            string
 	PMMAgentID        string
 	ServiceName       string
@@ -60,12 +64,14 @@ type addPostgreSQLCommand struct {
 	MetricsMode       string
 	DisableCollectors string
 
-	QuerySource string
-
-	SkipConnectionCheck  bool
-	TLS                  bool
-	TLSSkipVerify        bool
+	QuerySource          string
 	DisableQueryExamples bool
+
+	TLS           bool
+	TLSSkipVerify bool
+	TLSCAFile     string
+	TLSCertFile   string
+	TLSKeyFile    string
 }
 
 func (cmd *addPostgreSQLCommand) GetServiceName() string {
@@ -109,23 +115,47 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 	}
 
 	var usePgStatements bool
+
 	var usePgStatMonitor bool
+
 	switch cmd.QuerySource {
 	case "pgstatements":
 		usePgStatements = true
 	case "pgstatmonitor":
 		usePgStatMonitor = true
 	case "none":
-		// nothing
+	}
+
+	var tlsCa, tlsCert, tlsKey string
+	if cmd.TLS {
+		tlsCa, err = commands.ReadFile(cmd.TLSCAFile)
+		if err != nil {
+			return nil, err
+		}
+
+		tlsCert, err = commands.ReadFile(cmd.TLSCertFile)
+		if err != nil {
+			return nil, err
+		}
+
+		tlsKey, err = commands.ReadFile(cmd.TLSKeyFile)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	params := &postgresql.AddPostgreSQLParams{
 		Body: postgresql.AddPostgreSQLBody{
-			NodeID:         cmd.NodeID,
-			ServiceName:    serviceName,
-			Address:        host,
-			Port:           int64(port),
-			Socket:         socket,
+			NodeID:      cmd.NodeID,
+			ServiceName: serviceName,
+
+			Address:             host,
+			Port:                int64(port),
+			Username:            cmd.Username,
+			Password:            cmd.Password,
+			Socket:              socket,
+			SkipConnectionCheck: cmd.SkipConnectionCheck,
+
 			PMMAgentID:     cmd.PMMAgentID,
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
@@ -138,9 +168,12 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			QANPostgresqlPgstatementsAgent:  usePgStatements,
 			QANPostgresqlPgstatmonitorAgent: usePgStatMonitor,
 
-			SkipConnectionCheck:  cmd.SkipConnectionCheck,
-			TLS:                  cmd.TLS,
-			TLSSkipVerify:        cmd.TLSSkipVerify,
+			TLS:           cmd.TLS,
+			TLSCa:         tlsCa,
+			TLSCert:       tlsCert,
+			TLSKey:        tlsKey,
+			TLSSkipVerify: cmd.TLSSkipVerify,
+
 			DisableQueryExamples: cmd.DisableQueryExamples,
 			MetricsMode:          pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
 			DisableCollectors:    commands.ParseDisableCollectors(cmd.DisableCollectors),
@@ -171,13 +204,11 @@ func init() {
 
 	AddPostgreSQLC.Arg("address", "PostgreSQL address and port (default: 127.0.0.1:5432)").StringVar(&AddPostgreSQL.Address)
 	AddPostgreSQLC.Flag("socket", "Path to socket").StringVar(&AddPostgreSQL.Socket)
+	AddPostgreSQLC.Flag("username", "PostgreSQL username").Default("postgres").StringVar(&AddPostgreSQL.Username)
+	AddPostgreSQLC.Flag("password", "PostgreSQL password").StringVar(&AddPostgreSQL.Password)
 
 	AddPostgreSQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddPostgreSQL.NodeID)
 	AddPostgreSQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddPostgreSQL.PMMAgentID)
-
-	AddPostgreSQLC.Flag("username", "PostgreSQL username").Default("postgres").StringVar(&AddPostgreSQL.Username)
-	AddPostgreSQLC.Flag("password", "PostgreSQL password").StringVar(&AddPostgreSQL.Password)
-	AddPostgreSQLC.Flag("agent-password", "Custom password for /metrics endpoint").StringVar(&AddPostgreSQL.AgentPassword)
 
 	querySources := []string{"pgstatements", "pgstatmonitor", "none"} // TODO add "auto"
 	querySourceHelp := fmt.Sprintf("Source of SQL queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
@@ -189,8 +220,13 @@ func init() {
 	AddPostgreSQLC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddPostgreSQL.CustomLabels)
 
 	AddPostgreSQLC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddPostgreSQL.SkipConnectionCheck)
+
 	AddPostgreSQLC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddPostgreSQL.TLS)
+	AddPostgreSQLC.Flag("tls-ca-file", "TLS CA certificate file").StringVar(&AddPostgreSQL.TLSCAFile)
+	AddPostgreSQLC.Flag("tls-cert-file", "TLS certificate file").StringVar(&AddPostgreSQL.TLSCertFile)
+	AddPostgreSQLC.Flag("tls-key-file", "TLS certificate key file").StringVar(&AddPostgreSQL.TLSKeyFile)
 	AddPostgreSQLC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddPostgreSQL.TLSSkipVerify)
+
 	AddPostgreSQLC.Flag("disable-queryexamples", "Disable collection of query examples").BoolVar(&AddPostgreSQL.DisableQueryExamples)
 	AddPostgreSQLC.Flag("metrics-mode", "Metrics flow mode, can be push - agent will push metrics,"+
 		" pull - server scrape metrics from agent  or auto - chosen by server.").
