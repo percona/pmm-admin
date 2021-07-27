@@ -87,8 +87,6 @@ github.com/go-openapi/runtime v0.0.0-20180920151709-4f900dc2ade9/go.mod h1:6v9a6
 github.com/go-openapi/runtime v0.19.0/go.mod h1:OwNfisksmmaZse4+gpV3Ne9AyMOlP1lt4sK4FXt0O64=
 github.com/go-openapi/runtime v0.19.4/go.mod h1:X277bwSUBxVlCYR3r7xgZZGKVvBd/29gLDlFGtJ8NL4=
 github.com/go-openapi/runtime v0.19.15/go.mod h1:dhGWCTKRXlAfGnQG0ONViOZpjfg0m2gUt9nTQPQZuoo=
-github.com/go-openapi/runtime v0.19.19 h1:PCaQSqG0HiCgpekchPrHO9AEc5ZUaAclOUp9T3RSKoQ=
-github.com/go-openapi/runtime v0.19.19/go.mod h1:Lm9YGCeecBnUUkFTxPC4s1+lwrkJ0pthx8YvyjCfkgk=
 github.com/go-openapi/runtime v0.19.20 h1:J/t+QIjbcoq8WJvjGxRKiFBhqUE8slS9SbmD0Oi/raQ=
 github.com/go-openapi/runtime v0.19.20/go.mod h1:Lm9YGCeecBnUUkFTxPC4s1+lwrkJ0pthx8YvyjCfkgk=
 github.com/go-openapi/spec v0.17.0/go.mod h1:XkF/MOi14NmjsfZ8VtAKf8pIlbZzyoTvZsdfssdxcBI=
@@ -168,6 +166,7 @@ github.com/google/go-cmp v0.2.0/go.mod h1:oXzfMopK8JAjlY9xF4vHSVASa0yLyX7SntLO5a
 github.com/google/go-cmp v0.3.0/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
+github.com/google/go-cmp v0.5.0 h1:/QaMHBdZ26BB3SSst0Iwl10Epc+xhTquomWX0oZEB6w=
 github.com/google/go-cmp v0.5.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/uuid v1.0.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
@@ -223,22 +222,8 @@ github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWb
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
 github.com/pelletier/go-toml v1.4.0/go.mod h1:PN7xzY2wHTK0K9p34ErDQMlFxa51Fk0OUruD3k1mMwo=
-github.com/percona/pmm v0.0.0-20210720101757-e3251a16a1fb h1:LurViLjlcCEt3CTt28oo/rlHmygyql/Xg3EpmYKI0Rg=
-github.com/percona/pmm v0.0.0-20210720101757-e3251a16a1fb/go.mod h1:Cm2JKvJMlMimtAhmF/1BUvz3qVJZ2O2zxQXRvtQh93Q=
-github.com/percona/pmm v0.0.0-20210720103024-1175a7afed00 h1:bgQ4h7g8AdztozVA7hmeXQvGphE9gwhiFLkaUb+D2jg=
-github.com/percona/pmm v0.0.0-20210720103024-1175a7afed00/go.mod h1:Cm2JKvJMlMimtAhmF/1BUvz3qVJZ2O2zxQXRvtQh93Q=
-github.com/percona/pmm v0.0.0-20210720103436-a6e9cff6494d h1:s1bs9EgvduOp4FIbedvG+C5FGVCNl+6axQyxKexTmjs=
-github.com/percona/pmm v0.0.0-20210720103436-a6e9cff6494d/go.mod h1:Cm2JKvJMlMimtAhmF/1BUvz3qVJZ2O2zxQXRvtQh93Q=
-github.com/percona/pmm v0.0.0-20210721103200-04317f62a82d h1:9IdHZuqd9t6UuA40j2C17ZHg9ZOxb/vGB1TuIm9hVow=
-github.com/percona/pmm v0.0.0-20210721103200-04317f62a82d/go.mod h1:Cm2JKvJMlMimtAhmF/1BUvz3qVJZ2O2zxQXRvtQh93Q=
-github.com/percona/pmm v0.0.0-20210722061959-453ecd1343e0 h1:94iPB34bbfwX/k1EPj2F9rYSRufxHCMVQITvNj1VVKo=
-github.com/percona/pmm v0.0.0-20210722061959-453ecd1343e0/go.mod h1:Cm2JKvJMlMimtAhmF/1BUvz3qVJZ2O2zxQXRvtQh93Q=
-github.com/percona/pmm v0.0.0-20210723112106-a68b7874b109 h1:1G1Cd0w3zUkuu2Z+UxP1Oy4LFeKZEfdrlk93SMybNSU=
-github.com/percona/pmm v0.0.0-20210723112106-a68b7874b109/go.mod h1:Cm2JKvJMlMimtAhmF/1BUvz3qVJZ2O2zxQXRvtQh93Q=
-github.com/percona/pmm v0.0.0-20210726135845-755347587569 h1:OZK2m73kxkSl1/TxVsWbi/k0YlAuOz/d8ZIGLPMK5Yc=
-github.com/percona/pmm v0.0.0-20210726135845-755347587569/go.mod h1:Cm2JKvJMlMimtAhmF/1BUvz3qVJZ2O2zxQXRvtQh93Q=
-github.com/percona/pmm v2.16.1-0.20210503110502-3c8ba7b08a74+incompatible h1:Ae/EjtR/W6RPmc7HRXr229UeV9h2h/aHZQWFOQAxseM=
-github.com/percona/pmm v2.16.1-0.20210503110502-3c8ba7b08a74+incompatible/go.mod h1:nN14kK4Dfl2Ub1k05aOnAHv7SmLEQtCsYX+DEfLgrkU=
+github.com/percona/pmm v0.0.0-20210727090455-51cee033df6b h1:5m5gCd02WdKMn4mDmq/jSR9ssm5p1bvhOZKiFAYG1GU=
+github.com/percona/pmm v0.0.0-20210727090455-51cee033df6b/go.mod h1:Cm2JKvJMlMimtAhmF/1BUvz3qVJZ2O2zxQXRvtQh93Q=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
@@ -319,7 +304,6 @@ golang.org/x/net v0.0.0-20191002035440-2ec189313ef0/go.mod h1:z5CRVTTTmAJ677TzLL
 golang.org/x/net v0.0.0-20200202094626-16171245cfb2/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20200226121028-0de0cce0169b/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e/go.mod h1:qpuaurCH72eLCgpAm/N6yyVIVM9cpaDIP3A8BGJEC5A=
-golang.org/x/net v0.0.0-20200602114024-627f9648deb9 h1:pNX+40auqi2JqRfOP1akLGtYcn15TUbkhwuCO3foqqM=
 golang.org/x/net v0.0.0-20200602114024-627f9648deb9/go.mod h1:qpuaurCH72eLCgpAm/N6yyVIVM9cpaDIP3A8BGJEC5A=
 golang.org/x/net v0.0.0-20200707034311-ab3426394381 h1:VXak5I6aEWmAXeQjA+QSZzlgNrpq9mjcfDemuexIKsU=
 golang.org/x/net v0.0.0-20200707034311-ab3426394381/go.mod h1:/O7V0waA8r7cgGh81Ro3o1hOxt32SMVPicZroKQ2sZA=
@@ -345,7 +329,6 @@ golang.org/x/sys v0.0.0-20190531175056-4c3a928424d2/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20190616124812-15dcb6c0061f/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20190801041406-cbf593c0f2f3/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200106162015-b016eb3dc98e/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
-golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd h1:xhmwyvizuTgC2qz7ZlMluP20uW+C3Rm0FD/WLDX8884=
 golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200722175500-76b94024e4b6 h1:X9xIZ1YU8bLZA3l6gqDUHSFiD0GFI9S548h6C8nDtOY=
 golang.org/x/sys v0.0.0-20200722175500-76b94024e4b6/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=

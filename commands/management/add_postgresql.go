@@ -49,14 +49,12 @@ type addPostgreSQLCommand struct {
 	Socket              string
 	Username            string
 	Password            string
+	AgentPassword       string
 	SkipConnectionCheck bool
 
 	NodeID            string
 	PMMAgentID        string
 	ServiceName       string
-	Username          string
-	Password          string
-	AgentPassword     string
 	Environment       string
 	Cluster           string
 	ReplicationSet    string
@@ -153,6 +151,7 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			Port:                int64(port),
 			Username:            cmd.Username,
 			Password:            cmd.Password,
+			AgentPassword:       cmd.AgentPassword,
 			Socket:              socket,
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
 
@@ -160,9 +159,6 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
-			Username:       cmd.Username,
-			Password:       cmd.Password,
-			AgentPassword:  cmd.AgentPassword,
 			CustomLabels:   customLabels,
 
 			QANPostgresqlPgstatementsAgent:  usePgStatements,
