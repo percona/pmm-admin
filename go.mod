@@ -8,7 +8,7 @@ require (
 	github.com/AlekSi/pointer v1.1.0
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d
 	github.com/go-openapi/runtime v0.19.20
-	github.com/percona/pmm v0.0.0-20210728124255-3bbc61af6d3b
+	github.com/percona/pmm v0.0.0-20210729102440-72f70c96c89b
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.6.1
