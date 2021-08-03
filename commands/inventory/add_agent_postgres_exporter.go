@@ -52,12 +52,17 @@ type addAgentPostgresExporterCommand struct {
 	ServiceID           string
 	Username            string
 	Password            string
+	AgentPassword       string
 	CustomLabels        string
 	SkipConnectionCheck bool
-	TLS                 bool
-	TLSSkipVerify       bool
 	PushMetrics         bool
 	DisableCollectors   string
+
+	TLS           bool
+	TLSSkipVerify bool
+	TLSCAFile     string
+	TLSCertFile   string
+	TLSKeyFile    string
 }
 
 func (cmd *addAgentPostgresExporterCommand) Run() (commands.Result, error) {
@@ -65,18 +70,42 @@ func (cmd *addAgentPostgresExporterCommand) Run() (commands.Result, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	var tlsCa, tlsCert, tlsKey string
+	if cmd.TLS {
+		tlsCa, err = commands.ReadFile(cmd.TLSCAFile)
+		if err != nil {
+			return nil, err
+		}
+
+		tlsCert, err = commands.ReadFile(cmd.TLSCertFile)
+		if err != nil {
+			return nil, err
+		}
+
+		tlsKey, err = commands.ReadFile(cmd.TLSKeyFile)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	params := &agents.AddPostgresExporterParams{
 		Body: agents.AddPostgresExporterBody{
 			PMMAgentID:          cmd.PMMAgentID,
 			ServiceID:           cmd.ServiceID,
 			Username:            cmd.Username,
 			Password:            cmd.Password,
+			AgentPassword:       cmd.AgentPassword,
 			CustomLabels:        customLabels,
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
-			TLS:                 cmd.TLS,
-			TLSSkipVerify:       cmd.TLSSkipVerify,
 			PushMetrics:         cmd.PushMetrics,
 			DisableCollectors:   commands.ParseDisableCollectors(cmd.DisableCollectors),
+
+			TLS:           cmd.TLS,
+			TLSSkipVerify: cmd.TLSSkipVerify,
+			TLSCa:         tlsCa,
+			TLSCert:       tlsCert,
+			TLSKey:        tlsKey,
 		},
 		Context: commands.Ctx,
 	}
@@ -101,12 +130,17 @@ func init() {
 	AddAgentPostgresExporterC.Arg("service-id", "Service identifier").Required().StringVar(&AddAgentPostgresExporter.ServiceID)
 	AddAgentPostgresExporterC.Arg("username", "PostgreSQL username for scraping metrics").Default("postgres").StringVar(&AddAgentPostgresExporter.Username)
 	AddAgentPostgresExporterC.Flag("password", "PostgreSQL password for scraping metrics").StringVar(&AddAgentPostgresExporter.Password)
+	AddAgentPostgresExporterC.Flag("agent-password", "Custom password for /metrics endpoint").StringVar(&AddAgentPostgresExporter.AgentPassword)
 	AddAgentPostgresExporterC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&AddAgentPostgresExporter.CustomLabels)
 	AddAgentPostgresExporterC.Flag("skip-connection-check", "Skip connection check").BoolVar(&AddAgentPostgresExporter.SkipConnectionCheck)
-	AddAgentPostgresExporterC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentPostgresExporter.TLS)
-	AddAgentPostgresExporterC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentPostgresExporter.TLSSkipVerify)
 	AddAgentPostgresExporterC.Flag("push-metrics", "Enables push metrics model flow,"+
 		" it will be sent to the server by an agent").BoolVar(&AddAgentPostgresExporter.PushMetrics)
 	AddAgentPostgresExporterC.Flag("disable-collectors",
 		"Comma-separated list of collector names to exclude from exporter").StringVar(&AddAgentPostgresExporter.DisableCollectors)
+
+	AddAgentPostgresExporterC.Flag("tls", "Use TLS to connect to the database").BoolVar(&AddAgentPostgresExporter.TLS)
+	AddAgentPostgresExporterC.Flag("tls-skip-verify", "Skip TLS certificates validation").BoolVar(&AddAgentPostgresExporter.TLSSkipVerify)
+	AddAgentPostgresExporterC.Flag("tls-ca-file", "TLS CA certificate file").StringVar(&AddAgentPostgresExporter.TLSCAFile)
+	AddAgentPostgresExporterC.Flag("tls-cert-file", "TLS certificate file").StringVar(&AddAgentPostgresExporter.TLSCertFile)
+	AddAgentPostgresExporterC.Flag("tls-key-file", "TLS certificate key file").StringVar(&AddAgentPostgresExporter.TLSKeyFile)
 }
