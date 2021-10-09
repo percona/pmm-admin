@@ -62,7 +62,7 @@ check-style:                    ## Run style checkers and linters.
 
 check-all: check check-style    ## Run all linters for new code..
 
-FILES = $(shell find . -type f -name '*.go')
+FILES = $(shell find . -type f -name "*.go")
 
 format:                         ## Format source code.
 	gofmt -w -s $(FILES)
