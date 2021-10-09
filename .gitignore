@@ -1,4 +1,7 @@
+# Intellij Idea
 /.idea/
+.iml
+
 /.vscode/
 /bin/
 cover.out
