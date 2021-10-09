@@ -36,7 +36,7 @@ import (
 
 func main() {
 	kingpin.CommandLine.Name = "pmm-admin"
-	kingpin.CommandLine.Help = fmt.Sprintf("Version %s", version.Version)
+	kingpin.CommandLine.Help = fmt.Sprintf("Version %s %s", version.Version)
 	kingpin.CommandLine.HelpFlag.Short('h')
 	kingpin.CommandLine.UsageTemplate(commands.UsageTemplate)
 
