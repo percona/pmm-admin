@@ -24,13 +24,14 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/percona/pmm/version"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/alecthomas/kingpin.v2"
+
 	"github.com/percona/pmm-admin/commands"
 	"github.com/percona/pmm-admin/commands/inventory"
 	"github.com/percona/pmm-admin/commands/management"
 	"github.com/percona/pmm-admin/logger"
-	"github.com/percona/pmm/version"
-	"github.com/sirupsen/logrus"
-	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 func main() {
