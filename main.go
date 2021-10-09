@@ -19,13 +19,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/percona/pmm/version"
-	"github.com/sirupsen/logrus"
-	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
 	"os/exec"
 	"os/signal"
 	"syscall"
+
+	"github.com/percona/pmm/version"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/commands"
 	"github.com/percona/pmm-admin/commands/inventory"
