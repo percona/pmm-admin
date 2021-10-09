@@ -28,10 +28,10 @@ release:                        ## Build pmm-admin release binary.
 	env CGO_ENABLED=0 go build -v $(LD_FLAGS) -o $(PMM_RELEASE_PATH)/pmm-admin
 
 init:                           ## Installs development tools
-	go build -modfile=tools/go.mod -o $(BIN_PATH)/go-consistent github.com/quasilyte/go-consistent
-	go build -modfile=tools/go.mod -o $(BIN_PATH)/golangci-lint github.com/golangci/golangci-lint/cmd/golangci-lint
-	go build -modfile=tools/go.mod -o $(BIN_PATH)/reviewdog github.com/reviewdog/reviewdog/cmd/reviewdog
-	go build -modfile=tools/go.mod -o $(BIN_PATH)/goimports golang.org/x/tools/cmd/goimports
+	go build -modfile=tools/go.mod -o "$(BIN_PATH)/go-consistent" github.com/quasilyte/go-consistent
+	go build -modfile=tools/go.mod -o "$(BIN_PATH)/golangci-lint" github.com/golangci/golangci-lint/cmd/golangci-lint
+	go build -modfile=tools/go.mod -o "$(BIN_PATH)/reviewdog" github.com/reviewdog/reviewdog/cmd/reviewdog
+	go build -modfile=tools/go.mod -o "$(BIN_PATH)/goimports" golang.org/x/tools/cmd/goimports
 
 install:                        ## Install pmm-admin binary.
 	go install $(LD_FLAGS) ./...
