@@ -16,11 +16,15 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"go/build"
+	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -87,5 +91,25 @@ func TestImports(t *testing.T) {
 				t.Errorf("Package %q should not import %q.", path, i)
 			}
 		}
+	}
+}
+
+func TestCancelContextInterrupts(t *testing.T) {
+	t.Parallel()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	signals := make(chan os.Signal, 1)
+
+	handleInterrupts(signals, cancel)
+
+	// sending signal
+	signals <- syscall.SIGTERM
+
+	timeout := time.After(100 * time.Millisecond)
+	select {
+	case <-ctx.Done():
+		t.Log("Context is canceled")
+	case <-timeout:
+		t.Fatal("Context is not canceled")
 	}
 }

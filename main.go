@@ -19,14 +19,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/percona/pmm/version"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
 	"os/exec"
 	"os/signal"
 	"syscall"
-
-	"github.com/percona/pmm/version"
-	"github.com/sirupsen/logrus"
-	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/commands"
 	"github.com/percona/pmm-admin/commands/inventory"
@@ -73,15 +72,9 @@ func main() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	// handle termination signals
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGTERM, syscall.SIGINT)
-	go func() {
-		s := <-signals
-		signal.Stop(signals)
-		logrus.Warnf("Got %s, shutting down...", s.String())
-		cancel()
-	}()
+	handleInterrupts(signals, cancel)
 
 	allCommands := map[string]commands.Command{
 		management.RegisterC.FullCommand():   management.Register,
@@ -229,4 +222,13 @@ func main() {
 
 		os.Exit(1)
 	}
+}
+
+func handleInterrupts(signals chan os.Signal, cancel context.CancelFunc) {
+	go func() {
+		s := <-signals
+		signal.Stop(signals)
+		logrus.Warnf("Got %s, shutting down...", s.String())
+		cancel()
+	}()
 }
