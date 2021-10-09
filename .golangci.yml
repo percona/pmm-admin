@@ -27,6 +27,8 @@ linters:
     - gomodguard        # we don't use go modules
     - interfacer        # deprecated
     - maligned          # deprecated
+    - golint            # deprecated
+    - scopelint         # deprecated
     - wsl               # useless lint
 
 issues:

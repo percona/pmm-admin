@@ -19,9 +19,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/percona/pmm/version"
-	"github.com/sirupsen/logrus"
-	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -31,6 +28,9 @@ import (
 	"github.com/percona/pmm-admin/commands/inventory"
 	"github.com/percona/pmm-admin/commands/management"
 	"github.com/percona/pmm-admin/logger"
+	"github.com/percona/pmm/version"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 func main() {
