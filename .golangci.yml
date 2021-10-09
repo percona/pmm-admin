@@ -25,6 +25,8 @@ linters:
     - gochecknoglobals  # we need global variables for commands
     - gochecknoinits    # we need inits for commands
     - gomodguard        # we don't use go modules
+    - interfacer        # deprecated
+    - maligned          # deprecated
 
 issues:
   exclude-use-default: false
