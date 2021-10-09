@@ -31,7 +31,6 @@ init:                           ## Installs development tools
 	go build -modfile=tools/go.mod -o "$(BIN_PATH)/go-consistent" github.com/quasilyte/go-consistent
 	go build -modfile=tools/go.mod -o "$(BIN_PATH)/golangci-lint" github.com/golangci/golangci-lint/cmd/golangci-lint
 	go build -modfile=tools/go.mod -o "$(BIN_PATH)/reviewdog" github.com/reviewdog/reviewdog/cmd/reviewdog
-	go build -modfile=tools/go.mod -o "$(BIN_PATH)/goimports" golang.org/x/tools/cmd/goimports
 
 install:                        ## Install pmm-admin binary.
 	go install $(LD_FLAGS) ./...
@@ -65,7 +64,7 @@ check-all: check check-style    ## Run all linters for new code..
 FILES = $(shell find . -type f -name "*.go")
 
 format:                         ## Format source code.
-	gofmt -w -s $(FILES)
+	#gofmt -w -s $(FILES)
 	$(BIN_PATH)/goimports -local github.com/percona/pmm-admin -l -w $(FILES)
 
 env-up:                         ## Start development environment.

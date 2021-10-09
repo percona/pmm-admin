@@ -45,8 +45,9 @@ before_install:
 
 install: skip
 before_script:
-  # ensure that files are not changed
+  # build dependencies
   - make init
+  # make sure we don't have pending reformats
   - make format
   - git status
   - git diff --exit-code
