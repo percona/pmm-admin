@@ -1,6 +1,6 @@
 # Intellij Idea
 /.idea/
-.iml
+*.iml
 
 /.vscode/
 /bin/
