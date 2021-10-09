@@ -19,14 +19,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/percona/pmm/version"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
 	"os/exec"
 	"os/signal"
-
-	"github.com/percona/pmm/version"
-	"github.com/sirupsen/logrus"
-	"golang.org/x/sys/unix"
-	"gopkg.in/alecthomas/kingpin.v2"
+	"syscall"
 
 	"github.com/percona/pmm-admin/commands"
 	"github.com/percona/pmm-admin/commands/inventory"
@@ -75,11 +74,11 @@ func main() {
 
 	// handle termination signals
 	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, unix.SIGTERM, unix.SIGINT)
+	signal.Notify(signals, syscall.SIGTERM, syscall.SIGINT)
 	go func() {
 		s := <-signals
 		signal.Stop(signals)
-		logrus.Warnf("Got %s, shutting down...", unix.SignalName(s.(unix.Signal)))
+		logrus.Warnf("Got %s, shutting down...", s.String())
 		cancel()
 	}()
 
