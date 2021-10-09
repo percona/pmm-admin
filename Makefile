@@ -64,8 +64,7 @@ check-all: check check-style    ## Run all linters for new code..
 FILES = $(shell find . -type f -name "*.go")
 
 format:                         ## Format source code.
-	#gofmt -w -s $(FILES)
-	$(BIN_PATH)/goimports -local github.com/percona/pmm-admin -l -w $(FILES)
+	$(BIN_PATH)/golangci-lint run -c=.golangci.yml --fix --new-from-rev=main
 
 env-up:                         ## Start development environment.
 	docker-compose up --force-recreate --abort-on-container-exit --renew-anon-volumes --remove-orphans
