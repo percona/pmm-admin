@@ -47,8 +47,8 @@ install: skip
 before_script:
   # build dependencies
   - make init
-  # make sure we don't have pending reformats
-  - make format
+  # make sure we don't have pending lint fixes
+  - make lint-fix
   - git status
   - git diff --exit-code
 
