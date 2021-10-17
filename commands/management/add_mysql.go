@@ -17,6 +17,8 @@ package management
 
 import (
 	"fmt"
+	"github.com/percona/pmm-admin/agentlocal"
+	"gopkg.in/ini.v1"
 	"os"
 	"strconv"
 	"strings"
@@ -26,7 +28,6 @@ import (
 	"github.com/percona/pmm/api/managementpb/json/client"
 	mysql "github.com/percona/pmm/api/managementpb/json/client/my_sql"
 
-	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
 )
 
@@ -114,6 +115,17 @@ type addMySQLCommand struct {
 	DisableTablestats      bool
 	DisableTablestatsLimit uint16
 	CreateUser             bool
+}
+
+func (cmd *addMySQLCommand) ApplyDefaults(cfg *ini.File) {
+	usernameOverride := cfg.Section("").Key("username").String()
+	if usernameOverride != "" {
+		cmd.Username = usernameOverride
+	}
+	passwordOverride := cfg.Section("").Key("password").String()
+	if passwordOverride != "" {
+		cmd.Password = passwordOverride
+	}
 }
 
 func (cmd *addMySQLCommand) GetServiceName() string {
