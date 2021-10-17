@@ -21,10 +21,13 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"gopkg.in/ini.v1"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os/user"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strings"
@@ -67,6 +70,10 @@ type Result interface {
 //    * summary command (for progress output).
 type Command interface {
 	Run() (Result, error)
+}
+
+type ApplyDefaults interface {
+	ApplyDefaults(cfg *ini.File)
 }
 
 // TODO remove Command above, rename CommandWithContext to Command
@@ -115,6 +122,7 @@ type globalFlagsValues struct {
 	ServerInsecureTLS bool
 	Debug             bool
 	Trace             bool
+	DefaultConfig     string
 }
 
 // GlobalFlags contains pmm-admin core flags values.
@@ -182,6 +190,37 @@ func (e errFromNginx) Error() string {
 
 func (e errFromNginx) GoString() string {
 	return fmt.Sprintf("errFromNginx(%q)", string(e))
+}
+
+func ConfigureDefaults(config string, cmd ApplyDefaults) error {
+	if config != "" {
+		var err error
+		config, err = normalizePath(config)
+		if err != nil {
+			return fmt.Errorf("fail to normalize path: %v", err)
+		}
+		cfg, err := ini.Load(config)
+		if err != nil {
+			return fmt.Errorf("fail to read credentials file: %v", err)
+		}
+
+		cmd.ApplyDefaults(cfg)
+	} else {
+		logrus.Debug("default config not provided")
+	}
+
+	return nil
+}
+
+func normalizePath(path string) (string, error) {
+	if strings.HasPrefix(path, "~/") {
+		usr, err := user.Current()
+		if err != nil {
+			return "", err
+		}
+		return filepath.Join(usr.HomeDir, path[2:]), nil
+	}
+	return path, nil
 }
 
 // SetupClients configures local and PMM Server API clients.
