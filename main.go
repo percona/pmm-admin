@@ -42,6 +42,8 @@ func main() {
 
 	serverURLF := kingpin.Flag("server-url", "PMM Server URL in `https://username:password@pmm-server-host/` format").String()
 	kingpin.Flag("server-insecure-tls", "Skip PMM Server TLS certificate validation").BoolVar(&commands.GlobalFlags.ServerInsecureTLS)
+	kingpin.Flag("defaults-file", "Default config").StringVar(&commands.GlobalFlags.DefaultConfig)
+
 	kingpin.Flag("debug", "Enable debug logging").BoolVar(&commands.GlobalFlags.Debug)
 	kingpin.Flag("trace", "Enable trace logging (implies debug)").BoolVar(&commands.GlobalFlags.Trace)
 	jsonF := kingpin.Flag("json", "Enable JSON output").Bool()
@@ -150,6 +152,13 @@ func main() {
 	// pmm-admin status command don't connect to PMM Server.
 	if command != commands.Status {
 		commands.SetupClients(ctx, *serverURLF)
+	}
+
+	if c, ok := command.(commands.ApplyDefaults); ok {
+		err := commands.ConfigureDefaults(commands.GlobalFlags.DefaultConfig, c)
+		if err != nil {
+			logrus.Panicf("Failed to configure defaults: %v", err)
+		}
 	}
 
 	var res commands.Result
