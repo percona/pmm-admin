@@ -189,6 +189,9 @@ func main() {
 			fmt.Printf("%s\n", b)
 		} else {
 			msg := e.Error
+			if e.Code == 401 {
+				msg += ". Please check username and password."
+			}
 			fmt.Println(msg)
 		}
 
