@@ -30,7 +30,6 @@ jobs:
         uses: percona-platform/checkout@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          #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
 
       - name: Prepare - Init
         run: make init
@@ -46,7 +45,6 @@ jobs:
       - name: Run reviewdog
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          #${{ secrets.GITHUB_TOKEN }}
         run: make ci-reviewdog
 
       - name: Install
