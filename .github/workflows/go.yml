@@ -1,4 +1,4 @@
-name: Go
+name: build
 
 on:
   push:
@@ -47,7 +47,7 @@ jobs:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: make ci-reviewdog
 
-      - name: Install
+      - name: Build and install
         run: make install
 
       - name: Run Tests
@@ -58,12 +58,3 @@ jobs:
 
       - name: Run required checkers and linters.
         run: make check
-
-      - name: Run debug commands on failure
-        if: ${{ failure() }}
-        run: |
-          env
-          go version
-          go env
-          pwd
-          git status
