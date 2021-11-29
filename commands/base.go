@@ -193,21 +193,21 @@ func (e errFromNginx) GoString() string {
 }
 
 func ConfigureDefaults(config string, cmd ApplyDefaults) error {
-	if config != "" {
-		var err error
-		config, err = normalizePath(config)
-		if err != nil {
-			return fmt.Errorf("fail to normalize path: %v", err)
-		}
-		cfg, err := ini.Load(config)
-		if err != nil {
-			return fmt.Errorf("fail to read credentials file: %v", err)
-		}
-
-		cmd.ApplyDefaults(cfg)
-	} else {
-		logrus.Debug("default config not provided")
+	if config == "" {
+	        logrus.Debug("default config not provided")
+	        return nil
+	 }
+	var err error
+	config, err = expandPath(config)
+	if err != nil {
+		return fmt.Errorf("fail to normalize path: %v", err)
 	}
+	cfg, err := ini.Load(config)
+	if err != nil {
+		return fmt.Errorf("fail to read credentials file: %v", err)
+	}
+
+	cmd.ApplyDefaults(cfg)
 
 	return nil
 }
