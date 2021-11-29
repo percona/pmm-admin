@@ -164,7 +164,7 @@ func TestRun(t *testing.T) {
 
 func TestApplyDefaults(t *testing.T) {
 	t.Run("password and username is set", func(t *testing.T) {
-		file, cleanup, e := commands.DefaultConfig("username=root\npassword=toor\n")
+		file, cleanup, e := commands.DefaultConfig("[client]\nusername=root\npassword=toor\n")
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -179,7 +179,7 @@ func TestApplyDefaults(t *testing.T) {
 	})
 
 	t.Run("password and username from config have priority", func(t *testing.T) {
-		file, cleanup, e := commands.DefaultConfig("username=root\npassword=toor\n")
+		file, cleanup, e := commands.DefaultConfig("[client]\nusername=root\npassword=toor\n")
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -215,7 +215,7 @@ func TestApplyDefaults(t *testing.T) {
 	})
 
 	t.Run("only username is set", func(t *testing.T) {
-		file, cleanup, e := commands.DefaultConfig("username=root\n")
+		file, cleanup, e := commands.DefaultConfig("[client]\nusername=root\n")
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -233,7 +233,7 @@ func TestApplyDefaults(t *testing.T) {
 	})
 
 	t.Run("only password is set", func(t *testing.T) {
-		file, cleanup, e := commands.DefaultConfig("password=toor\n")
+		file, cleanup, e := commands.DefaultConfig("[client]\npassword=toor\n")
 		if e != nil {
 			t.Fatal(e)
 		}
