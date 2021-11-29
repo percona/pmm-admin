@@ -62,7 +62,10 @@ type addAgentMongodbExporterCommand struct {
 	TLSCaFile                     string
 	AuthenticationMechanism       string
 	PushMetrics                   bool
-	DisableCollectors             string
+	DisableCollectors             []string
+
+	StatsCollections string
+	CollectionsLimit int32
 }
 
 func (cmd *addAgentMongodbExporterCommand) Run() (commands.Result, error) {
@@ -96,7 +99,9 @@ func (cmd *addAgentMongodbExporterCommand) Run() (commands.Result, error) {
 			TLSCa:                         tlsCa,
 			AuthenticationMechanism:       cmd.AuthenticationMechanism,
 			PushMetrics:                   cmd.PushMetrics,
-			DisableCollectors:             commands.ParseDisableCollectors(cmd.DisableCollectors),
+			DisableCollectors:             cmd.DisableCollectors,
+			StatsCollections:              cmd.StatsCollections,
+			CollectionsLimit:              cmd.CollectionsLimit,
 		},
 		Context: commands.Ctx,
 	}
@@ -133,6 +138,10 @@ func init() {
 		StringVar(&AddAgentMongodbExporter.AuthenticationMechanism)
 	AddAgentMongodbExporterC.Flag("push-metrics", "Enables push metrics model flow,"+
 		" it will be sent to the server by an agent").BoolVar(&AddAgentMongodbExporter.PushMetrics)
-	AddAgentMongodbExporterC.Flag("disable-collectors",
-		"Comma-separated list of collector names to exclude from exporter").StringVar(&AddAgentMongodbExporter.DisableCollectors)
+
+	AddAgentMongodbExporterC.Flag("disable-collectors", "Comma-separated list of collector names to exclude from exporter").EnumsVar(
+		&AddAgentMongodbExporter.DisableCollectors, "diagnosticdata", "replicasetstatus", "dbstats", "topmetrics")
+	AddAgentMongodbExporterC.Flag("stats-collections", "Collections for collstats & indexstats").StringVar(&AddAgentMongodbExporter.StatsCollections)
+	AddAgentMongodbExporterC.Flag("max-collections-limit", "Disable collstats & indexstats if there are more than <n> collections").
+		Int32Var(&AddAgentMongodbExporter.CollectionsLimit)
 }
