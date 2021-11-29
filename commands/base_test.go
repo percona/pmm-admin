@@ -156,9 +156,9 @@ func TestConfigureDefaults(t *testing.T) {
 	})
 }
 
-func TestNormalizePath(t *testing.T) {
+func TestExpandPath(t *testing.T) {
 	t.Run("relative to userhome", func(t *testing.T) {
-		actual, err := normalizePath("~/")
+		actual, err := expandPath("~/")
 		assert.NoError(t, err)
 		usr, err := user.Current()
 		assert.NoError(t, err)
@@ -167,7 +167,7 @@ func TestNormalizePath(t *testing.T) {
 	})
 	t.Run("relative to userhome", func(t *testing.T) {
 		originalPath := "./test"
-		actual, err := normalizePath(originalPath)
+		actual, err := expandPath(originalPath)
 		assert.NoError(t, err)
 
 		assert.Equal(t, originalPath, actual)

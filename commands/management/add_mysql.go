@@ -118,11 +118,11 @@ type addMySQLCommand struct {
 }
 
 func (cmd *addMySQLCommand) ApplyDefaults(cfg *ini.File) {
-	usernameOverride := cfg.Section("").Key("username").String()
+	usernameOverride := cfg.Section("client").Key("username").String()
 	if usernameOverride != "" {
 		cmd.Username = usernameOverride
 	}
-	passwordOverride := cfg.Section("").Key("password").String()
+	passwordOverride := cfg.Section("client").Key("password").String()
 	if passwordOverride != "" {
 		cmd.Password = passwordOverride
 	}

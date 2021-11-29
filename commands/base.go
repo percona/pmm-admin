@@ -195,7 +195,7 @@ func (e errFromNginx) GoString() string {
 func ConfigureDefaults(config string, cmd ApplyDefaults) error {
 	if config != "" {
 		var err error
-		config, err = normalizePath(config)
+		config, err = expandPath(config)
 		if err != nil {
 			return fmt.Errorf("fail to normalize path: %v", err)
 		}
@@ -212,7 +212,7 @@ func ConfigureDefaults(config string, cmd ApplyDefaults) error {
 	return nil
 }
 
-func normalizePath(path string) (string, error) {
+func expandPath(path string) (string, error) {
 	if strings.HasPrefix(path, "~/") {
 		usr, err := user.Current()
 		if err != nil {
