@@ -16,9 +16,10 @@
 package inventory
 
 import (
-	"github.com/percona/pmm-admin/commands"
 	"github.com/percona/pmm/api/inventorypb/json/client"
 	"github.com/percona/pmm/api/inventorypb/json/client/agents"
+
+	"github.com/percona/pmm-admin/commands"
 )
 
 var addAgentMongodbExporterResultT = commands.ParseTemplate(`
@@ -99,7 +100,7 @@ func (cmd *addAgentMongodbExporterCommand) Run() (commands.Result, error) {
 			AuthenticationMechanism:       cmd.AuthenticationMechanism,
 			PushMetrics:                   cmd.PushMetrics,
 			DisableCollectors:             commands.ParseDisableCollectors(cmd.DisableCollectors),
-			StatsCollections:              cmd.StatsCollections,
+			StatsCollections:              commands.ParseDisableCollectors(cmd.StatsCollections),
 			CollectionsLimit:              cmd.CollectionsLimit,
 		},
 		Context: commands.Ctx,

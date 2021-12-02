@@ -159,7 +159,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 			MetricsMode: pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
 
 			DisableCollectors: commands.ParseDisableCollectors(cmd.DisableCollectors),
-			StatsCollections:  cmd.StatsCollections,
+			StatsCollections:  commands.ParseDisableCollectors(cmd.StatsCollections),
 			CollectionsLimit:  cmd.CollectionsLimit,
 		},
 		Context: commands.Ctx,
