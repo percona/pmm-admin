@@ -63,7 +63,7 @@ type addMongoDBCommand struct {
 	ReplicationSet    string
 	CustomLabels      string
 	MetricsMode       string
-	DisableCollectors []string
+	DisableCollectors string
 
 	QuerySource string
 
@@ -158,7 +158,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 
 			MetricsMode: pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
 
-			DisableCollectors: cmd.DisableCollectors,
+			DisableCollectors: commands.ParseDisableCollectors(cmd.DisableCollectors),
 			StatsCollections:  cmd.StatsCollections,
 			CollectionsLimit:  cmd.CollectionsLimit,
 		},
@@ -219,8 +219,7 @@ func init() {
 		" pull - server scrape metrics from agent  or auto - chosen by server.").
 		Default("auto").
 		EnumVar(&AddMongoDB.MetricsMode, metricsModes...)
-	AddMongoDBC.Flag("disable-collectors", "Comma-separated list of collector names to exclude from exporter").EnumsVar(
-		&AddMongoDB.DisableCollectors, "diagnosticdata", "replicasetstatus", "dbstats", "topmetrics")
+	AddMongoDBC.Flag("disable-collectors", "Comma-separated list of collector names to exclude from exporter").StringVar(&AddMongoDB.DisableCollectors)
 	addGlobalFlags(AddMongoDBC)
 	AddMongoDBC.Flag("socket", "Path to socket").StringVar(&AddMongoDB.Socket)
 
