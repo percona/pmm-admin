@@ -345,7 +345,7 @@ var (
 	SummaryC    = kingpin.Command("summary", "Fetch system data for diagnostics")
 	hostname, _ = os.Hostname()
 	filename    = fmt.Sprintf("summary_%s_%s.zip",
-		strings.Replace(hostname, ".", "_", -1), time.Now().Format("2006_01_02_15_04_05"))
+		strings.ReplaceAll(hostname, ".", "_"), time.Now().Format("2006_01_02_15_04_05"))
 )
 
 func init() {
