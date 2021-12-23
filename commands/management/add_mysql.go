@@ -17,6 +17,7 @@ package management
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"os"
 	"strconv"
 	"strings"
@@ -120,13 +121,21 @@ type addMySQLCommand struct {
 }
 
 func (cmd *addMySQLCommand) ApplyDefaults(cfg *ini.File) {
-	usernameOverride := cfg.Section("client").Key("user").String()
-	if usernameOverride != "" {
-		cmd.Username = usernameOverride
+	defaultUsername := cfg.Section("client").Key("user").String()
+	if defaultUsername != "" {
+		if cmd.Username == "" {
+			cmd.Username = defaultUsername
+		} else {
+			logrus.Debug("default username is not used, it is already set")
+		}
 	}
-	passwordOverride := cfg.Section("client").Key("password").String()
-	if passwordOverride != "" {
-		cmd.Password = passwordOverride
+	defaultPassword := cfg.Section("client").Key("password").String()
+	if defaultPassword != "" {
+		if cmd.Password == "" {
+			cmd.Password = defaultPassword
+		} else {
+			logrus.Debug("default password is not used, it is already set")
+		}
 	}
 }
 

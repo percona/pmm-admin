@@ -16,6 +16,7 @@
 package management
 
 import (
+	"github.com/sirupsen/logrus"
 	"strings"
 	"testing"
 
@@ -179,7 +180,8 @@ func TestApplyDefaults(t *testing.T) {
 		assert.Equal(t, "toor", cmd.Password)
 	})
 
-	t.Run("password and username from config have priority", func(t *testing.T) {
+	t.Run("password and username from config have lower priority", func(t *testing.T) {
+		logrus.SetLevel(logrus.TraceLevel)
 		file, cleanup, e := commands.DefaultConfig("[client]\nuser=root\npassword=toor\n")
 		if e != nil {
 			t.Fatal(e)
@@ -193,8 +195,8 @@ func TestApplyDefaults(t *testing.T) {
 
 		commands.ConfigureDefaults(file.Name(), cmd)
 
-		assert.Equal(t, "root", cmd.Username)
-		assert.Equal(t, "toor", cmd.Password)
+		assert.Equal(t, "default-username", cmd.Username)
+		assert.Equal(t, "default-password", cmd.Password)
 	})
 
 	t.Run("not updated if not set", func(t *testing.T) {
@@ -222,15 +224,12 @@ func TestApplyDefaults(t *testing.T) {
 		}
 		defer cleanup()
 
-		cmd := &addMySQLCommand{
-			Username: "default-username",
-			Password: "default-password",
-		}
+		cmd := &addMySQLCommand{}
 
 		commands.ConfigureDefaults(file.Name(), cmd)
 
 		assert.Equal(t, "root", cmd.Username)
-		assert.Equal(t, "default-password", cmd.Password)
+		assert.Equal(t, "", cmd.Password)
 	})
 
 	t.Run("only password is set", func(t *testing.T) {
@@ -240,14 +239,11 @@ func TestApplyDefaults(t *testing.T) {
 		}
 		defer cleanup()
 
-		cmd := &addMySQLCommand{
-			Username: "default-username",
-			Password: "default-password",
-		}
+		cmd := &addMySQLCommand{}
 
 		commands.ConfigureDefaults(file.Name(), cmd)
 
-		assert.Equal(t, "default-username", cmd.Username)
+		assert.Equal(t, "", cmd.Username)
 		assert.Equal(t, "toor", cmd.Password)
 	})
 }
