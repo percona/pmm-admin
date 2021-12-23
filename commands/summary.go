@@ -289,6 +289,9 @@ func addPprofData(ctx context.Context, zipW *zip.Writer, skipServer bool) {
 func (cmd *summaryCommand) makeArchive(ctx context.Context) (err error) {
 	var f *os.File
 
+	if cmd.Filename == "" {
+		cmd.Filename = filename
+	}
 	if f, err = os.Create(cmd.Filename); err != nil {
 		err = errors.WithStack(err)
 		return
@@ -338,14 +341,14 @@ func (cmd *summaryCommand) RunWithContext(ctx context.Context) (Result, error) {
 
 // register command
 var (
-	Summary  = new(summaryCommand)
-	SummaryC = kingpin.Command("summary", "Fetch system data for diagnostics")
+	Summary     = new(summaryCommand)
+	SummaryC    = kingpin.Command("summary", "Fetch system data for diagnostics")
+	hostname, _ = os.Hostname()
+	filename    = fmt.Sprintf("summary_%s_%s.zip",
+		strings.Replace(hostname, ".", "_", -1), time.Now().Format("2006_01_02_15_04_05"))
 )
 
 func init() {
-	hostname, _ := os.Hostname()
-	filename := fmt.Sprintf("summary_%s_%s.zip",
-		strings.Replace(hostname, ".", "_", -1), time.Now().Format("2006_01_02_15_04_05"))
 	SummaryC.Flag("filename", "Summary archive filename").Default(filename).StringVar(&Summary.Filename)
 	SummaryC.Flag("skip-server", "Skip fetching logs.zip from PMM Server").BoolVar(&Summary.SkipServer)
 	SummaryC.Flag("pprof", "Include performance profiling data").BoolVar(&Summary.Pprof)
