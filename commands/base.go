@@ -21,7 +21,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"gopkg.in/ini.v1"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -32,6 +31,8 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+
+	"gopkg.in/ini.v1"
 
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"

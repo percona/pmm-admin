@@ -17,11 +17,13 @@ package management
 
 import (
 	"fmt"
-	"github.com/percona/pmm-admin/agentlocal"
-	"gopkg.in/ini.v1"
 	"os"
 	"strconv"
 	"strings"
+
+	"gopkg.in/ini.v1"
+
+	"github.com/percona/pmm-admin/agentlocal"
 
 	"github.com/AlekSi/pointer"
 	"github.com/alecthomas/units"
@@ -118,7 +120,7 @@ type addMySQLCommand struct {
 }
 
 func (cmd *addMySQLCommand) ApplyDefaults(cfg *ini.File) {
-	usernameOverride := cfg.Section("client").Key("username").String()
+	usernameOverride := cfg.Section("client").Key("user").String()
 	if usernameOverride != "" {
 		cmd.Username = usernameOverride
 	}

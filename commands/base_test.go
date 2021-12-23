@@ -18,12 +18,13 @@ package commands
 import (
 	"bytes"
 	"fmt"
-	"gopkg.in/ini.v1"
 	"io/ioutil"
 	"os"
 	"os/user"
 	"strings"
 	"testing"
+
+	"gopkg.in/ini.v1"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -115,23 +116,22 @@ func TestReadFile(t *testing.T) {
 
 type cmdWithDefaultsApply struct {
 	applyDefaultCalled bool
-	username           string
+	user               string
 	password           string
 }
 
 func (c *cmdWithDefaultsApply) ApplyDefaults(cfg *ini.File) {
-	c.username = cfg.Section("").Key("username").String()
-	c.password = cfg.Section("").Key("password").String()
+	c.user = cfg.Section("client").Key("user").String()
+	c.password = cfg.Section("client").Key("password").String()
 	c.applyDefaultCalled = true
 }
 
 func TestConfigureDefaults(t *testing.T) {
 	t.Run("ApplyDefaults is called if command supports it", func(t *testing.T) {
-		file, cleanup, e := DefaultConfig("username=root\npassword=toor\n")
+		file, e := os.Open("../testdata/.my.cnf")
 		if e != nil {
 			t.Fatal(e)
 		}
-		defer cleanup()
 
 		cmd := &cmdWithDefaultsApply{}
 
@@ -139,7 +139,7 @@ func TestConfigureDefaults(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, "root", cmd.username)
+		assert.Equal(t, "root", cmd.user)
 		assert.Equal(t, "toor", cmd.password)
 	})
 
@@ -150,7 +150,7 @@ func TestConfigureDefaults(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, "", cmd.username)
+		assert.Equal(t, "", cmd.user)
 		assert.Equal(t, "", cmd.password)
 		assert.False(t, cmd.applyDefaultCalled)
 	})

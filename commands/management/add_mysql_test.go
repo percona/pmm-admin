@@ -16,9 +16,10 @@
 package management
 
 import (
-	"github.com/percona/pmm-admin/commands"
 	"strings"
 	"testing"
+
+	"github.com/percona/pmm-admin/commands"
 
 	mysql "github.com/percona/pmm/api/managementpb/json/client/my_sql"
 	"github.com/stretchr/testify/assert"
@@ -164,7 +165,7 @@ func TestRun(t *testing.T) {
 
 func TestApplyDefaults(t *testing.T) {
 	t.Run("password and username is set", func(t *testing.T) {
-		file, cleanup, e := commands.DefaultConfig("[client]\nusername=root\npassword=toor\n")
+		file, cleanup, e := commands.DefaultConfig("[client]\nuser=root\npassword=toor\n")
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -179,7 +180,7 @@ func TestApplyDefaults(t *testing.T) {
 	})
 
 	t.Run("password and username from config have priority", func(t *testing.T) {
-		file, cleanup, e := commands.DefaultConfig("[client]\nusername=root\npassword=toor\n")
+		file, cleanup, e := commands.DefaultConfig("[client]\nuser=root\npassword=toor\n")
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -215,7 +216,7 @@ func TestApplyDefaults(t *testing.T) {
 	})
 
 	t.Run("only username is set", func(t *testing.T) {
-		file, cleanup, e := commands.DefaultConfig("[client]\nusername=root\n")
+		file, cleanup, e := commands.DefaultConfig("[client]\nuser=root\n")
 		if e != nil {
 			t.Fatal(e)
 		}
