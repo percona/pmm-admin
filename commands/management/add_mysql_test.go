@@ -16,9 +16,10 @@
 package management
 
 import (
-	"github.com/sirupsen/logrus"
 	"strings"
 	"testing"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/percona/pmm-admin/commands"
 

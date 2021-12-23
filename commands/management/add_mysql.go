@@ -17,10 +17,11 @@ package management
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 
 	"gopkg.in/ini.v1"
 
