@@ -201,7 +201,7 @@ func ConfigureDefaults(config string, cmd ApplyDefaults) error {
 		}
 		cfg, err := ini.Load(config)
 		if err != nil {
-			return fmt.Errorf("fail to read credentials file: %v", err)
+			return fmt.Errorf("fail to read config file: %v", err)
 		}
 
 		cmd.ApplyDefaults(cfg)
