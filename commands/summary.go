@@ -289,9 +289,6 @@ func addPprofData(ctx context.Context, zipW *zip.Writer, skipServer bool) {
 func (cmd *summaryCommand) makeArchive(ctx context.Context) (err error) {
 	var f *os.File
 
-	if cmd.Filename == "" {
-		cmd.Filename = filename
-	}
 	if f, err = os.Create(cmd.Filename); err != nil {
 		err = errors.WithStack(err)
 		return
@@ -330,6 +327,10 @@ func (cmd *summaryCommand) Run() (Result, error) {
 }
 
 func (cmd *summaryCommand) RunWithContext(ctx context.Context) (Result, error) {
+	if cmd.Filename == "" {
+		cmd.Filename = filename
+	}
+
 	if err := cmd.makeArchive(ctx); err != nil {
 		return nil, err
 	}
