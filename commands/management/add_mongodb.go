@@ -227,5 +227,7 @@ func init() {
 	AddMongoDBC.Flag("socket", "Path to socket").StringVar(&AddMongoDB.Socket)
 
 	AddMongoDBC.Flag("stats-collections", "Collections for collstats & indexstats").StringVar(&AddMongoDB.StatsCollections)
-	AddMongoDBC.Flag("max-collections-limit", "Disable collstats & indexstats if there are more than <n> collections").Int32Var(&AddMongoDB.CollectionsLimit)
+	AddMongoDBC.Flag("max-collections-limit",
+		"Disable collstats & indexstats if there are more than <n> collections. 0: No limit, -1: Let PMM automatically set this value.").
+		Default("-1").Int32Var(&AddMongoDB.CollectionsLimit)
 }
