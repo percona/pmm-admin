@@ -53,16 +53,15 @@ type addPostgreSQLCommand struct {
 	AgentPassword       string
 	SkipConnectionCheck bool
 
-	NodeID             string
-	PMMAgentID         string
-	PMMAgentListenPort int32
-	ServiceName        string
-	Environment        string
-	Cluster            string
-	ReplicationSet     string
-	CustomLabels       string
-	MetricsMode        string
-	DisableCollectors  string
+	NodeID            string
+	PMMAgentID        string
+	ServiceName       string
+	Environment       string
+	Cluster           string
+	ReplicationSet    string
+	CustomLabels      string
+	MetricsMode       string
+	DisableCollectors string
 
 	QuerySource          string
 	DisableQueryExamples bool
@@ -158,12 +157,11 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			Socket:              socket,
 			SkipConnectionCheck: cmd.SkipConnectionCheck,
 
-			PMMAgentID:         cmd.PMMAgentID,
-			PMMAgentListenPort: int64(cmd.PMMAgentListenPort),
-			Environment:        cmd.Environment,
-			Cluster:            cmd.Cluster,
-			ReplicationSet:     cmd.ReplicationSet,
-			CustomLabels:       customLabels,
+			PMMAgentID:     cmd.PMMAgentID,
+			Environment:    cmd.Environment,
+			Cluster:        cmd.Cluster,
+			ReplicationSet: cmd.ReplicationSet,
+			CustomLabels:   customLabels,
 
 			QANPostgresqlPgstatementsAgent:  usePgStatements,
 			QANPostgresqlPgstatmonitorAgent: usePgStatMonitor,
@@ -211,7 +209,6 @@ func init() {
 
 	AddPostgreSQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddPostgreSQL.NodeID)
 	AddPostgreSQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddPostgreSQL.PMMAgentID)
-	AddPostgreSQLC.Flag("pmm-agent-listen-port", "Overwrite default listen port of pmm-agent").Default("7777").Int32Var(&AddPostgreSQL.PMMAgentListenPort)
 
 	querySources := []string{"pgstatements", "pgstatmonitor", "none"} // TODO add "auto"
 	querySourceHelp := fmt.Sprintf("Source of SQL queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
