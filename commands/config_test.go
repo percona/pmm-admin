@@ -34,12 +34,14 @@ func TestConfigCommandArgs(t *testing.T) {
 		u, err := url.Parse("http://127.0.0.1:80")
 		require.NoError(t, err)
 		GlobalFlags = &globalFlagsValues{
-			ServerURL: u,
+			ServerURL:          u,
+			PMMAgentListenPort: 7777,
 		}
 		args, switchedToTLS := cmd.args()
 		expected := []string{
 			"--server-address=127.0.0.1:443",
 			"--server-insecure-tls",
+			"--listen-port=7777",
 			"setup", "1.2.3.4", "generic", "node1",
 		}
 		assert.Equal(t, expected, args)
@@ -55,7 +57,8 @@ func TestConfigCommandArgs(t *testing.T) {
 		u, err := url.Parse("http://admin:admin@127.0.0.1")
 		require.NoError(t, err)
 		GlobalFlags = &globalFlagsValues{
-			ServerURL: u,
+			ServerURL:          u,
+			PMMAgentListenPort: 7777,
 		}
 		args, switchedToTLS := cmd.args()
 		expected := []string{
@@ -63,6 +66,7 @@ func TestConfigCommandArgs(t *testing.T) {
 			"--server-username=admin",
 			"--server-password=admin",
 			"--server-insecure-tls",
+			"--listen-port=7777",
 			"setup", "1.2.3.4", "generic", "node1",
 		}
 		assert.Equal(t, expected, args)
@@ -78,7 +82,8 @@ func TestConfigCommandArgs(t *testing.T) {
 		u, err := url.Parse("http://admin:admin@127.0.0.1")
 		require.NoError(t, err)
 		GlobalFlags = &globalFlagsValues{
-			ServerURL: u,
+			ServerURL:          u,
+			PMMAgentListenPort: 7777,
 		}
 		args, switchedToTLS := cmd.args()
 		expected := []string{
@@ -86,6 +91,7 @@ func TestConfigCommandArgs(t *testing.T) {
 			"--server-username=admin",
 			"--server-password=admin",
 			"--server-insecure-tls",
+			"--listen-port=7777",
 			"setup",
 			"--disable-collectors=cpu,diskstats",
 			"1.2.3.4", "generic", "node1",
