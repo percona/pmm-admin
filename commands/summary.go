@@ -244,7 +244,7 @@ func addPprofData(ctx context.Context, zipW *zip.Writer, skipServer bool) {
 	}
 
 	sources := map[string]string{
-		"client/pprof/pmm-agent": "http://127.0.0.1:7777/debug/pprof",
+		"client/pprof/pmm-agent": fmt.Sprintf("http://127.0.0.1:%d/debug/pprof", GlobalFlags.PMMAgentListenPort),
 	}
 	if !skipServer {
 		sources["server/pprof/pmm-managed"] = "http://127.0.0.1:7773/debug/pprof"

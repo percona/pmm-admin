@@ -47,14 +47,13 @@ type configCommand struct {
 	NodeType    string
 	NodeName    string
 
-	NodeModel          string
-	Region             string
-	Az                 string
-	MetricsMode        string
-	DisableCollectors  string
-	CustomLabels       string
-	BasePath           string
-	PMMAgentListenPort string
+	NodeModel         string
+	Region            string
+	Az                string
+	MetricsMode       string
+	DisableCollectors string
+	CustomLabels      string
+	BasePath          string
 
 	Force bool
 }
@@ -89,6 +88,7 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 	if GlobalFlags.Trace {
 		res = append(res, "--trace")
 	}
+	res = append(res, fmt.Sprintf("--listen-port=%d", GlobalFlags.PMMAgentListenPort))
 
 	res = append(res, "setup")
 	if cmd.NodeModel != "" {
@@ -118,10 +118,6 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 
 	if cmd.BasePath != "" {
 		res = append(res, fmt.Sprintf("--paths-base=%s", cmd.BasePath))
-	}
-
-	if cmd.PMMAgentListenPort != "" {
-		res = append(res, fmt.Sprintf("--pmm-agent-listen-port=%s", cmd.PMMAgentListenPort))
 	}
 
 	res = append(res, cmd.NodeAddress, cmd.NodeType, cmd.NodeName)
@@ -179,5 +175,4 @@ func init() {
 	ConfigC.Flag("disable-collectors", "Comma-separated list of collector names to exclude from exporter").StringVar(&Config.DisableCollectors)
 	ConfigC.Flag("custom-labels", "Custom user-assigned labels").StringVar(&Config.CustomLabels)
 	ConfigC.Flag("paths-base", "Base path where all binaries, tools and collectors of PMM client are located").StringVar(&Config.BasePath)
-	ConfigC.Flag("pmm-agent-listen-port", "Overwrite default listen port of pmm-agent").Default("7777").StringVar(&Config.PMMAgentListenPort)
 }
