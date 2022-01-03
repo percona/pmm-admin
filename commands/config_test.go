@@ -55,8 +55,7 @@ func TestConfigCommandArgs(t *testing.T) {
 		u, err := url.Parse("http://admin:admin@127.0.0.1")
 		require.NoError(t, err)
 		GlobalFlags = &globalFlagsValues{
-			ServerURL:          u,
-			PMMAgentListenPort: 7777,
+			ServerURL: u,
 		}
 		args, switchedToTLS := cmd.args()
 		expected := []string{
