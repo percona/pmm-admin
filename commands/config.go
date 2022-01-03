@@ -88,7 +88,6 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 	if GlobalFlags.Trace {
 		res = append(res, "--trace")
 	}
-	res = append(res, fmt.Sprintf("--listen-port=%d", GlobalFlags.PMMAgentListenPort))
 
 	res = append(res, "setup")
 	if cmd.NodeModel != "" {
