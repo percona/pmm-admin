@@ -29,8 +29,10 @@ import (
 	"github.com/percona/pmm-admin/agentlocal"
 )
 
+const defaultPMMAgentListenPort = 7777
+
 func TestSummary(t *testing.T) {
-	agentlocal.SetTransport(context.TODO(), true, 7777)
+	agentlocal.SetTransport(context.TODO(), true, defaultPMMAgentListenPort)
 
 	f, err := ioutil.TempFile("", "pmm-admin-test-summary")
 	require.NoError(t, err)
