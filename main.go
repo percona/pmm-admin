@@ -44,7 +44,7 @@ func main() {
 	kingpin.Flag("server-insecure-tls", "Skip PMM Server TLS certificate validation").BoolVar(&commands.GlobalFlags.ServerInsecureTLS)
 	kingpin.Flag("debug", "Enable debug logging").BoolVar(&commands.GlobalFlags.Debug)
 	kingpin.Flag("trace", "Enable trace logging (implies debug)").BoolVar(&commands.GlobalFlags.Trace)
-	kingpin.Flag("listen-port", "Set listen port of pmm-agent").Default("7777").Uint32Var(&commands.GlobalFlags.PMMAgentListenPort)
+	kingpin.Flag("pmm-agent-listen-port", "Set listen port of pmm-agent").Default("7777").Uint32Var(&commands.GlobalFlags.PMMAgentListenPort)
 	jsonF := kingpin.Flag("json", "Enable JSON output").Bool()
 
 	kingpin.Flag("version", "Show application version").Short('v').Action(func(*kingpin.ParseContext) error {
