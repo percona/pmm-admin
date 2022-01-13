@@ -32,8 +32,8 @@ var errNoNode = errors.New("no node available")
 const haProxyMinPMMServerVersion = "2.15.0"
 
 // ServerVersionLessThan return if provided version is lower than server version.
-func ServerVersionLessThan(currentVersion string) (bool, error) {
-	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+func ServerVersionLessThan(currentVersion string, port uint32) (bool, error) {
+	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo, port)
 	if err != nil {
 		return false, err
 	}
@@ -54,9 +54,9 @@ func ServerVersionLessThan(currentVersion string) (bool, error) {
 }
 
 // IsHAProxySupported return if is HAProxy supported on running PMM server.
-func IsHAProxySupported() (bool, error) {
+func IsHAProxySupported(port uint32) (bool, error) {
 	minVersion := haProxyMinPMMServerVersion
-	lessThanMinVersion, err := ServerVersionLessThan(minVersion)
+	lessThanMinVersion, err := ServerVersionLessThan(minVersion, port)
 	if err != nil {
 		return false, err
 	}

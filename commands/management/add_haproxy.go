@@ -62,7 +62,7 @@ type addHAProxyCommand struct {
 }
 
 func (cmd *addHAProxyCommand) Run() (commands.Result, error) {
-	isSupported, err := helpers.IsHAProxySupported()
+	isSupported, err := helpers.IsHAProxySupported(commands.GlobalFlags.PMMAgentListenPort)
 	if !isSupported {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (cmd *addHAProxyCommand) Run() (commands.Result, error) {
 	}
 
 	if cmd.NodeID == "" {
-		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo, commands.GlobalFlags.PMMAgentListenPort)
 		if err != nil {
 			return nil, err
 		}

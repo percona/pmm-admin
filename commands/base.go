@@ -190,7 +190,7 @@ func SetupClients(ctx context.Context, serverURL string, pmmAgentListenPort uint
 	agentlocal.SetTransport(ctx, GlobalFlags.Debug || GlobalFlags.Trace, pmmAgentListenPort)
 
 	if serverURL == "" {
-		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo, GlobalFlags.PMMAgentListenPort)
 		if err != nil {
 			if err == agentlocal.ErrNotSetUp { //nolint:errorlint,goerr113
 				logrus.Fatalf("Failed to get PMM Server parameters from local pmm-agent: %s.\n"+

@@ -123,7 +123,7 @@ type listCommand struct {
 
 func (cmd *listCommand) Run() (Result, error) {
 	if cmd.NodeID == "" {
-		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo, GlobalFlags.PMMAgentListenPort)
 		if err != nil {
 			return nil, err
 		}

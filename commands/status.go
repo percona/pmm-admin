@@ -100,7 +100,7 @@ func (cmd *statusCommand) Run() (Result, error) {
 	var err error
 
 	for {
-		status, err = agentlocal.GetStatus(agentlocal.RequestNetworkInfo)
+		status, err = agentlocal.GetStatus(agentlocal.RequestNetworkInfo, GlobalFlags.PMMAgentListenPort)
 		if err == nil {
 			break
 		}

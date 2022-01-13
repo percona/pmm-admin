@@ -84,14 +84,19 @@ type AgentStatus struct {
 
 // GetRawStatus returns raw local pmm-agent status. No special cases.
 // Most callers should use GetStatus instead.
-func GetRawStatus(ctx context.Context, requestNetworkInfo NetworkInfo) (*agentlocal.StatusOKBody, error) {
+func GetRawStatus(ctx context.Context, requestNetworkInfo NetworkInfo, port uint32) (*agentlocal.StatusOKBody, error) {
 	params := &agentlocal.StatusParams{
 		Body: agentlocal.StatusBody{
 			GetNetworkInfo: bool(requestNetworkInfo),
 		},
 		Context: ctx,
 	}
-	res, err := client.Default.AgentLocal.Status(params)
+
+	conf := client.DefaultTransportConfig()
+	conf.Host = fmt.Sprintf("127.0.0.1:%d", port)
+	client := client.NewHTTPClientWithConfig(nil, conf)
+
+	res, err := client.AgentLocal.Status(params)
 	if err != nil {
 		return nil, err
 	}
@@ -101,8 +106,8 @@ func GetRawStatus(ctx context.Context, requestNetworkInfo NetworkInfo) (*agentlo
 // GetStatus returns local pmm-agent status.
 // As a special case, if pmm-agent is running, but not set up, ErrNotSetUp is returned.
 // If pmm-agent is set up, but not connected ErrNotConnected is returned.
-func GetStatus(requestNetworkInfo NetworkInfo) (*Status, error) {
-	p, err := GetRawStatus(context.TODO(), requestNetworkInfo)
+func GetStatus(requestNetworkInfo NetworkInfo, port uint32) (*Status, error) {
+	p, err := GetRawStatus(context.TODO(), requestNetworkInfo, port)
 	if err != nil {
 		return nil, err
 	}

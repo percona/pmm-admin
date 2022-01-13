@@ -88,7 +88,7 @@ func (cmd *addProxySQLCommand) Run() (commands.Result, error) {
 	}
 
 	if cmd.PMMAgentID == "" || cmd.NodeID == "" {
-		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo, commands.GlobalFlags.PMMAgentListenPort)
 		if err != nil {
 			return nil, err
 		}
