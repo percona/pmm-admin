@@ -94,11 +94,7 @@ func GetRawStatus(ctx context.Context, requestNetworkInfo NetworkInfo, port uint
 		Context: ctx,
 	}
 
-	conf := client.DefaultTransportConfig()
-	conf.Host = fmt.Sprintf("%s:%d", Localhost, port)
-	client := client.NewHTTPClientWithConfig(nil, conf)
-
-	res, err := client.AgentLocal.Status(params)
+	res, err := client.Default.AgentLocal.Status(params)
 	if err != nil {
 		return nil, err
 	}
