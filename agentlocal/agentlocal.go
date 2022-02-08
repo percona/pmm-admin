@@ -34,7 +34,7 @@ import (
 // SetTransport configures transport for accessing local pmm-agent API.
 func SetTransport(ctx context.Context, debug bool, port uint32) {
 	// use JSON APIs over HTTP/1.1
-	transport := httptransport.New(fmt.Sprintf("127.0.0.1:%d", port), "/", []string{"http"})
+	transport := httptransport.New(fmt.Sprintf("%s:%d", Localhost, port), "/", []string{"http"})
 	transport.SetLogger(logrus.WithField("component", "agentlocal-transport"))
 	transport.SetDebug(debug)
 	transport.Context = ctx
@@ -49,8 +49,10 @@ func SetTransport(ctx context.Context, debug bool, port uint32) {
 type NetworkInfo bool
 
 const (
-	RequestNetworkInfo      NetworkInfo = true
-	DoNotRequestNetworkInfo NetworkInfo = false
+	RequestNetworkInfo        NetworkInfo = true
+	DoNotRequestNetworkInfo   NetworkInfo = false
+	Localhost                             = "127.0.0.1"
+	DefaultPMMAgentListenPort             = 7777
 )
 
 // ErrNotSetUp is returned by GetStatus when pmm-agent is running, but not set up.
@@ -93,7 +95,7 @@ func GetRawStatus(ctx context.Context, requestNetworkInfo NetworkInfo, port uint
 	}
 
 	conf := client.DefaultTransportConfig()
-	conf.Host = fmt.Sprintf("127.0.0.1:%d", port)
+	conf.Host = fmt.Sprintf("%s:%d", Localhost, port)
 	client := client.NewHTTPClientWithConfig(nil, conf)
 
 	res, err := client.AgentLocal.Status(params)

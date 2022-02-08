@@ -187,10 +187,8 @@ func (e errFromNginx) GoString() string {
 
 // SetupClients configures local and PMM Server API clients.
 func SetupClients(ctx context.Context, serverURL string, pmmAgentListenPort uint32) {
-	agentlocal.SetTransport(ctx, GlobalFlags.Debug || GlobalFlags.Trace, pmmAgentListenPort)
-
 	if serverURL == "" {
-		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo, GlobalFlags.PMMAgentListenPort)
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo, pmmAgentListenPort)
 		if err != nil {
 			if err == agentlocal.ErrNotSetUp { //nolint:errorlint,goerr113
 				logrus.Fatalf("Failed to get PMM Server parameters from local pmm-agent: %s.\n"+
