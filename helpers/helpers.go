@@ -33,7 +33,7 @@ const haProxyMinPMMServerVersion = "2.15.0"
 
 // ServerVersionLessThan return if provided version is lower than server version.
 func ServerVersionLessThan(currentVersion string, port uint32) (bool, error) {
-	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo, port)
+	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 	if err != nil {
 		return false, err
 	}

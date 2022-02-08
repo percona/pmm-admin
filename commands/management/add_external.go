@@ -75,7 +75,7 @@ func (cmd *addExternalCommand) Run() (commands.Result, error) {
 	}
 
 	if cmd.RunsOnNodeID == "" || cmd.NodeID == "" {
-		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo, commands.GlobalFlags.PMMAgentListenPort)
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
 			return nil, err
 		}

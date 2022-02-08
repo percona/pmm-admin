@@ -58,7 +58,7 @@ func (cmd *unregisterCommand) Run() (commands.Result, error) {
 			return nil, err
 		}
 	} else {
-		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo, commands.GlobalFlags.PMMAgentListenPort)
+		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
 			return nil, err
 		}
