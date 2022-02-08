@@ -54,7 +54,7 @@ type addHAProxyServiceCommand struct {
 }
 
 func (cmd *addHAProxyServiceCommand) Run() (commands.Result, error) {
-	isSupported, err := helpers.IsHAProxySupported(commands.GlobalFlags.PMMAgentListenPort)
+	isSupported, err := helpers.IsHAProxySupported()
 	if !isSupported {
 		return nil, err
 	}
