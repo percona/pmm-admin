@@ -153,7 +153,7 @@ func main() {
 
 	// pmm-admin status command don't connect to PMM Server.
 	if command != commands.Status {
-		commands.SetupClients(ctx, *serverURLF, commands.GlobalFlags.PMMAgentListenPort)
+		commands.SetupClients(ctx, *serverURLF)
 	}
 
 	var res commands.Result

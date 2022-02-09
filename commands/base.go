@@ -186,7 +186,7 @@ func (e errFromNginx) GoString() string {
 }
 
 // SetupClients configures local and PMM Server API clients.
-func SetupClients(ctx context.Context, serverURL string, pmmAgentListenPort uint32) {
+func SetupClients(ctx context.Context, serverURL string) {
 	if serverURL == "" {
 		status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 		if err != nil {
