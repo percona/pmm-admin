@@ -16,10 +16,44 @@
 package management
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func CreateDummyCredentialsFile(d string, p string, exec bool) (string, error) {
+	tmpFile, err := os.Create(os.TempDir() + "/" + "add_mysql_test." + p)
+	defer tmpFile.Close()
+
+	if err != nil {
+		return "", err
+	}
+
+	content := []byte(d)
+	if _, err := tmpFile.Write(content); err != nil {
+		return "", err
+	}
+
+	if exec {
+		if err := tmpFile.Chmod(0111); err != nil {
+			return "", err
+		}
+	}
+	return tmpFile.Name(), nil
+}
+
+func CreateDummyCredentialsExecutable(d string) (string, error) {
+	f, err := CreateDummyCredentialsFile(`
+#!/bin/sh
+
+echo `+d, "sh", true)
+
+	if err != nil {
+		return "", err
+	}
+	return f, nil
+}
 
 func TestManagementGlobalFlags(t *testing.T) {
 	tests := []struct {
