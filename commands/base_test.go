@@ -34,6 +34,23 @@ func init() {
 	logrus.SetFormatter(new(logger.TextFormatter))
 }
 
+func TestCredentials(t *testing.T) {
+	creds := Credentials{Username: "testuser", Password: "testpass", AgentPassword: "testagentpass"}
+	credsJson, err := creds.Marshal()
+	if err != nil || credsJson == "" {
+		t.Fatalf("failed to convert Credentials to JSON: %v", err)
+	}
+
+	newCreds := Credentials{}
+	if err := newCreds.Unmarshal(credsJson); err != nil {
+		t.Fatalf("failed to convert JSON to Credentials: %v", err)
+	}
+
+	if newCreds != creds {
+		t.Fatalf("expected: %v, got: %v", creds, newCreds)
+	}
+}
+
 func TestParseRenderTemplate(t *testing.T) {
 	var stderr bytes.Buffer
 	logrus.SetOutput(&stderr)

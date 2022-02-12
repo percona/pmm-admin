@@ -20,11 +20,13 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"reflect"
 	"regexp"
 	"strings"
@@ -73,6 +75,53 @@ type Command interface {
 type CommandWithContext interface {
 	// TODO rename to Run
 	RunWithContext(ctx context.Context) (Result, error)
+}
+
+// Credentials provides access to an external provider so that
+// the username, password, or agent password can be managed
+// externally, e.g. HashiCorp Vault, Ansible Vault, etc
+type Credentials struct {
+	AgentPassword string `json:"agentpassword"`
+	Password      string `json:"password"`
+	Username      string `json:"username"`
+}
+
+func (c *Credentials) Marshal() (string, error) {
+	data, err := json.Marshal(c)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+func (c *Credentials) Unmarshal(jsonString string) error {
+	if err := json.Unmarshal([]byte(jsonString), &c); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Credentials) ReadFromSource(src string) error {
+	exec := false
+	if f, err := os.Lstat(src); err != nil {
+		return err
+	} else {
+		exec = f.Mode()&0111 != 0
+	}
+
+	if exec {
+		return fmt.Errorf("execution is currently unimplemented: %s is executable", src)
+	} else {
+		// Read the file
+		content, err := ReadFile(src)
+		if err != nil {
+			return err
+		}
+		if err := c.Unmarshal(content); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 type ErrorResponse interface {
@@ -166,12 +215,12 @@ func ReadFile(filepath string) (string, error) {
 		return "", nil
 	}
 
-	certificate, err := ioutil.ReadFile(filepath)
+	content, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return "", errors.Wrapf(err, "cannot load file in path %q", filepath)
 	}
 
-	return string(certificate), nil
+	return string(content), nil
 }
 
 type errFromNginx string
