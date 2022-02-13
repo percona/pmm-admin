@@ -20,8 +20,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/user"
 	"strings"
 	"testing"
+
+	"gopkg.in/ini.v1"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -108,5 +111,65 @@ func TestReadFile(t *testing.T) {
 		certificate, err := ReadFile("")
 		require.NoError(t, err)
 		require.Empty(t, certificate)
+	})
+}
+
+type cmdWithDefaultsApply struct {
+	applyDefaultCalled bool
+	user               string
+	password           string
+}
+
+func (c *cmdWithDefaultsApply) ApplyDefaults(cfg *ini.File) {
+	c.user = cfg.Section("client").Key("user").String()
+	c.password = cfg.Section("client").Key("password").String()
+	c.applyDefaultCalled = true
+}
+
+func TestConfigureDefaults(t *testing.T) {
+	t.Run("ApplyDefaults is called if command supports it", func(t *testing.T) {
+		file, e := os.Open("../testdata/.my.cnf")
+		if e != nil {
+			t.Fatal(e)
+		}
+
+		cmd := &cmdWithDefaultsApply{}
+
+		if err := ConfigureDefaults(file.Name(), cmd); err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, "root", cmd.user)
+		assert.Equal(t, "toor", cmd.password)
+	})
+
+	t.Run("ApplyDefaults is not called if pass is not setup", func(t *testing.T) {
+		cmd := &cmdWithDefaultsApply{}
+
+		if err := ConfigureDefaults("", cmd); err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, "", cmd.user)
+		assert.Equal(t, "", cmd.password)
+		assert.False(t, cmd.applyDefaultCalled)
+	})
+}
+
+func TestExpandPath(t *testing.T) {
+	t.Run("relative to userhome", func(t *testing.T) {
+		actual, err := expandPath("~/")
+		assert.NoError(t, err)
+		usr, err := user.Current()
+		assert.NoError(t, err)
+
+		assert.Equal(t, usr.HomeDir, actual)
+	})
+	t.Run("relative to userhome", func(t *testing.T) {
+		originalPath := "./test"
+		actual, err := expandPath(originalPath)
+		assert.NoError(t, err)
+
+		assert.Equal(t, originalPath, actual)
 	})
 }

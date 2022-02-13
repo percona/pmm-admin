@@ -21,12 +21,17 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/sirupsen/logrus"
+
+	"gopkg.in/ini.v1"
+
+	"github.com/percona/pmm-admin/agentlocal"
+
 	"github.com/AlekSi/pointer"
 	"github.com/alecthomas/units"
 	"github.com/percona/pmm/api/managementpb/json/client"
 	mysql "github.com/percona/pmm/api/managementpb/json/client/my_sql"
 
-	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm-admin/commands"
 )
 
@@ -114,6 +119,25 @@ type addMySQLCommand struct {
 	DisableTablestats      bool
 	DisableTablestatsLimit uint16
 	CreateUser             bool
+}
+
+func (cmd *addMySQLCommand) ApplyDefaults(cfg *ini.File) {
+	defaultUsername := cfg.Section("client").Key("user").String()
+	if defaultUsername != "" {
+		if cmd.Username == "" {
+			cmd.Username = defaultUsername
+		} else {
+			logrus.Debug("default username is not used, it is already set")
+		}
+	}
+	defaultPassword := cfg.Section("client").Key("password").String()
+	if defaultPassword != "" {
+		if cmd.Password == "" {
+			cmd.Password = defaultPassword
+		} else {
+			logrus.Debug("default password is not used, it is already set")
+		}
+	}
 }
 
 func (cmd *addMySQLCommand) GetServiceName() string {

@@ -19,6 +19,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/sirupsen/logrus"
+
+	"github.com/percona/pmm-admin/commands"
+
 	mysql "github.com/percona/pmm/api/managementpb/json/client/my_sql"
 	"github.com/stretchr/testify/assert"
 )
@@ -158,5 +162,89 @@ func TestRun(t *testing.T) {
 			expected := "Unrecognized option. To create a user, see 'https://www.percona.com/doc/percona-monitoring-and-management/2.x/concepts/services-mysql.html#pmm-conf-mysql-user-account-creating'"
 			assert.Equal(t, expected, err.Error())
 		}
+	})
+}
+
+func TestApplyDefaults(t *testing.T) {
+	t.Run("password and username is set", func(t *testing.T) {
+		file, cleanup, e := commands.DefaultConfig("[client]\nuser=root\npassword=toor\n")
+		if e != nil {
+			t.Fatal(e)
+		}
+		defer cleanup()
+
+		cmd := &addMySQLCommand{}
+
+		commands.ConfigureDefaults(file.Name(), cmd)
+
+		assert.Equal(t, "root", cmd.Username)
+		assert.Equal(t, "toor", cmd.Password)
+	})
+
+	t.Run("password and username from config have lower priority", func(t *testing.T) {
+		logrus.SetLevel(logrus.TraceLevel)
+		file, cleanup, e := commands.DefaultConfig("[client]\nuser=root\npassword=toor\n")
+		if e != nil {
+			t.Fatal(e)
+		}
+		defer cleanup()
+
+		cmd := &addMySQLCommand{
+			Username: "default-username",
+			Password: "default-password",
+		}
+
+		commands.ConfigureDefaults(file.Name(), cmd)
+
+		assert.Equal(t, "default-username", cmd.Username)
+		assert.Equal(t, "default-password", cmd.Password)
+	})
+
+	t.Run("not updated if not set", func(t *testing.T) {
+		file, cleanup, e := commands.DefaultConfig("")
+		if e != nil {
+			t.Fatal(e)
+		}
+		defer cleanup()
+
+		cmd := &addMySQLCommand{
+			Username: "default-username",
+			Password: "default-password",
+		}
+
+		commands.ConfigureDefaults(file.Name(), cmd)
+
+		assert.Equal(t, "default-username", cmd.Username)
+		assert.Equal(t, "default-password", cmd.Password)
+	})
+
+	t.Run("only username is set", func(t *testing.T) {
+		file, cleanup, e := commands.DefaultConfig("[client]\nuser=root\n")
+		if e != nil {
+			t.Fatal(e)
+		}
+		defer cleanup()
+
+		cmd := &addMySQLCommand{}
+
+		commands.ConfigureDefaults(file.Name(), cmd)
+
+		assert.Equal(t, "root", cmd.Username)
+		assert.Equal(t, "", cmd.Password)
+	})
+
+	t.Run("only password is set", func(t *testing.T) {
+		file, cleanup, e := commands.DefaultConfig("[client]\npassword=toor\n")
+		if e != nil {
+			t.Fatal(e)
+		}
+		defer cleanup()
+
+		cmd := &addMySQLCommand{}
+
+		commands.ConfigureDefaults(file.Name(), cmd)
+
+		assert.Equal(t, "", cmd.Username)
+		assert.Equal(t, "toor", cmd.Password)
 	})
 }
