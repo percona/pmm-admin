@@ -21,9 +21,10 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm/utils/nodeinfo"
 	"github.com/sirupsen/logrus"
+
+	"github.com/percona/pmm-admin/agentlocal"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -121,7 +122,7 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 		res = append(res, fmt.Sprintf("--paths-base=%s", cmd.BasePath))
 	}
 
-	if GlobalFlags.PMMAgentListenPort != agentlocal.DefaultPMMAgentListenPort {
+	if GlobalFlags.PMMAgentListenPort != 0 && GlobalFlags.PMMAgentListenPort != agentlocal.DefaultPMMAgentListenPort {
 		res = append(res, fmt.Sprintf("--listen-port=%d", GlobalFlags.PMMAgentListenPort))
 	}
 
