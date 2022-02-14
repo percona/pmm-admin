@@ -21,6 +21,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/percona/pmm-admin/agentlocal"
 	"github.com/percona/pmm/utils/nodeinfo"
 	"github.com/sirupsen/logrus"
 
@@ -54,6 +55,7 @@ type configCommand struct {
 	DisableCollectors string
 	CustomLabels      string
 	BasePath          string
+	ListenPort        uint32
 
 	Force bool
 }
@@ -117,6 +119,10 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 
 	if cmd.BasePath != "" {
 		res = append(res, fmt.Sprintf("--paths-base=%s", cmd.BasePath))
+	}
+
+	if GlobalFlags.PMMAgentListenPort != agentlocal.DefaultPMMAgentListenPort {
+		res = append(res, fmt.Sprintf("--listen-port=%d", GlobalFlags.PMMAgentListenPort))
 	}
 
 	res = append(res, cmd.NodeAddress, cmd.NodeType, cmd.NodeName)
