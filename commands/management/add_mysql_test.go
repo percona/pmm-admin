@@ -19,7 +19,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/percona/pmm-admin/commands"
 	mysql "github.com/percona/pmm/api/managementpb/json/client/my_sql"
 	"github.com/stretchr/testify/assert"
 )
@@ -146,23 +145,6 @@ Table statistics collection disabled (always).
 		expected := ""
 		assert.Equal(t, expected, strings.TrimSpace(res.TablestatStatus()))
 	})
-}
-
-func TestCredentials(t *testing.T) {
-	data := `{"username": "testuser", "password": "testpass", "agentpassword": "testagentpass"}`
-	creds := commands.Credentials{}
-	cr, _ := CreateDummyCredentialsFile(data, "json", false)
-	ce, _ := CreateDummyCredentialsExecutable(data)
-
-	if err := creds.ReadFromSource(cr); err != nil {
-		t.Fatalf("failed to read from source: %v", err)
-	}
-	if err := creds.ReadFromSource(ce); err == nil {
-		t.Fatalf("unexpected exection of source: %v", err)
-	}
-	if creds.Username != "testuser" {
-		t.Fatalf("expected 'testuser', got: %v", creds.Username)
-	}
 }
 
 func TestRun(t *testing.T) {
