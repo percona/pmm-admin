@@ -94,7 +94,7 @@ type addMySQLCommand struct {
 	Username          string
 	Password          string
 	AgentPassword     string
-	Credentials       string
+	CredentialsFile   string
 	Environment       string
 	Cluster           string
 	ReplicationSet    string
@@ -135,7 +135,7 @@ func (cmd *addMySQLCommand) GetSocket() string {
 
 func (cmd *addMySQLCommand) GetCredentials() error {
 	creds := commands.Credentials{}
-	if err := creds.ReadFromSource(cmd.Credentials); err != nil {
+	if err := creds.ReadFromSource(cmd.CredentialsFile); err != nil {
 		return err
 	}
 	cmd.AgentPassword = creds.AgentPassword
@@ -186,9 +186,9 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		}
 	}
 
-	if cmd.Credentials != "" {
+	if cmd.CredentialsFile != "" {
 		if err := cmd.GetCredentials(); err != nil {
-			return nil, fmt.Errorf("failed to retrieve credentials from %s: %v", cmd.Credentials, err)
+			return nil, fmt.Errorf("failed to retrieve credentials from %s: %v", cmd.CredentialsFile, err)
 		}
 	}
 
@@ -220,7 +220,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			Username:       cmd.Username,
 			Password:       cmd.Password,
 			AgentPassword:  cmd.AgentPassword,
-			Credentials:    cmd.Credentials,
+			Credentials:    cmd.CredentialsFile,
 			CustomLabels:   customLabels,
 
 			QANMysqlSlowlog:    cmd.QuerySource == mysqlQuerySourceSlowLog,
@@ -273,7 +273,7 @@ func init() {
 	AddMySQLC.Flag("username", "MySQL username").Default("root").StringVar(&AddMySQL.Username)
 	AddMySQLC.Flag("password", "MySQL password").StringVar(&AddMySQL.Password)
 	AddMySQLC.Flag("agent-password", "Custom password for /metrics endpoint").StringVar(&AddMySQL.AgentPassword)
-	AddMySQLC.Flag("credentials", "Credentials provider").ExistingFileVar(&AddMySQL.Credentials)
+	AddMySQLC.Flag("credentials", "Credentials provider").ExistingFileVar(&AddMySQL.CredentialsFile)
 
 	querySources := []string{mysqlQuerySourceSlowLog, mysqlQuerySourcePerfSchema, mysqlQuerySourceNone} // TODO add "auto", make it default
 	querySourceHelp := fmt.Sprintf("Source of SQL queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
