@@ -34,22 +34,77 @@ func init() {
 	logrus.SetFormatter(new(logger.TextFormatter))
 }
 
+func CreateDummyCredentialsFile(d string, p string, exec bool) (string, error) {
+	tmpFile, err := os.Create(os.TempDir() + "/" + "CreateDummyCredentialsFile." + p)
+
+	if err != nil {
+		return "", err
+	}
+	defer tmpFile.Close()
+
+	content := []byte(d)
+	if _, err := tmpFile.Write(content); err != nil {
+		return "", err
+	}
+
+	if exec {
+		if err := tmpFile.Chmod(0111); err != nil {
+			return "", err
+		}
+	}
+	return tmpFile.Name(), nil
+}
+
+func CreateDummyCredentialsExecutable(d string) (string, error) {
+	f, err := CreateDummyCredentialsFile(`
+#!/bin/sh
+
+echo `+d, "sh", true)
+
+	if err != nil {
+		return "", err
+	}
+	return f, nil
+}
+
 func TestCredentials(t *testing.T) {
-	creds := Credentials{Username: "testuser", Password: "testpass", AgentPassword: "testagentpass"}
-	credsJson, err := creds.Marshal()
-	if err != nil || credsJson == "" {
-		t.Fatalf("failed to convert Credentials to JSON: %v", err)
-	}
+	data := `{"username": "testuser", "password": "testpass", "agentpassword": "testagentpass"}`
+	creds := Credentials{}
+	cr, _ := CreateDummyCredentialsFile(data, "json", false)
+	ce, _ := CreateDummyCredentialsExecutable(data)
 
-	newCreds := Credentials{}
-	if err := newCreds.Unmarshal(credsJson); err != nil {
-		t.Fatalf("failed to convert JSON to Credentials: %v", err)
-	}
+	defer func() {
+		os.Remove(cr)
+		os.Remove(ce)
+	}()
 
-	if newCreds != creds {
-		t.Fatalf("expected: %v, got: %v", creds, newCreds)
+	if err := creds.ReadFromSource(cr); err != nil {
+		t.Fatalf("failed to read from source: %v", err)
+	}
+	if err := creds.ReadFromSource(ce); err == nil {
+		t.Fatalf("unexpected exection of source: %v", err)
+	}
+	if creds.Username != "testuser" {
+		t.Fatalf("expected 'testuser', got: %v", creds.Username)
 	}
 }
+
+//func TestCredentials(t *testing.T) {
+//	creds := Credentials{Username: "testuser", Password: "testpass", AgentPassword: "testagentpass"}
+//	credsJson, err := creds.Marshal()
+//	if err != nil || credsJson == "" {
+//		t.Fatalf("failed to convert Credentials to JSON: %v", err)
+//	}
+//
+//	newCreds := Credentials{}
+//	if err := newCreds.Unmarshal(credsJson); err != nil {
+//		t.Fatalf("failed to convert JSON to Credentials: %v", err)
+//	}
+//
+//	if newCreds != creds {
+//		t.Fatalf("expected: %v, got: %v", creds, newCreds)
+//	}
+//}
 
 func TestParseRenderTemplate(t *testing.T) {
 	var stderr bytes.Buffer
