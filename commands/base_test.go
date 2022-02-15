@@ -69,7 +69,6 @@ echo `+d, "sh", true)
 
 func TestCredentials(t *testing.T) {
 	data := `{"username": "testuser", "password": "testpass", "agentpassword": "testagentpass"}`
-	creds := Credentials{}
 	cr, _ := CreateDummyCredentialsFile(data, "json", false)
 	ce, _ := CreateDummyCredentialsExecutable(data)
 
@@ -78,33 +77,18 @@ func TestCredentials(t *testing.T) {
 		os.Remove(ce)
 	}()
 
-	if err := creds.ReadFromSource(cr); err != nil {
-		t.Fatalf("failed to read from source: %v", err)
-	}
-	if err := creds.ReadFromSource(ce); err == nil {
-		t.Fatalf("unexpected exection of source: %v", err)
-	}
-	if creds.Username != "testuser" {
-		t.Fatalf("expected 'testuser', got: %v", creds.Username)
-	}
-}
+	t.Run("Reading", func(t *testing.T) {
+		// Test reading is OK
+		creds, _ := ReadFromSource(cr)
+		assert.Equal(t, creds.Username, "testuser")
+	})
 
-//func TestCredentials(t *testing.T) {
-//	creds := Credentials{Username: "testuser", Password: "testpass", AgentPassword: "testagentpass"}
-//	credsJson, err := creds.Marshal()
-//	if err != nil || credsJson == "" {
-//		t.Fatalf("failed to convert Credentials to JSON: %v", err)
-//	}
-//
-//	newCreds := Credentials{}
-//	if err := newCreds.Unmarshal(credsJson); err != nil {
-//		t.Fatalf("failed to convert JSON to Credentials: %v", err)
-//	}
-//
-//	if newCreds != creds {
-//		t.Fatalf("expected: %v, got: %v", creds, newCreds)
-//	}
-//}
+	t.Run("Executing", func(t *testing.T) {
+		// Ensure that execution currently errors
+		_, err := ReadFromSource(ce)
+		require.Error(t, err)
+	})
+}
 
 func TestParseRenderTemplate(t *testing.T) {
 	var stderr bytes.Buffer
