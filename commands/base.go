@@ -86,42 +86,29 @@ type Credentials struct {
 	Username      string `json:"username"`
 }
 
-func (c *Credentials) Marshal() (string, error) {
-	data, err := json.Marshal(c)
-	if err != nil {
-		return "", err
-	}
-	return string(data), nil
-}
-
-func (c *Credentials) Unmarshal(jsonString string) error {
-	if err := json.Unmarshal([]byte(jsonString), &c); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *Credentials) ReadFromSource(src string) error {
+func ReadFromSource(src string) (*Credentials, error) {
 	exec := false
+	c := Credentials{}
+
 	if f, err := os.Lstat(src); err != nil {
-		return err
+		return nil, err
 	} else {
 		exec = f.Mode()&0111 != 0
 	}
 
 	if exec {
-		return fmt.Errorf("execution is currently unimplemented: %s is executable", src)
+		return nil, fmt.Errorf("execution is currently unimplemented: %s is executable", src)
 	} else {
 		// Read the file
 		content, err := ReadFile(src)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		if err := c.Unmarshal(content); err != nil {
-			return err
+		if err := json.Unmarshal([]byte(content), &c); err != nil {
+			return nil, err
 		}
 	}
-	return nil
+	return &c, nil
 }
 
 type ErrorResponse interface {
