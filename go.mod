@@ -10,7 +10,7 @@ require (
 	github.com/AlekSi/pointer v1.1.0
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d
 	github.com/go-openapi/runtime v0.23.0
-	github.com/percona/pmm v0.0.0-20220126100200-47362f079afb
+	github.com/percona/pmm v0.0.0-20220217203844-204787aa6ac8
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.7.0

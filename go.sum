@@ -278,6 +278,8 @@ github.com/pelletier/go-toml v1.4.0/go.mod h1:PN7xzY2wHTK0K9p34ErDQMlFxa51Fk0OUr
 github.com/pelletier/go-toml v1.7.0/go.mod h1:vwGMzjaWMwyfHwgIBhI2YUM4fB6nL6lVAvS1LBMMhTE=
 github.com/percona/pmm v0.0.0-20220126100200-47362f079afb h1:B3cOvhUFn2xeQGF0y2xgtPMcpW5+q6xeJhI2L3aBRyA=
 github.com/percona/pmm v0.0.0-20220126100200-47362f079afb/go.mod h1:OmWayvQAavtvlzLkvpea5tAqaWGGNNyG+xj4MJUsNm4=
+github.com/percona/pmm v0.0.0-20220217203844-204787aa6ac8 h1:kSFIz8J6OS7GOcMKgItsJyDxjRlswA0lPRzerCuzO/I=
+github.com/percona/pmm v0.0.0-20220217203844-204787aa6ac8/go.mod h1:OmWayvQAavtvlzLkvpea5tAqaWGGNNyG+xj4MJUsNm4=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
