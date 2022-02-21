@@ -24,8 +24,6 @@ import (
 	"github.com/percona/pmm/utils/nodeinfo"
 	"github.com/sirupsen/logrus"
 
-	"github.com/percona/pmm-admin/agentlocal"
-
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -81,6 +79,10 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 		}
 	}
 
+	if GlobalFlags.PMMAgentListenPort != 0 {
+		res = append(res, fmt.Sprintf("--listen-port=%d", GlobalFlags.PMMAgentListenPort))
+	}
+
 	if GlobalFlags.ServerInsecureTLS {
 		res = append(res, "--server-insecure-tls")
 	}
@@ -120,10 +122,6 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 
 	if cmd.BasePath != "" {
 		res = append(res, fmt.Sprintf("--paths-base=%s", cmd.BasePath))
-	}
-
-	if GlobalFlags.PMMAgentListenPort != 0 && GlobalFlags.PMMAgentListenPort != agentlocal.DefaultPMMAgentListenPort {
-		res = append(res, fmt.Sprintf("--listen-port=%d", GlobalFlags.PMMAgentListenPort))
 	}
 
 	res = append(res, cmd.NodeAddress, cmd.NodeType, cmd.NodeName)
