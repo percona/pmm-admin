@@ -44,6 +44,7 @@ func main() {
 	defaultListenPort := fmt.Sprintf("%d", agentlocal.DefaultPMMAgentListenPort)
 	serverURLF := kingpin.Flag("server-url", "PMM Server URL in `https://username:password@pmm-server-host/` format").String()
 	kingpin.Flag("server-insecure-tls", "Skip PMM Server TLS certificate validation").BoolVar(&commands.GlobalFlags.ServerInsecureTLS)
+	kingpin.Flag("log-level", "Set logging level").EnumVar(&commands.GlobalFlags.LogLevel, "debug", "info", "warn", "error", "fatal")
 	kingpin.Flag("debug", "Enable debug logging").BoolVar(&commands.GlobalFlags.Debug)
 	kingpin.Flag("trace", "Enable trace logging (implies debug)").BoolVar(&commands.GlobalFlags.Trace)
 	kingpin.Flag("pmm-agent-listen-port", "Set listen port of pmm-agent").Default(defaultListenPort).Uint32Var(&commands.GlobalFlags.PMMAgentListenPort)
@@ -66,12 +67,15 @@ func main() {
 	if *jsonF {
 		logrus.SetFormatter(new(logrus.JSONFormatter)) // with levels and timestamps always present
 	}
-	if commands.GlobalFlags.Debug {
-		logrus.SetLevel(logrus.DebugLevel)
-	}
-	if commands.GlobalFlags.Trace {
-		logrus.SetLevel(logrus.TraceLevel)
-		logrus.SetReportCaller(true) // https://github.com/sirupsen/logrus/issues/954
+
+	{
+		level, trace := parseLoggerConfig(commands.GlobalFlags.LogLevel, commands.GlobalFlags.Debug, commands.GlobalFlags.Trace)
+
+		logrus.SetLevel(level)
+
+		if trace {
+			logrus.SetReportCaller(true)
+		}
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -234,4 +238,35 @@ func main() {
 
 		os.Exit(1)
 	}
+}
+
+const defaultLevel = logrus.WarnLevel
+
+func parseLoggerConfig(cfgLogLevel string, cfgDebug, cfgTrace bool) (logrus.Level, bool) {
+	var (
+		level = defaultLevel
+		trace = false
+	)
+
+	if cfgLogLevel != "" {
+		parsedLevel, err := logrus.ParseLevel(cfgLogLevel)
+
+		if err != nil {
+			logrus.Errorf("config: cannot parse logging level: %s, error: %v", cfgLogLevel, err)
+		} else {
+			level = parsedLevel
+		}
+	}
+
+	if cfgDebug {
+		level = logrus.DebugLevel
+	}
+
+	if cfgTrace {
+		level = logrus.TraceLevel
+
+		trace = true
+	}
+
+	return level, trace
 }

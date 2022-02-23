@@ -113,6 +113,7 @@ func RenderTemplate(t *template.Template, data interface{}) string {
 type globalFlagsValues struct {
 	ServerURL          *url.URL
 	ServerInsecureTLS  bool
+	LogLevel           string
 	Debug              bool
 	Trace              bool
 	PMMAgentListenPort uint32

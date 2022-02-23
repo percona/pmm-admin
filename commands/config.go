@@ -87,6 +87,9 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 		res = append(res, "--server-insecure-tls")
 	}
 
+	if GlobalFlags.LogLevel != "" {
+		res = append(res, fmt.Sprintf("--log-level=%s", GlobalFlags.LogLevel))
+	}
 	if GlobalFlags.Debug {
 		res = append(res, "--debug")
 	}
