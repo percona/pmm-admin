@@ -93,4 +93,31 @@ func TestConfigCommandArgs(t *testing.T) {
 		assert.Equal(t, expected, args)
 		assert.True(t, switchedToTLS)
 	})
+
+	t.Run("LoggingLevel", func(t *testing.T) {
+		u, err := url.Parse("http://admin:admin@127.0.0.1")
+		require.NoError(t, err)
+		GlobalFlags = &globalFlagsValues{
+			ServerURL: u,
+			LogLevel:  "info",
+			Debug:     true,
+			Trace:     true,
+		}
+		args, switchedToTLS := cmd.args()
+		expected := []string{
+			"--server-address=127.0.0.1:443",
+			"--server-username=admin",
+			"--server-password=admin",
+			"--server-insecure-tls",
+			"--log-level=info",
+			"--debug",
+			"--trace",
+			"setup",
+			"1.2.3.4",
+			"generic",
+			"node1",
+		}
+		assert.Equal(t, expected, args)
+		assert.True(t, switchedToTLS)
+	})
 }
