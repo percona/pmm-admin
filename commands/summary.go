@@ -186,6 +186,7 @@ func addVMAgentTargets(ctx context.Context, zipW *zip.Writer, agentsInfo []*agen
 
 	for _, agent := range agentsInfo {
 		if pointer.GetString(agent.AgentType) == types.AgentTypeVMAgent {
+			var b []byte
 			b, err := getURL(ctx, fmt.Sprintf("http://%s:%d/api/v1/targets", agentlocal.Localhost, agent.ListenPort))
 			if err != nil {
 				logrus.Debugf("%s", err)
