@@ -194,7 +194,7 @@ func addVMAgentTargets(ctx context.Context, zipW *zip.Writer, agentsInfo []*agen
 
 			addData(zipW, "client/vmagent-targets.json", now, bytes.NewReader(b))
 
-			req, err := http.NewRequest("GET", fmt.Sprintf("http://%s:%d/targets", agentlocal.Localhost, agent.ListenPort), nil)
+			req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("http://%s:%d/targets", agentlocal.Localhost, agent.ListenPort), nil)
 			req.Header.Set("accept", "text/html")
 			res, _ := http.DefaultClient.Do(req)
 			if err != nil {
