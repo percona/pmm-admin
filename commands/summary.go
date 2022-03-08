@@ -199,7 +199,8 @@ func addVMAgentTargets(ctx context.Context, zipW *zip.Writer, agentsInfo []*agen
 			res, _ := http.DefaultClient.Do(req)
 			if err != nil {
 				logrus.Debugf("%s", err)
-				html = []byte(err.Error())
+				addData(zipW, "client/vmagent-targets.html", now, bytes.NewReader([]byte(err.Error())))
+				return
 			}
 			defer res.Body.Close()
 			html, err = io.ReadAll(res.Body)
@@ -208,6 +209,7 @@ func addVMAgentTargets(ctx context.Context, zipW *zip.Writer, agentsInfo []*agen
 				html = []byte(err.Error())
 			}
 			addData(zipW, "client/vmagent-targets.html", now, bytes.NewReader(html))
+			return
 		}
 	}
 }
