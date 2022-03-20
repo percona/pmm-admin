@@ -88,10 +88,10 @@ type Error struct {
 func GetError(err ErrorResponse) Error {
 	v := reflect.ValueOf(err)
 	p := v.Elem().FieldByName("Payload")
-	e := p.Elem().FieldByName("Error")
+	m := p.Elem().FieldByName("Message")
 	return Error{
 		Code:  err.Code(),
-		Error: e.String(),
+		Error: m.String(),
 	}
 }
 
