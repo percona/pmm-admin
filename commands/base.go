@@ -79,7 +79,7 @@ type CommandWithContext interface {
 
 // Credentials provides access to an external provider so that
 // the username, password, or agent password can be managed
-// externally, e.g. HashiCorp Vault, Ansible Vault, etc
+// externally, e.g. HashiCorp Vault, Ansible Vault, etc.
 type Credentials struct {
 	AgentPassword string `json:"agentpassword"`
 	Password      string `json:"password"`
@@ -93,7 +93,7 @@ func ReadFromSource(src string) (*Credentials, error) {
 	if f, err := os.Lstat(src); err != nil {
 		return nil, err
 	} else {
-		exec = f.Mode()&0111 != 0
+		exec = f.Mode()&0o111 != 0
 	}
 
 	if exec {

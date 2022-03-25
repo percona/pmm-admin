@@ -138,9 +138,11 @@ func (cmd *addMySQLCommand) GetCredentials() error {
 	if err != nil {
 		return err
 	}
+
 	cmd.AgentPassword = creds.AgentPassword
 	cmd.Password = creds.Password
 	cmd.Username = creds.Username
+
 	return nil
 }
 
@@ -188,7 +190,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 
 	if cmd.CredentialsFile != "" {
 		if err := cmd.GetCredentials(); err != nil {
-			return nil, fmt.Errorf("failed to retrieve credentials from %s: %v", cmd.CredentialsFile, err)
+			return nil, fmt.Errorf("failed to retrieve credentials from %s: %w", cmd.CredentialsFile, err)
 		}
 	}
 
@@ -220,7 +222,6 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			Username:       cmd.Username,
 			Password:       cmd.Password,
 			AgentPassword:  cmd.AgentPassword,
-			Credentials:    cmd.CredentialsFile,
 			CustomLabels:   customLabels,
 
 			QANMysqlSlowlog:    cmd.QuerySource == mysqlQuerySourceSlowLog,
