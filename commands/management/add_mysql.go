@@ -188,12 +188,6 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		}
 	}
 
-	if cmd.CredentialsFile != "" {
-		if err := cmd.GetCredentials(); err != nil {
-			return nil, fmt.Errorf("failed to retrieve credentials from %s: %w", cmd.CredentialsFile, err)
-		}
-	}
-
 	serviceName, socket, host, port, err := processGlobalAddFlagsWithSocket(cmd)
 	if err != nil {
 		return nil, err
@@ -206,6 +200,12 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		}
 
 		tablestatsGroupTableLimit = -1
+	}
+
+	if cmd.CredentialsFile != "" {
+		if err := cmd.GetCredentials(); err != nil {
+			return nil, fmt.Errorf("failed to retrieve credentials from %s: %w", cmd.CredentialsFile, err)
+		}
 	}
 
 	params := &mysql.AddMySQLParams{
