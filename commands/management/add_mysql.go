@@ -136,7 +136,7 @@ func (cmd *addMySQLCommand) GetSocket() string {
 func (cmd *addMySQLCommand) GetCredentials() error {
 	creds, err := commands.ReadFromSource(cmd.CredentialsFile)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w", err)
 	}
 
 	cmd.AgentPassword = creds.AgentPassword

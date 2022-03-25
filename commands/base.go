@@ -27,6 +27,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strings"
@@ -44,8 +45,12 @@ import (
 	"github.com/percona/pmm-admin/agentlocal"
 )
 
-// Ctx is a shared context for all requests.
-var Ctx = context.Background()
+var (
+	// Ctx is a shared context for all requests.
+	Ctx = context.Background()
+
+	errExecutionNotImplemented = errors.New("execution is currently unimplemented")
+)
 
 // Result is a common interface for all command results.
 //
@@ -86,28 +91,30 @@ type Credentials struct {
 	Username      string `json:"username"`
 }
 
+// ReadFromSource parses a JSON file src and return
+// a Credentials pointer containing the data.
 func ReadFromSource(src string) (*Credentials, error) {
-	exec := false
-	c := Credentials{}
+	c := Credentials{"", "", ""}
 
-	if f, err := os.Lstat(src); err != nil {
-		return nil, err
-	} else {
-		exec = f.Mode()&0o111 != 0
+	f, err := os.Lstat(src)
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
 	}
 
-	if exec {
-		return nil, fmt.Errorf("execution is currently unimplemented: %s is executable", src)
-	} else {
-		// Read the file
-		content, err := ReadFile(src)
-		if err != nil {
-			return nil, err
-		}
-		if err := json.Unmarshal([]byte(content), &c); err != nil {
-			return nil, err
-		}
+	if f.Mode()&0o111 != 0 {
+		return nil, fmt.Errorf("%w: %s", errExecutionNotImplemented, src)
 	}
+
+	// Read the file
+	content, err := ReadFile(src)
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+
+	if err := json.Unmarshal([]byte(content), &c); err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+
 	return &c, nil
 }
 
@@ -198,14 +205,14 @@ func ParseDisableCollectors(collectors string) []string {
 }
 
 // ReadFile reads file from filepath if filepath is not empty.
-func ReadFile(filepath string) (string, error) {
-	if filepath == "" {
+func ReadFile(filePath string) (string, error) {
+	if filePath == "" {
 		return "", nil
 	}
 
-	content, err := ioutil.ReadFile(filepath)
+	content, err := ioutil.ReadFile(filepath.Clean(filePath))
 	if err != nil {
-		return "", errors.Wrapf(err, "cannot load file in path %q", filepath)
+		return "", errors.Wrapf(err, "cannot load file in path %q", filePath)
 	}
 
 	return string(content), nil

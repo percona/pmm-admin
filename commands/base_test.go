@@ -37,8 +37,9 @@ func init() {
 func CreateDummyCredentialsFile(d string, p string, exec bool) (string, error) {
 	tmpFile, err := os.Create(os.TempDir() + "/" + "CreateDummyCredentialsFile." + p)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("%w", err)
 	}
+
 	defer func() {
 		if tmpErr := tmpFile.Close(); tmpErr != nil {
 			err = tmpErr
@@ -47,14 +48,15 @@ func CreateDummyCredentialsFile(d string, p string, exec bool) (string, error) {
 
 	content := []byte(d)
 	if _, err := tmpFile.Write(content); err != nil {
-		return "", err
+		return "", fmt.Errorf("%w", err)
 	}
 
 	if exec {
 		if err := tmpFile.Chmod(0o111); err != nil {
-			return "", err
+			return "", fmt.Errorf("%w", err)
 		}
 	}
+
 	return tmpFile.Name(), err
 }
 
@@ -66,27 +68,32 @@ echo `+d, "sh", true)
 	if err != nil {
 		return "", err
 	}
+
 	return f, nil
 }
 
 func TestCredentials(t *testing.T) {
+	t.Parallel()
+
 	data := `{"username": "testuser", "password": "testpass", "agentpassword": "testagentpass"}`
 	cr, _ := CreateDummyCredentialsFile(data, "json", false)
 	ce, _ := CreateDummyCredentialsExecutable(data)
 
-	defer func() {
-		_ = os.Remove(cr)
-		_ = os.Remove(ce)
-	}()
+	t.Cleanup(func() {
+		assert.NoError(t, os.Remove(cr))
+		assert.NoError(t, os.Remove(ce))
+	})
 
 	t.Run("Reading", func(t *testing.T) {
 		// Test reading is OK
+		t.Parallel()
 		creds, _ := ReadFromSource(cr)
 		assert.Equal(t, creds.Username, "testuser")
 	})
 
 	t.Run("Executing", func(t *testing.T) {
 		// Ensure that execution currently errors
+		t.Parallel()
 		_, err := ReadFromSource(ce)
 		require.Error(t, err)
 	})
