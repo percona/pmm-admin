@@ -36,11 +36,14 @@ func init() {
 
 func CreateDummyCredentialsFile(d string, p string, exec bool) (string, error) {
 	tmpFile, err := os.Create(os.TempDir() + "/" + "CreateDummyCredentialsFile." + p)
-
 	if err != nil {
 		return "", err
 	}
-	defer tmpFile.Close()
+	defer func() {
+		if tmpErr := tmpFile.Close(); tmpErr != nil {
+			err = tmpErr
+		}
+	}()
 
 	content := []byte(d)
 	if _, err := tmpFile.Write(content); err != nil {
@@ -48,11 +51,11 @@ func CreateDummyCredentialsFile(d string, p string, exec bool) (string, error) {
 	}
 
 	if exec {
-		if err := tmpFile.Chmod(0111); err != nil {
+		if err := tmpFile.Chmod(0o111); err != nil {
 			return "", err
 		}
 	}
-	return tmpFile.Name(), nil
+	return tmpFile.Name(), err
 }
 
 func CreateDummyCredentialsExecutable(d string) (string, error) {
@@ -60,7 +63,6 @@ func CreateDummyCredentialsExecutable(d string) (string, error) {
 #!/bin/sh
 
 echo `+d, "sh", true)
-
 	if err != nil {
 		return "", err
 	}
@@ -73,8 +75,8 @@ func TestCredentials(t *testing.T) {
 	ce, _ := CreateDummyCredentialsExecutable(data)
 
 	defer func() {
-		os.Remove(cr)
-		os.Remove(ce)
+		_ = os.Remove(cr)
+		_ = os.Remove(ce)
 	}()
 
 	t.Run("Reading", func(t *testing.T) {
