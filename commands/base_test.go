@@ -34,8 +34,8 @@ func init() {
 	logrus.SetFormatter(new(logger.TextFormatter))
 }
 
-func CreateDummyCredentialsFile(d string, p string, exec bool) (string, error) {
-	tmpFile, err := os.Create(os.TempDir() + "/" + "CreateDummyCredentialsFile." + p)
+func CreateDummyCredentialsSource(d string, p string, exec bool) (string, error) {
+	tmpFile, err := os.Create(os.TempDir() + "/" + "CreateDummyCredentialsSource." + p)
 	if err != nil {
 		return "", fmt.Errorf("%w", err)
 	}
@@ -61,7 +61,7 @@ func CreateDummyCredentialsFile(d string, p string, exec bool) (string, error) {
 }
 
 func CreateDummyCredentialsExecutable(d string) (string, error) {
-	f, err := CreateDummyCredentialsFile(`
+	f, err := CreateDummyCredentialsSource(`
 #!/bin/sh
 
 echo `+d, "sh", true)
@@ -76,7 +76,7 @@ func TestCredentials(t *testing.T) {
 	t.Parallel()
 
 	data := `{"username": "testuser", "password": "testpass", "agentpassword": "testagentpass"}`
-	cr, _ := CreateDummyCredentialsFile(data, "json", false)
+	cr, _ := CreateDummyCredentialsSource(data, "json", false)
 	ce, _ := CreateDummyCredentialsExecutable(data)
 
 	t.Cleanup(func() {

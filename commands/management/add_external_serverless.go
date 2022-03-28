@@ -47,10 +47,10 @@ func (res *addExternalServerlessResult) String() string {
 }
 
 type addExternalServerlessCommand struct {
-	Name            string
-	Username        string
-	Password        string
-	CredentialsFile string
+	Name              string
+	Username          string
+	Password          string
+	CredentialsSource string
 
 	URL         string
 	Scheme      string
@@ -76,7 +76,7 @@ type addExternalServerlessCommand struct {
 }
 
 func (cmd *addExternalServerlessCommand) GetCredentials() error {
-	creds, err := commands.ReadFromSource(cmd.CredentialsFile)
+	creds, err := commands.ReadFromSource(cmd.CredentialsSource)
 	if err != nil {
 		return fmt.Errorf("%w", err)
 	}
@@ -107,9 +107,9 @@ func (cmd *addExternalServerlessCommand) Run() (commands.Result, error) {
 		cmd.MetricsPath = fmt.Sprintf("/%s", cmd.MetricsPath)
 	}
 
-	if cmd.CredentialsFile != "" {
+	if cmd.CredentialsSource != "" {
 		if err := cmd.GetCredentials(); err != nil {
-			return nil, fmt.Errorf("failed to retrieve credentials from %s: %w", cmd.CredentialsFile, err)
+			return nil, fmt.Errorf("failed to retrieve credentials from %s: %w", cmd.CredentialsSource, err)
 		}
 	}
 
@@ -224,7 +224,7 @@ func init() {
 
 	AddExternalServerlessC.Flag("username", "External username").StringVar(&AddExternalServerless.Username)
 	AddExternalServerlessC.Flag("password", "External password").StringVar(&AddExternalServerless.Password)
-	AddExternalServerlessC.Flag("credentials", "Credentials provider").ExistingFileVar(&AddExternalServerless.CredentialsFile)
+	AddExternalServerlessC.Flag("credentials-source", "Credentials provider").ExistingFileVar(&AddExternalServerless.CredentialsSource)
 
 	AddExternalServerlessC.Flag("address", "External exporter address and port").
 		PlaceHolder("1.2.3.4:9000").StringVar(&AddExternalServerless.Address)

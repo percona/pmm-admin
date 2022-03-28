@@ -58,7 +58,7 @@ type addMongoDBCommand struct {
 	Username          string
 	Password          string
 	AgentPassword     string
-	CredentialsFile   string
+	CredentialsSource string
 	Environment       string
 	Cluster           string
 	ReplicationSet    string
@@ -99,7 +99,7 @@ func (cmd *addMongoDBCommand) GetSocket() string {
 }
 
 func (cmd *addMongoDBCommand) GetCredentials() error {
-	creds, err := commands.ReadFromSource(cmd.CredentialsFile)
+	creds, err := commands.ReadFromSource(cmd.CredentialsSource)
 	if err != nil {
 		return fmt.Errorf("%w", err)
 	}
@@ -144,9 +144,9 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
-	if cmd.CredentialsFile != "" {
+	if cmd.CredentialsSource != "" {
 		if err := cmd.GetCredentials(); err != nil {
-			return nil, fmt.Errorf("failed to retrieve credentials from %s: %w", cmd.CredentialsFile, err)
+			return nil, fmt.Errorf("failed to retrieve credentials from %s: %w", cmd.CredentialsSource, err)
 		}
 	}
 
@@ -216,7 +216,7 @@ func init() {
 	AddMongoDBC.Flag("username", "MongoDB username").StringVar(&AddMongoDB.Username)
 	AddMongoDBC.Flag("password", "MongoDB password").StringVar(&AddMongoDB.Password)
 	AddMongoDBC.Flag("agent-password", "Custom password for /metrics endpoint").StringVar(&AddMongoDB.AgentPassword)
-	AddMongoDBC.Flag("credentials", "Credentials provider").ExistingFileVar(&AddMongoDB.CredentialsFile)
+	AddMongoDBC.Flag("credentials-source", "Credentials provider").ExistingFileVar(&AddMongoDB.CredentialsSource)
 
 	querySources := []string{mongodbQuerySourceProfiler, mongodbQuerySourceNone} // TODO add "auto"
 	querySourceHelp := fmt.Sprintf("Source of queries, one of: %s (default: %s)", strings.Join(querySources, ", "), querySources[0])
