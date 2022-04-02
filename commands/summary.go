@@ -121,10 +121,19 @@ func addClientData(ctx context.Context, zipW *zip.Writer) {
 		logrus.Errorf("%s", err)
 		return
 	}
+	now := time.Now()
+	for _, agent := range status.AgentsInfo {
+		b, err := json.MarshalIndent(agent.Logs, "", "  ")
+		if err != nil {
+			logrus.Debugf("%s", err)
+			b = []byte(err.Error())
+		}
+		b = append(b, '\n')
+		addData(zipW, "logs/"+pointer.GetString(agent.AgentType)+".json", now, bytes.NewReader(b))
+		agent.Logs = nil
+	}
 
 	addVMAgentTargets(ctx, zipW, status.AgentsInfo)
-
-	now := time.Now()
 
 	b, err := json.MarshalIndent(status, "", "  ")
 	if err != nil {
