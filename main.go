@@ -69,11 +69,11 @@ func main() {
 	}
 
 	{
-		level, trace := parseLoggerConfig(commands.GlobalFlags.LogLevel, commands.GlobalFlags.Debug, commands.GlobalFlags.Trace)
+		level := parseLoggerConfig(commands.GlobalFlags.LogLevel, commands.GlobalFlags.Debug, commands.GlobalFlags.Trace)
 
 		logrus.SetLevel(level)
 
-		if trace {
+		if level == logrus.TraceLevel {
 			logrus.SetReportCaller(true)
 		}
 	}
@@ -240,25 +240,24 @@ func main() {
 	}
 }
 
-func parseLoggerConfig(level string, debug, trace bool) (logrus.Level, bool) {
+func parseLoggerConfig(level string, debug, trace bool) logrus.Level {
 	if trace {
-		return logrus.TraceLevel, true
+		return logrus.TraceLevel
 	}
 
 	if debug {
-		return logrus.DebugLevel, false
+		return logrus.DebugLevel
 	}
 
 	if level != "" {
 		parsedLevel, err := logrus.ParseLevel(level)
-
 		if err != nil {
 			logrus.Errorf("config: cannot parse logging level: %s, error: %v", level, err)
 		} else {
-			return parsedLevel, false
+			return parsedLevel
 		}
 	}
 
 	// warning level default by issue PMM-7326
-	return logrus.WarnLevel, false
+	return logrus.WarnLevel
 }
