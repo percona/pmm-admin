@@ -255,7 +255,7 @@ func init() {
 
 	AddMySQLC.Flag("username", "MySQL username").Default("root").StringVar(&AddMySQL.Username)
 	AddMySQLC.Flag("password", "MySQL password").StringVar(&AddMySQL.Password)
-	AddMySQLC.Flag("defaults-file", "Path to defaults file").Default("~/.my.cnf").StringVar(&AddMySQL.DefaultsFile)
+	AddMySQLC.Flag("defaults-file", "Path to defaults file").StringVar(&AddMySQL.DefaultsFile)
 	AddMySQLC.Flag("agent-password", "Custom password for /metrics endpoint").StringVar(&AddMySQL.AgentPassword)
 
 	querySources := []string{mysqlQuerySourceSlowLog, mysqlQuerySourcePerfSchema, mysqlQuerySourceNone} // TODO add "auto", make it default
