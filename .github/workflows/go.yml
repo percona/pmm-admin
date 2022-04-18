@@ -56,5 +56,3 @@ jobs:
           make test-crosscover
           make test-race
 
-      - name: Run required checkers and linters.
-        run: make check

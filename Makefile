@@ -70,6 +70,7 @@ env-down:                       ## Stop development environment.
 	docker-compose down --volumes --remove-orphans
 
 ci-reviewdog:                   ## Runs reviewdog checks.
+	go run .github/check-license.go
 	$(BIN_PATH)/golangci-lint run -c=.golangci-required.yml --out-format=line-number | $(BIN_PATH)/reviewdog -f=golangci-lint -level=error -reporter=github-pr-check
 	$(BIN_PATH)/golangci-lint run -c=.golangci.yml --out-format=line-number | $(BIN_PATH)/reviewdog -f=golangci-lint -level=error -reporter=github-pr-review
 	$(BIN_PATH)/go-consistent -pedantic -exclude "tests" ./... | $(BIN_PATH)/reviewdog -f=go-consistent -name='Required go-consistent checks' -reporter=github-pr-check
