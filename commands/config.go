@@ -125,11 +125,11 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 		res = append(res, fmt.Sprintf("--paths-base=%s", cmd.BasePath))
 	}
 
-	res = append(res, cmd.NodeAddress, cmd.NodeType, cmd.NodeName)
-
 	if cmd.AgentPassword != "" {
-		res = append(res, cmd.AgentPassword)
+		res = append(res, fmt.Sprintf("--agent-password=%s", cmd.AgentPassword))
 	}
+
+	res = append(res, cmd.NodeAddress, cmd.NodeType, cmd.NodeName)
 
 	return //nolint:nakedret
 }
