@@ -1,6 +1,6 @@
 module github.com/percona/pmm-admin
 
-go 1.17
+go 1.18
 
 replace gopkg.in/alecthomas/kingpin.v2 => github.com/Percona-Lab/kingpin v2.2.6-percona+incompatible
 
