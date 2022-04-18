@@ -60,7 +60,7 @@ FILES = $(shell find . -type f -name '*.go')
 
 format:                         ## Format source code.
 	$(BIN_PATH)/gofumpt -l -w $(FILES)
-	$(BIN_PATH)/goimports -local github.com/percona/pmm-agent -l -w $(FILES)
+	$(BIN_PATH)/goimports -local github.com/percona/pmm-admin -l -w $(FILES)
 	$(BIN_PATH)/gci write --Section Standard --Section Default --Section "Prefix(github.com/percona/pmm-admin)" $(FILES)
 
 env-up:                         ## Start development environment.
