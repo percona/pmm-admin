@@ -49,7 +49,7 @@ var (
 	// Ctx is a shared context for all requests.
 	Ctx = context.Background()
 
-	errExecutionNotImplemented = errors.New("execution is currently unimplemented")
+	errExecutionNotImplemented = errors.New("execution is not supported")
 )
 
 // Result is a common interface for all command results.
