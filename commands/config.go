@@ -126,7 +126,7 @@ func (cmd *configCommand) args() (res []string, switchedToTLS bool) {
 	}
 
 	if cmd.AgentPassword != "" {
-		res = append(res, fmt.Sprintf("--agent-password=%s", cmd.AgentPassword))
+		res = append(res, fmt.Sprintf("--agent-password=%q", cmd.AgentPassword))
 	}
 
 	res = append(res, cmd.NodeAddress, cmd.NodeType, cmd.NodeName)
