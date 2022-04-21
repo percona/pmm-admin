@@ -253,7 +253,7 @@ func init() {
 	AddMySQLC.Flag("node-id", "Node ID (default is autodetected)").StringVar(&AddMySQL.NodeID)
 	AddMySQLC.Flag("pmm-agent-id", "The pmm-agent identifier which runs this instance (default is autodetected)").StringVar(&AddMySQL.PMMAgentID)
 
-	AddMySQLC.Flag("username", "MySQL username").Default("root").StringVar(&AddMySQL.Username)
+	AddMySQLC.Flag("username", "MySQL username").StringVar(&AddMySQL.Username)
 	AddMySQLC.Flag("password", "MySQL password").StringVar(&AddMySQL.Password)
 	AddMySQLC.Flag("defaults-file", "Path to defaults file").StringVar(&AddMySQL.DefaultsFile)
 	AddMySQLC.Flag("agent-password", "Custom password for /metrics endpoint").StringVar(&AddMySQL.AgentPassword)
