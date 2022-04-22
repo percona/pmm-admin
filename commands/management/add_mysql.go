@@ -126,7 +126,8 @@ func (cmd *addMySQLCommand) GetAddress() string {
 }
 
 func (cmd *addMySQLCommand) GetDefaultAddress() string {
-	return "127.0.0.1:3306"
+	// address may be specified in defaults file
+	return ""
 }
 
 func (cmd *addMySQLCommand) GetSocket() string {
