@@ -175,6 +175,7 @@ func (cmd *addPostgreSQLCommand) Run() (commands.Result, error) {
 			DisableQueryExamples: cmd.DisableQueryExamples,
 			MetricsMode:          pointer.ToString(strings.ToUpper(cmd.MetricsMode)),
 			DisableCollectors:    commands.ParseDisableCollectors(cmd.DisableCollectors),
+			LogLevel:             &addLogLevel,
 		},
 		Context: commands.Ctx,
 	}
@@ -235,4 +236,5 @@ func init() {
 	AddPostgreSQLC.Flag("disable-collectors", "Comma-separated list of collector names to exclude from exporter").StringVar(&AddPostgreSQL.DisableCollectors)
 
 	addGlobalFlags(AddPostgreSQLC)
+	addLogLevelFlag(AddPostgreSQLC)
 }

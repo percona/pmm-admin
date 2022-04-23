@@ -163,6 +163,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 			DisableCollectors:   commands.ParseDisableCollectors(cmd.DisableCollectors),
 			StatsCollections:    commands.ParseDisableCollectors(cmd.StatsCollections),
 			CollectionsLimit:    cmd.CollectionsLimit,
+			LogLevel:            &addLogLevel,
 		},
 		Context: commands.Ctx,
 	}
@@ -224,6 +225,7 @@ func init() {
 	AddMongoDBC.Flag("enable-all-collectors", "Enable all collectors").BoolVar(&AddMongoDB.EnableAllCollectors)
 	AddMongoDBC.Flag("disable-collectors", "Comma-separated list of collector names to exclude from exporter").StringVar(&AddMongoDB.DisableCollectors)
 	addGlobalFlags(AddMongoDBC)
+	addLogLevelFlag(AddMongoDBC)
 	AddMongoDBC.Flag("socket", "Path to socket").StringVar(&AddMongoDB.Socket)
 
 	AddMongoDBC.Flag("stats-collections", "Collections for collstats & indexstats").StringVar(&AddMongoDB.StatsCollections)
