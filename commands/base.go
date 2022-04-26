@@ -94,7 +94,7 @@ type Credentials struct {
 // ReadFromSource parses a JSON file src and return
 // a Credentials pointer containing the data.
 func ReadFromSource(src string) (*Credentials, error) {
-	c := Credentials{"", "", ""}
+	creds := Credentials{"", "", ""}
 
 	f, err := os.Lstat(src)
 	if err != nil {
@@ -111,11 +111,11 @@ func ReadFromSource(src string) (*Credentials, error) {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	if err := json.Unmarshal([]byte(content), &c); err != nil {
+	if err := json.Unmarshal([]byte(content), &creds); err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	return &c, nil
+	return &creds, nil
 }
 
 type ErrorResponse interface {
