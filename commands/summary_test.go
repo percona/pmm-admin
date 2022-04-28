@@ -18,11 +18,13 @@ package commands
 import (
 	"archive/zip"
 	"context"
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/percona/pmm/api/agentlocalpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -96,5 +98,62 @@ func TestSummary(t *testing.T) {
 		}
 
 		assert.True(t, hasPprofDir)
+	})
+
+	t.Run("Summary - test process_exec_path", func(t *testing.T) {
+		t.Parallel()
+		if os.Getenv("DEVCONTAINER") == "" {
+			t.Skip("can be tested only inside devcontainer")
+		}
+
+		cmd := &summaryCommand{
+			Filename:   filename,
+			Pprof:      false,
+			SkipServer: true,
+		}
+		res, err := cmd.Run()
+		require.NoError(t, err)
+		expected := &summaryResult{
+			Filename: filename,
+		}
+
+		// Check there is a pprof dir with data inside the zip file
+		reader, err := zip.OpenReader(filename)
+		assert.NoError(t, err)
+		assert.Equal(t, expected, res)
+
+		hasStatusFile := false
+		var statusFile *zip.File
+
+		for _, file := range reader.File {
+			if file.Name == "client/status.json" {
+				statusFile = file
+				hasStatusFile = true
+
+				break
+			}
+		}
+
+		assert.True(t, hasStatusFile)
+
+		jsonFile, err := statusFile.Open()
+		assert.NoError(t, err)
+		defer assert.NoError(t, jsonFile.Close())
+		jsonByteValueFile, _ := ioutil.ReadAll(jsonFile)
+
+		var status agentlocalpb.StatusResponse
+		err = json.Unmarshal(jsonByteValueFile, &status)
+		assert.NoError(t, err)
+
+		agentHasProcessExecPath := false
+		for _, agentInfo := range status.AgentsInfo {
+			if agentInfo.ProcessExecPath != "" {
+				agentHasProcessExecPath = true
+
+				break
+			}
+		}
+
+		assert.True(t, agentHasProcessExecPath)
 	})
 }
