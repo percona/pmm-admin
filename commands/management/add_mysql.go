@@ -126,8 +126,15 @@ func (cmd *addMySQLCommand) GetAddress() string {
 }
 
 func (cmd *addMySQLCommand) GetDefaultAddress() string {
-	// address may be specified in defaults file
-	return ""
+	if cmd.DefaultsFile != "" {
+		// address might be specified in defaults file
+		return ""
+	}
+	return "127.0.0.1:3306"
+}
+
+func (cmd *addMySQLCommand) GetDefaultUsername() string {
+	return "root"
 }
 
 func (cmd *addMySQLCommand) GetSocket() string {
@@ -181,6 +188,8 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 		return nil, err
 	}
 
+	username := defaultsFileUsernameCheck(cmd)
+
 	tablestatsGroupTableLimit := int32(cmd.DisableTablestatsLimit)
 	if cmd.DisableTablestats {
 		if tablestatsGroupTableLimit != 0 {
@@ -201,7 +210,7 @@ func (cmd *addMySQLCommand) Run() (commands.Result, error) {
 			Environment:    cmd.Environment,
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
-			Username:       cmd.Username,
+			Username:       username,
 			Password:       cmd.Password,
 			DefaultsFile:   cmd.DefaultsFile,
 			AgentPassword:  cmd.AgentPassword,
@@ -287,4 +296,18 @@ func init() {
 		EnumVar(&AddMySQL.MetricsMode, metricsModes...)
 	AddMySQLC.Flag("disable-collectors", "Comma-separated list of collector names to exclude from exporter").StringVar(&AddMySQL.DisableCollectors)
 	addGlobalFlags(AddMySQLC)
+}
+
+func defaultsFileUsernameCheck(cmd *addMySQLCommand) string {
+	// defaults file specified, but passed username has higher priority
+	if cmd.Username != "" && cmd.DefaultsFile != "" {
+		return cmd.Username
+	}
+
+	// username not specified, but can be in defaults files
+	if cmd.Username == "" && cmd.DefaultsFile != "" {
+		return ""
+	}
+
+	return cmd.GetDefaultUsername()
 }
