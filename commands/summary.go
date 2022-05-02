@@ -122,17 +122,6 @@ func addClientData(ctx context.Context, zipW *zip.Writer) {
 		return
 	}
 	now := time.Now()
-	for _, agent := range status.AgentsInfo {
-		b, err := json.MarshalIndent(agent.Logs, "", "  ")
-		if err != nil {
-			logrus.Debugf("%s", err)
-			b = []byte(err.Error())
-		}
-		b = append(b, '\n')
-		addData(zipW, "logs/"+pointer.GetString(agent.AgentType)+".json", now, bytes.NewReader(b))
-		agent.Logs = nil
-	}
-
 	addVMAgentTargets(ctx, zipW, status.AgentsInfo)
 
 	b, err := json.MarshalIndent(status, "", "  ")
@@ -153,6 +142,14 @@ func addClientData(ctx context.Context, zipW *zip.Writer) {
 	addData(zipW, "client/pmm-agent-version.txt", now, bytes.NewReader(b))
 
 	addData(zipW, "client/pmm-admin-version.txt", now, bytes.NewReader([]byte(version.FullInfo())))
+	// TODO add to zip
+	fileName := "pmm-admin-summary.zip"
+	err = downloadFile(fmt.Sprintf("http://%s:%d/logs.zip", agentlocal.Localhost, agentlocal.DefaultPMMAgentListenPort), fileName)
+	if err != nil {
+		logrus.Debugf("%s", err)
+		b = []byte(err.Error())
+	}
+	logrus.Info("pmm-admin-summary.zip created")
 
 	if status.ConfigFilepath != "" {
 		addFile(zipW, "client/pmm-agent-config.yaml", status.ConfigFilepath)
@@ -227,6 +224,34 @@ func getURL(ctx context.Context, url string) ([]byte, error) {
 		return nil, errors.Wrap(err, "cannot read response body")
 	}
 	return b, nil
+}
+
+// downloadFile download file to local destination
+func downloadFile(url, fileName string) error {
+	//Get the response bytes from the url
+	response, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != 200 {
+		return errors.New("Received non 200 response code")
+	}
+
+	//Create an empty file
+	file, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	//Write the bytes to the file
+	_, err = io.Copy(file, response.Body)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type pprofData struct {
