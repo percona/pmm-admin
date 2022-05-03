@@ -121,7 +121,6 @@ func addClientData(ctx context.Context, zipW *zip.Writer) {
 		logrus.Errorf("%s", err)
 		return
 	}
-	now := time.Now()
 	addVMAgentTargets(ctx, zipW, status.AgentsInfo)
 
 	b, err := json.MarshalIndent(status, "", "  ")
@@ -130,6 +129,7 @@ func addClientData(ctx context.Context, zipW *zip.Writer) {
 		b = []byte(err.Error())
 	}
 	b = append(b, '\n')
+	now := time.Now()
 	addData(zipW, "client/status.json", now, bytes.NewReader(b))
 
 	// FIXME get it via pmm-agent's API - it is _not_ a good idea to use exec there
@@ -142,7 +142,7 @@ func addClientData(ctx context.Context, zipW *zip.Writer) {
 	addData(zipW, "client/pmm-agent-version.txt", now, bytes.NewReader(b))
 
 	addData(zipW, "client/pmm-admin-version.txt", now, bytes.NewReader([]byte(version.FullInfo())))
-	// TODO add to zip
+	// TODO add to zip ?
 	fileName := "pmm-admin-summary.zip"
 	err = downloadFile(fmt.Sprintf("http://%s:%d/logs.zip", agentlocal.Localhost, agentlocal.DefaultPMMAgentListenPort), fileName)
 	if err != nil {
