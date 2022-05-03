@@ -346,7 +346,6 @@ func (cmd *summaryCommand) makeArchive(ctx context.Context) (err error) {
 	err = downloadFile(zipW, fmt.Sprintf("http://%s:%d/logs.zip", agentlocal.Localhost, agentlocal.DefaultPMMAgentListenPort), "pmm-admin logs")
 	if err != nil {
 		logrus.Debugf("%s", err)
-		//b = []byte(err.Error())
 	}
 	addClientData(ctx, zipW)
 
