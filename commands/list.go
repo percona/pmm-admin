@@ -40,9 +40,9 @@ Service type{{"\t"}}Service name{{"\t"}}Address and port{{"\t"}}Service ID
 {{ range .Services }}
 {{- .HumanReadableServiceType }}{{"\t"}}{{ .ServiceName }}{{"\t"}}{{ .AddressPort }}{{"\t"}}{{ .ServiceID }}
 {{ end }}
-Agent type{{"\t"}}Status{{"\t"}}Metrics Mode{{"\t"}}Agent ID{{"\t"}}Service ID
+Agent type{{"\t"}}Status{{"\t"}}Metrics Mode{{"\t"}}Agent ID{{"\t"}}Service ID{{"\t"}}Port
 {{ range .Agents }}
-{{- .HumanReadableAgentType }}{{"\t"}}{{ .NiceAgentStatus }}{{"\t"}}{{ .MetricsMode }}{{"\t"}}{{ .AgentID }}{{"\t"}}{{ .ServiceID }}{{"\t"}}{{ .Port }} 
+{{- .HumanReadableAgentType }}{{"\t"}}{{ .NiceAgentStatus }}{{"\t"}}{{ .MetricsMode }}{{"\t"}}{{ .AgentID }}{{"\t"}}{{ .ServiceID }}{{"\t"}}{{ .Port }}
 {{ end }}
 `)
 

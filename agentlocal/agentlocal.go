@@ -82,7 +82,7 @@ type AgentStatus struct {
 	AgentID   string `json:"agent_id"`
 	AgentType string `json:"agent_type"`
 	Status    string `json:"status"`
-	Port      int64  `json:"listen_port"`
+	Port      int64  `json:"listen_port,omitempty"`
 }
 
 // GetRawStatus returns raw local pmm-agent status. No special cases.
