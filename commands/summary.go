@@ -143,14 +143,6 @@ func addClientData(ctx context.Context, zipW *zip.Writer) {
 
 	addData(zipW, "client/pmm-admin-version.txt", now, bytes.NewReader([]byte(version.FullInfo())))
 
-	fileName := "pmm-admin-summary.zip"
-	err = downloadFile(fmt.Sprintf("http://%s:%d/logs.zip", agentlocal.Localhost, agentlocal.DefaultPMMAgentListenPort), fileName)
-	if err != nil {
-		logrus.Debugf("%s", err)
-		b = []byte(err.Error())
-	}
-	logrus.Info("pmm-admin-summary.zip created")
-
 	if status.ConfigFilepath != "" {
 		addFile(zipW, "client/pmm-agent-config.yaml", status.ConfigFilepath)
 	}
@@ -227,8 +219,8 @@ func getURL(ctx context.Context, url string) ([]byte, error) {
 }
 
 // downloadFile download file to local destination
-func downloadFile(url, fileName string) error {
-	//Get the response bytes from the url
+func downloadFile(zipW *zip.Writer, url, fileName string) error {
+
 	response, err := http.Get(url)
 	if err != nil {
 		return err
@@ -239,17 +231,26 @@ func downloadFile(url, fileName string) error {
 		return errors.New("Received non 200 response code")
 	}
 
-	//Create an empty file
-	file, err := os.Create(fileName)
+	b, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "cannot read response body")
 	}
-	defer file.Close()
+	bufR := bytes.NewReader(b)
 
-	//Write the bytes to the file
-	_, err = io.Copy(file, response.Body)
+	zipR, err := zip.NewReader(bufR, bufR.Size())
 	if err != nil {
-		return err
+		return errors.Wrap(err, "cannot create Zip reader")
+	}
+
+	for _, rf := range zipR.File {
+		rc, err := rf.Open()
+		if err != nil {
+			logrus.Errorf("%s", err)
+			continue
+		}
+		addData(zipW, path.Join(fileName, rf.Name), rf.Modified, rc)
+
+		rc.Close()
 	}
 	return nil
 }
@@ -342,6 +343,11 @@ func (cmd *summaryCommand) makeArchive(ctx context.Context) (err error) {
 		}
 	}()
 
+	err = downloadFile(zipW, fmt.Sprintf("http://%s:%d/logs.zip", agentlocal.Localhost, agentlocal.DefaultPMMAgentListenPort), "pmm-admin logs")
+	if err != nil {
+		logrus.Debugf("%s", err)
+		//b = []byte(err.Error())
+	}
 	addClientData(ctx, zipW)
 
 	if cmd.Pprof {
