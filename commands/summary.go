@@ -142,7 +142,7 @@ func addClientData(ctx context.Context, zipW *zip.Writer) {
 	addData(zipW, "client/pmm-agent-version.txt", now, bytes.NewReader(b))
 
 	addData(zipW, "client/pmm-admin-version.txt", now, bytes.NewReader([]byte(version.FullInfo())))
-	// TODO add to zip ?
+
 	fileName := "pmm-admin-summary.zip"
 	err = downloadFile(fmt.Sprintf("http://%s:%d/logs.zip", agentlocal.Localhost, agentlocal.DefaultPMMAgentListenPort), fileName)
 	if err != nil {
