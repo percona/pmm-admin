@@ -143,6 +143,11 @@ func addClientData(ctx context.Context, zipW *zip.Writer) {
 
 	addData(zipW, "client/pmm-admin-version.txt", now, bytes.NewReader([]byte(version.FullInfo())))
 
+	err = downloadFile(zipW, fmt.Sprintf("http://%s:%d/logs.zip", agentlocal.Localhost, agentlocal.DefaultPMMAgentListenPort), "pmm-admin logs")
+	if err != nil {
+		logrus.Debugf("%s", err)
+	}
+
 	if status.ConfigFilepath != "" {
 		addFile(zipW, "client/pmm-agent-config.yaml", status.ConfigFilepath)
 	}
@@ -343,10 +348,6 @@ func (cmd *summaryCommand) makeArchive(ctx context.Context) (err error) {
 		}
 	}()
 
-	err = downloadFile(zipW, fmt.Sprintf("http://%s:%d/logs.zip", agentlocal.Localhost, agentlocal.DefaultPMMAgentListenPort), "pmm-admin logs")
-	if err != nil {
-		logrus.Debugf("%s", err)
-	}
 	addClientData(ctx, zipW)
 
 	if cmd.Pprof {
