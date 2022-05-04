@@ -143,9 +143,9 @@ func addClientData(ctx context.Context, zipW *zip.Writer) {
 
 	addData(zipW, "client/pmm-admin-version.txt", now, bytes.NewReader([]byte(version.FullInfo())))
 
-	err = downloadFile(zipW, fmt.Sprintf("http://%s:%d/logs.zip", agentlocal.Localhost, agentlocal.DefaultPMMAgentListenPort), "pmm-admin logs")
+	err = downloadFile(zipW, fmt.Sprintf("http://%s:%d/logs.zip", agentlocal.Localhost, agentlocal.DefaultPMMAgentListenPort), "pmm-admin")
 	if err != nil {
-		logrus.Debugf("%s", err)
+		logrus.Warnf("%s", err)
 	}
 
 	if status.ConfigFilepath != "" {
@@ -223,9 +223,8 @@ func getURL(ctx context.Context, url string) ([]byte, error) {
 	return b, nil
 }
 
-// downloadFile download file to local destination
+// downloadFile download file and includes into zip file
 func downloadFile(zipW *zip.Writer, url, fileName string) error {
-
 	response, err := http.Get(url)
 	if err != nil {
 		return err
