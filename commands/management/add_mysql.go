@@ -284,5 +284,4 @@ func init() {
 		EnumVar(&AddMySQL.MetricsMode, metricsModes...)
 	AddMySQLC.Flag("disable-collectors", "Comma-separated list of collector names to exclude from exporter").StringVar(&AddMySQL.DisableCollectors)
 	addGlobalFlags(AddMySQLC)
-	addLogLevelFlag(AddMySQLC)
 }

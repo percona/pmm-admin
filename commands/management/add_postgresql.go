@@ -236,5 +236,4 @@ func init() {
 	AddPostgreSQLC.Flag("disable-collectors", "Comma-separated list of collector names to exclude from exporter").StringVar(&AddPostgreSQL.DisableCollectors)
 
 	addGlobalFlags(AddPostgreSQLC)
-	addLogLevelFlag(AddPostgreSQLC)
 }
