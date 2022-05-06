@@ -1,0 +1,11 @@
+@startuml
+
+actor user
+user -> admin : pmm-admin config ...
+admin -> agent : Trigger setup on agent
+agent -> server : Ask server to register new agent
+server -> server : Register new agent
+server -> agent : Transmit ID to identify agent
+agent -> agent : Dump configuration to file
+
+@enduml
