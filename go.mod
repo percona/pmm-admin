@@ -4,13 +4,13 @@ go 1.18
 
 replace gopkg.in/alecthomas/kingpin.v2 => github.com/Percona-Lab/kingpin v2.2.6-percona+incompatible
 
-replace github.com/percona/pmm => github.com/pkadej/pmm v0.0.0-20220427173424-9aa771bbf8c1
+replace github.com/percona/pmm => github.com/pkadej/pmm v0.0.0-20220506114014-9d97c52d1e35
 
 require (
 	github.com/AlekSi/pointer v1.2.0
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d
-	github.com/go-openapi/runtime v0.23.3
-	github.com/percona/pmm v0.0.0-20220425222533-a6e4e7330135
+	github.com/go-openapi/runtime v0.24.0
+	github.com/percona/pmm v0.0.0-20220505164356-d8b4097358e1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.1
