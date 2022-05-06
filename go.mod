@@ -4,6 +4,8 @@ go 1.18
 
 replace gopkg.in/alecthomas/kingpin.v2 => github.com/Percona-Lab/kingpin v2.2.6-percona+incompatible
 
+replace github.com/percona/pmm => github.com/pkadej/pmm v0.0.0-20220427173424-9aa771bbf8c1
+
 require (
 	github.com/AlekSi/pointer v1.2.0
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d
