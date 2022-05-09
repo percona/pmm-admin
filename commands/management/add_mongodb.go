@@ -163,6 +163,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 			DisableCollectors:   commands.ParseDisableCollectors(cmd.DisableCollectors),
 			StatsCollections:    commands.ParseDisableCollectors(cmd.StatsCollections),
 			CollectionsLimit:    cmd.CollectionsLimit,
+			LogLevel:            &addLogLevel,
 		},
 		Context: commands.Ctx,
 	}
