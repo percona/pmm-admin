@@ -283,7 +283,7 @@ func addPprofData(ctx context.Context, zipW *zip.Writer, skipServer bool) {
 				logrus.Infof("Getting %s ...", url)
 				data, err := getURL(ctx, url)
 				if err != nil {
-					logrus.Debugf("%s", err)
+					logrus.Warnf("%s", err)
 					return
 				}
 
