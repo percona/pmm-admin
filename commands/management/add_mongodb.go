@@ -163,7 +163,6 @@ func (cmd *addMongoDBCommand) RunWithContext(ctx context.Context) (commands.Resu
 		logrus.Warnf("Failed to encrypt password: %s", err)
 		password = cmd.Password
 	}
-	password = cmd.Password
 
 	params := &mongodb.AddMongoDBParams{
 		Body: mongodb.AddMongoDBBody{
