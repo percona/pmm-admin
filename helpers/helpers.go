@@ -83,13 +83,14 @@ func GetNodeName(node *nodes.GetNodeOKBody) (string, error) {
 	}
 }
 
-// IsOnPmmServer returns true if pmm-admin is running on pmm-server
+// IsOnPmmServer returns true if pmm-admin is running on pmm-server.
 func IsOnPmmServer() (bool, error) {
-	pmmServer := "pmm-server"
 	status, err := agentlocal.GetStatus(agentlocal.DoNotRequestNetworkInfo)
 	if err != nil {
-		return false, err
+		return false, errors.Wrap(err, "can't get local pmm-agent status")
 	}
+
+	pmmServer := "pmm-server"
 
 	return status.NodeID == pmmServer && status.AgentID == pmmServer, nil
 }

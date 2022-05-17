@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/percona/pmm-admin/helpers"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -43,6 +42,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/percona/pmm-admin/agentlocal"
+	"github.com/percona/pmm-admin/helpers"
 )
 
 var summaryResultT = ParseTemplate(`
