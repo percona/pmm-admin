@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/percona/pmm-admin/helpers"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -283,7 +284,11 @@ func addPprofData(ctx context.Context, zipW *zip.Writer, skipServer bool) {
 				logrus.Infof("Getting %s ...", url)
 				data, err := getURL(ctx, url)
 				if err != nil {
-					logrus.Warnf("%s", err)
+					if res, _ := helpers.IsOnPmmServer(); res {
+						logrus.Warnf("%s", err)
+					} else {
+						logrus.Debugf("%s", err)
+					}
 					return
 				}
 
