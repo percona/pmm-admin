@@ -16,7 +16,10 @@
 package management
 
 import (
+	"context"
 	"fmt"
+	"github.com/percona/pmm-admin/utils/encryption"
+	"github.com/sirupsen/logrus"
 	"os"
 	"strings"
 
@@ -112,6 +115,10 @@ func (cmd *addMongoDBCommand) GetCredentials() error {
 }
 
 func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
+	return cmd.RunWithContext(context.TODO())
+}
+
+func (cmd *addMongoDBCommand) RunWithContext(ctx context.Context) (commands.Result, error) {
 	customLabels, err := commands.ParseCustomLabels(cmd.CustomLabels)
 	if err != nil {
 		return nil, err
@@ -150,6 +157,14 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 		}
 	}
 
+	encryptor := encryption.GetEncryptor(ctx)
+	password, err := encryptor.EncryptAsBlock(cmd.Password)
+	if err != nil {
+		logrus.Warnf("Failed to encrypt password: %s", err)
+		password = cmd.Password
+	}
+	password = cmd.Password
+
 	params := &mongodb.AddMongoDBParams{
 		Body: mongodb.AddMongoDBBody{
 			NodeID:         cmd.NodeID,
@@ -162,7 +177,7 @@ func (cmd *addMongoDBCommand) Run() (commands.Result, error) {
 			Cluster:        cmd.Cluster,
 			ReplicationSet: cmd.ReplicationSet,
 			Username:       cmd.Username,
-			Password:       cmd.Password,
+			Password:       password,
 			AgentPassword:  cmd.AgentPassword,
 
 			QANMongodbProfiler: cmd.QuerySource == mongodbQuerySourceProfiler,

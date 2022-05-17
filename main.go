@@ -19,6 +19,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/percona/pmm-admin/utils/encryption"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -60,6 +61,7 @@ func main() {
 		return nil
 	}).Bool()
 
+	kingpin.CommandLine.DefaultEnvars()
 	cmd := kingpin.Parse()
 
 	logrus.SetFormatter(new(logger.TextFormatter)) // with levels and timestamps for debug and trace
@@ -75,6 +77,10 @@ func main() {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
+	ctx, errEnc := encryption.InjectEncryptorIfNotPresent(ctx)
+	if errEnc != nil {
+		logrus.Panicf("Failed to inject encryptor: %v", errEnc)
+	}
 
 	// handle termination signals
 	signals := make(chan os.Signal, 1)
