@@ -8,7 +8,7 @@ require (
 	github.com/quasilyte/go-consistent v0.0.0-20200404105227-766526bf1e96
 	github.com/reviewdog/reviewdog v0.14.1
 	golang.org/x/tools v0.1.10
-	mvdan.cc/gofumpt v0.3.0
+	mvdan.cc/gofumpt v0.3.1
 )
 
 require (
