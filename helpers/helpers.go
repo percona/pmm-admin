@@ -90,7 +90,5 @@ func IsOnPmmServer() (bool, error) {
 		return false, errors.Wrap(err, "can't get local pmm-agent status")
 	}
 
-	pmmServer := "pmm-server"
-
-	return status.NodeID == pmmServer && status.AgentID == pmmServer, nil
+	return status.NodeID == "pmm-server", nil
 }
